@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TikTok</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:#000;height:100vh;display:flex;justify-content:center;align-items:center;}
+  #app{width:100%;max-width:430px;height:100vh;background:#000;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,0.8);}
+  .page{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;display:none;background:#000;}
+  .page.active{display:block;}
+  .page::-webkit-scrollbar{display:none;}
+
+  /* Bottom Nav */
+  #bottom-nav{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(0,0,0,0.97);backdrop-filter:blur(20px);border-top:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);}
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 10px;}
+  .nav-item span{font-size:10px;color:#888;font-weight:500;}
+  .nav-item.active span{color:#fff;}
+  .nav-create{cursor:pointer;position:relative;top:-6px;}
+  .nav-create-btn{width:46px;height:32px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;}
+  .nav-create-btn::before{content:'';position:absolute;left:-6px;width:8px;height:100%;background:#25f4ee;border-radius:4px;}
+  .nav-create-btn::after{content:'';position:absolute;right:-6px;width:8px;height:100%;background:#fe2c55;border-radius:4px;}
+  .nav-badge{position:absolute;top:-5px;right:-8px;background:#fe2c55;color:#fff;font-size:9px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+  /* Home Header */
+  .home-header{position:fixed;top:0;left:0;right:0;max-width:430px;margin:0 auto;background:linear-gradient(180deg,rgba(0,0,0,0.8) 0%,transparent 100%);z-index:20;padding:14px 16px 20px;}
+  .home-tabs{display:flex;align-items:center;justify-content:center;gap:20px;}
+  .home-tab{font-size:15px;font-weight:500;color:rgba(255,255,255,0.55);cursor:pointer;padding-bottom:4px;transition:.2s;}
+  .home-tab.active{color:#fff;font-weight:700;border-bottom:2px solid #fff;}
+  .home-search-icon{position:absolute;right:16px;top:14px;cursor:pointer;}
+  .live-badge{background:#fe2c55;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;}
+
+  /* Feed */
+  .feed-container{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;}
+  .feed-container::-webkit-scrollbar{display:none;}
+  .feed-post{height:100vh;width:100%;position:relative;scroll-snap-align:start;overflow:hidden;background:#000;}
+
+  /* Video Player Area */
+  .post-video-area{position:absolute;inset:0;cursor:pointer;background:#000;display:flex;align-items:center;justify-content:center;}
+  .post-video-area iframe{width:100%;height:100%;border:none;pointer-events:none;}
+  .post-thumb-overlay{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transition:opacity 0.4s;}
+  .post-thumb-overlay::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.2) 0%,transparent 35%,transparent 55%,rgba(0,0,0,0.8) 100%);}
+  .play-btn-big{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;background:rgba(0,0,0,0.55);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:opacity 0.3s;z-index:5;}
+  .play-btn-big svg{margin-left:5px;}
+  .video-loading-spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:4;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+  .video-loading-spinner.show{opacity:1;}
+
+  /* Like Animation */
+  .like-animation{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:90px;pointer-events:none;z-index:30;opacity:0;}
+  .like-animation.show{animation:likePop .7s ease-out forwards;}
+  @keyframes likePop{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}40%{transform:translate(-50%,-50%) scale(1.4);opacity:1;}70%{transform:translate(-50%,-50%) scale(1.1);opacity:.9;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
+
+  /* Actions */
+  .post-actions{position:absolute;right:10px;bottom:110px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:15;}
+  .action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+  .action-icon{width:46px;height:46px;border-radius:50%;background:rgba(20,20,20,0.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+  .action-icon:active{transform:scale(.88);}
+  .action-count{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+  .author-wrap{position:relative;margin-bottom:4px;}
+  .author-avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;overflow:hidden;cursor:pointer;}
+  .author-avatar img{width:100%;height:100%;object-fit:cover;}
+  .follow-dot{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:22px;height:22px;background:#fe2c55;border-radius:50%;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:background .2s;}
+  .follow-dot.done{background:#25f4ee;font-size:11px;}
+  .music-disk{width:44px;height:44px;border-radius:50%;background:rgba(20,20,20,0.6);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;animation:spin 4s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .music-disk-inner{width:14px;height:14px;border-radius:50%;background:#fff;}
+
+  /* Post Overlay */
+  .post-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px 14px 85px;z-index:10;pointer-events:none;}
+  .post-overlay *{pointer-events:auto;}
+  .post-author-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .post-mini-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+  .post-mini-avatar img{width:100%;height:100%;object-fit:cover;}
+  .post-username{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+  .follow-btn-feed{background:transparent;border:1px solid rgba(255,255,255,.7);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .2s;}
+  .follow-btn-feed.following{border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.5);}
+  .post-caption{font-size:13px;line-height:1.5;color:#fff;margin-bottom:8px;text-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .post-sound{font-size:12px;color:rgba(255,255,255,.9);display:flex;align-items:center;gap:6px;}
+  .sound-ticker{display:inline-block;white-space:nowrap;animation:ticker 10s linear infinite;max-width:200px;overflow:hidden;text-overflow:ellipsis;}
+  @keyframes ticker{0%{transform:translateX(0)}50%{transform:translateX(-30%)}100%{transform:translateX(0)}}
+  .post-progress{position:absolute;bottom:70px;left:0;right:0;height:2px;background:rgba(255,255,255,.25);}
+  .post-progress-fill{height:100%;background:rgba(255,255,255,.85);}
+
+  /* Cannot embed message */
+  .no-embed-msg{position:absolute;bottom:140px;left:16px;right:16px;background:rgba(0,0,0,0.85);border-radius:12px;padding:12px 16px;z-index:20;display:none;text-align:center;}
+  .no-embed-msg a{color:#fe2c55;font-weight:700;font-size:13px;text-decoration:none;}
+
+  /* Loading */
+  .feed-loading{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+  .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,0.15);border-top-color:#fe2c55;border-radius:50%;animation:spinLoader 0.8s linear infinite;}
+  @keyframes spinLoader{to{transform:rotate(360deg);}}
+  .feed-loading p{color:rgba(255,255,255,.5);font-size:14px;}
+
+  /* ======= VIDEO MODAL ======= */
+  #video-modal{position:absolute;inset:0;background:#000;z-index:500;display:none;flex-direction:column;overflow-y:auto;}
+  #video-modal.open{display:flex;}
+  #video-modal::-webkit-scrollbar{display:none;}
+  .modal-close{position:fixed;top:14px;right:16px;z-index:510;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .modal-iframe-wrap{width:100%;aspect-ratio:16/9;background:#111;flex-shrink:0;position:relative;}
+  .modal-iframe-wrap iframe{width:100%;height:100%;border:none;display:block;}
+  .modal-info{padding:14px 16px 10px;flex:1;}
+  .modal-title{font-size:15px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:6px;}
+  .modal-channel{font-size:13px;color:#aaa;margin-bottom:12px;}
+  .modal-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .modal-stat{background:rgba(255,255,255,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:#ccc;}
+  .modal-actions{display:flex;gap:12px;margin-bottom:16px;}
+  .modal-action-btn{flex:1;padding:10px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s;}
+  .modal-like-btn{background:rgba(254,44,85,0.15);color:#fe2c55;border:1.5px solid rgba(254,44,85,0.3);}
+  .modal-like-btn.liked{background:#fe2c55;color:#fff;border-color:#fe2c55;}
+  .modal-save-btn{background:rgba(255,193,7,0.1);color:#ffc107;border:1.5px solid rgba(255,193,7,0.25);}
+  .modal-save-btn.saved{background:#ffc107;color:#000;border-color:#ffc107;}
+  .modal-open-yt{display:block;text-align:center;padding:12px;background:rgba(255,0,0,0.1);border:1px solid rgba(255,0,0,0.3);border-radius:10px;color:#ff4444;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:14px;}
+  .modal-comments-title{font-size:15px;font-weight:700;color:#fff;padding:12px 16px 8px;border-top:1px solid rgba(255,255,255,0.1);}
+  .modal-comment-item{display:flex;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(255,255,255,0.06);}
+  .modal-comment-av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#333;}
+  .modal-comment-av img{width:100%;height:100%;object-fit:cover;}
+  .modal-comment-body{flex:1;}
+  .modal-comment-name{font-size:12px;font-weight:700;color:#ccc;margin-bottom:2px;}
+  .modal-comment-text{font-size:13px;color:#fff;line-height:1.4;}
+  .modal-comment-likes{font-size:11px;color:#888;margin-top:3px;}
+  .modal-comments-loading{padding:20px;text-align:center;color:#888;font-size:13px;}
+
+  /* ======= PROFILE ======= */
+  #page-profile{background:#fff;}
+  .profile-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:.5px solid #f0f0f0;position:sticky;top:0;z-index:10;}
+  .profile-username{font-size:16px;font-weight:700;}
+  .profile-body{padding:20px 16px 100px;}
+  .profile-avatar-section{display:flex;flex-direction:column;align-items:center;margin-bottom:16px;}
+  .profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#fff;overflow:hidden;}
+  .profile-name{font-size:19px;font-weight:700;margin-top:8px;}
+  .profile-handle{font-size:13px;color:#666;margin-top:2px;}
+  .edit-profile-btn{background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px 28px;font-size:14px;font-weight:600;margin-top:12px;cursor:pointer;}
+  .profile-stats{display:flex;justify-content:center;gap:36px;margin:20px 0;text-align:center;}
+  .stat-num{font-size:20px;font-weight:700;display:block;}
+  .stat-label{font-size:12px;color:#666;}
+  .add-bio{width:100%;border:1px dashed #ccc;border-radius:20px;padding:10px;text-align:center;font-size:13px;color:#666;cursor:pointer;margin-bottom:20px;}
+  .profile-tabs{display:flex;border-top:.5px solid #eee;}
+  .profile-tab{flex:1;text-align:center;padding:10px 8px;cursor:pointer;color:#999;font-weight:600;font-size:13px;border-bottom:2px solid transparent;}
+  .profile-tab.active{color:#000;border-bottom:2px solid #000;}
+  .grid-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;}
+  .grid-post{aspect-ratio:.56;background:#111;overflow:hidden;cursor:pointer;position:relative;}
+  .grid-post img{width:100%;height:100%;object-fit:cover;}
+  .grid-post-views{position:absolute;bottom:4px;left:4px;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;}
+  .profile-yt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;}
+  .profile-yt-post{aspect-ratio:.56;background:#f0f0f0;overflow:hidden;cursor:pointer;position:relative;}
+  .profile-yt-post img{width:100%;height:100%;object-fit:cover;}
+  .profile-yt-empty{padding:30px 16px;text-align:center;color:#999;font-size:14px;grid-column:1/-1;}
+
+  /* ======= FRIENDS ======= */
+  #page-friends{background:#fff;}
+  .friends-header{padding:14px 16px;background:#fff;border-bottom:.5px solid #eee;position:sticky;top:0;z-index:5;}
+  .friends-title{font-size:20px;font-weight:700;margin-bottom:12px;}
+  .friends-search{background:#f0f0f0;border-radius:20px;display:flex;align-items:center;gap:8px;padding:10px 14px;}
+  .friends-search input{flex:1;border:none;background:transparent;outline:none;font-size:14px;}
+  .friend-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid #f5f5f5;}
+  .friend-avatar{width:54px;height:54px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+  .friend-avatar img{width:100%;height:100%;object-fit:cover;}
+  .friend-info{flex:1;}
+  .friend-name{font-weight:600;font-size:15px;}
+  .friend-mutual{font-size:11px;color:#999;margin-top:2px;}
+  .follow-btn{background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;}
+  .follow-btn.following{background:transparent;color:#000;border:1px solid #ddd;}
+
+  /* ======= INBOX ======= */
+  #page-inbox{background:#fff;}
+  .inbox-header{padding:14px 16px;background:#fff;border-bottom:.5px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+  .inbox-title{font-size:20px;font-weight:700;}
+  .notif-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid #f5f5f5;cursor:pointer;}
+  .notif-avatar{width:46px;height:46px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+  .notif-avatar img{width:100%;height:100%;object-fit:cover;}
+  .notif-content{flex:1;}
+  .notif-text{font-size:13px;color:#000;line-height:1.4;}
+  .notif-time{font-size:10px;color:#999;margin-top:2px;}
+  .notif-thumb{width:42px;height:52px;border-radius:4px;overflow:hidden;}
+  .notif-thumb img{width:100%;height:100%;object-fit:cover;}
+
+  /* ======= CREATE ======= */
+  #page-create{background:#000;}
+  .create-header{position:absolute;top:0;left:0;right:0;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;z-index:10;}
+  .create-viewfinder{width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+  .camera-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:36px;}
+  .create-tools{position:absolute;right:14px;top:80px;display:flex;flex-direction:column;gap:20px;align-items:center;}
+  .create-tool{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+  .create-tool-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .create-tool span{font-size:10px;color:rgba(255,255,255,.7);}
+  .mode-selector{position:absolute;bottom:110px;left:0;right:0;display:flex;justify-content:center;gap:6px;}
+  .mode-btn{padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:none;font-size:13px;cursor:pointer;}
+  .mode-btn.active{background:#fff;color:#000;font-weight:700;}
+  .capture-wrap{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:40px;}
+  .capture-btn-outer{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .capture-btn-inner{width:62px;height:62px;border-radius:50%;background:#fff;transition:.1s;}
+  .capture-btn-outer:active .capture-btn-inner{transform:scale(.88);}
+  .flip-btn{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;}
+
+  /* ======= SEARCH ======= */
+  #page-search{background:#fff;}
+  .search-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:.5px solid #eee;position:sticky;top:0;z-index:5;}
+  .search-input-wrap{flex:1;background:#f0f0f0;border-radius:20px;display:flex;align-items:center;gap:8px;padding:9px 14px;}
+  .search-input-wrap input{flex:1;border:none;background:transparent;outline:none;font-size:15px;}
+  .search-trending{padding:14px 16px;}
+  .search-trending-title{font-size:16px;font-weight:700;margin-bottom:12px;}
+  .trending-tag{display:inline-block;background:#f5f5f5;border-radius:20px;padding:6px 14px;font-size:13px;margin:0 6px 8px 0;cursor:pointer;}
+  .search-result-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-bottom:0.5px solid #f5f5f5;}
+  .search-result-item:active{background:#f9f9f9;}
+  .search-result-thumb{width:80px;height:56px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#ddd;}
+  .search-result-thumb img{width:100%;height:100%;object-fit:cover;}
+  .search-result-info{flex:1;}
+  .search-result-title{font-size:13px;font-weight:600;color:#000;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .search-result-channel{font-size:11px;color:#888;}
+  .search-loading{padding:30px;text-align:center;color:#999;font-size:14px;}
+
+  /* ======= SIDE MENU ======= */
+  #menu-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
+  #menu-overlay.open{opacity:1;pointer-events:all;}
+  #side-menu{position:absolute;top:0;right:-285px;bottom:0;width:285px;background:#fff;z-index:201;transition:right .3s;overflow-y:auto;}
+  #side-menu.open{right:0;}
+  .menu-profile{padding:24px 20px 16px;border-bottom:8px solid #f5f5f5;display:flex;align-items:center;gap:14px;}
+  .menu-name{font-weight:700;font-size:16px;}
+  .menu-handle{font-size:12px;color:#999;}
+  .menu-section{padding:6px 0;border-bottom:8px solid #f5f5f5;}
+  .menu-section-title{font-size:11px;font-weight:700;color:#999;padding:8px 20px;text-transform:uppercase;letter-spacing:.5px;}
+  .menu-item{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;cursor:pointer;}
+  .menu-item-left{display:flex;align-items:center;gap:14px;font-size:14px;}
+  .menu-arrow{color:#ccc;font-size:16px;}
+
+  /* ======= COMMENTS SHEET ======= */
+  #sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:140;opacity:0;pointer-events:none;transition:opacity .3s;}
+  #sheet-overlay.open{opacity:1;pointer-events:all;}
+  #comment-sheet{position:absolute;bottom:-72%;left:0;right:0;height:72%;background:#fff;border-radius:16px 16px 0 0;z-index:150;transition:bottom .3s;}
+  #comment-sheet.open{bottom:0;}
+  .comment-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:.5px solid #eee;}
+  .comment-header-title{font-size:15px;font-weight:700;}
+  .comment-list{padding:12px 16px;height:calc(100% - 115px);overflow-y:auto;}
+  .comment-item{display:flex;gap:10px;margin-bottom:18px;}
+  .comment-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+  .comment-av img{width:100%;height:100%;object-fit:cover;}
+  .comment-body{flex:1;}
+  .comment-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+  .comment-text{font-size:13px;line-height:1.4;}
+  .comment-time{font-size:10px;color:#999;margin-top:3px;}
+  .comment-input-row{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:#fff;border-top:.5px solid #eee;display:flex;gap:10px;align-items:center;}
+  .comment-input{flex:1;background:#f0f0f0;border:none;border-radius:22px;padding:10px 16px;outline:none;font-size:14px;}
+  .comment-post-btn{color:#fe2c55;font-weight:700;border:none;background:none;font-size:14px;cursor:pointer;}
+
+  /* Toast */
+  #toast{position:absolute;bottom:85px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 18px;border-radius:22px;font-size:13px;z-index:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+  #toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <div class="home-header">
+      <div style="position:absolute;left:16px;top:14px"><span class="live-badge">LIVE</span></div>
+      <div class="home-tabs">
+        <span class="home-tab" onclick="switchTab(this)">Following</span>
+        <span class="home-tab active" onclick="switchTab(this)">For You</span>
+      </div>
+      <div class="home-search-icon" onclick="showPage('search')">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2.2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="feed-container" id="feedContainer">
+      <div class="feed-loading">
+        <div class="spinner"></div>
+        <p>Loading videos...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIENDS PAGE -->
+  <div id="page-friends" class="page" style="background:#fff">
+    <div class="friends-header">
+      <div class="friends-title">Friends</div>
+      <div class="friends-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#999" stroke-width="2"/></svg>
+        <input type="text" id="friendSearch" placeholder="Search users..." oninput="filterFriends()">
+      </div>
+    </div>
+    <div style="padding:10px 16px;font-size:12px;color:#999;font-weight:600">SUGGESTED FOR YOU</div>
+    <div id="friendsList">
+      <div class="friend-item" data-name="poonam3537">
+        <div class="friend-avatar"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt=""></div>
+        <div class="friend-info"><div class="friend-name">poonam3537</div><div class="friend-mutual">Recent search · 2.1M followers</div></div>
+        <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+      </div>
+      <div class="friend-item" data-name="aliofficial">
+        <div class="friend-avatar"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt=""></div>
+        <div class="friend-info"><div class="friend-name">aliofficial</div><div class="friend-mutual">New posts · 890K followers</div></div>
+        <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+      </div>
+      <div class="friend-item" data-name="kenDoll">
+        <div class="friend-avatar"><img src="https://randomuser.me/api/portraits/men/65.jpg" alt=""></div>
+        <div class="friend-info"><div class="friend-name">kenDoll ✓</div><div class="friend-mutual">Verified · 14.6M followers</div></div>
+        <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+      </div>
+      <div class="friend-item" data-name="sarahlooks">
+        <div class="friend-avatar"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt=""></div>
+        <div class="friend-info"><div class="friend-name">sarahlooks</div><div class="friend-mutual">Suggested · 4.2M followers</div></div>
+        <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE PAGE -->
+  <div id="page-create" class="page">
+    <div class="create-header">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer"><line x1="18" y1="6" x2="6" y2="18" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <div style="background:rgba(255,255,255,.18);padding:6px 18px;border-radius:20px;font-size:13px;color:#fff;cursor:pointer" onclick="showToast('Add sound')">🎵 Add sound</div>
+      <div style="font-size:13px;color:#fff;cursor:pointer" onclick="showToast('Settings')">⚙️</div>
+    </div>
+    <div class="create-viewfinder">
+      <div class="camera-circle">📷</div>
+      <div style="color:rgba(255,255,255,.45);font-size:14px">Tap to enable camera</div>
+    </div>
+    <div class="create-tools">
+      <div class="create-tool" onclick="showToast('Flip camera')"><div class="create-tool-icon">🔄</div><span>Flip</span></div>
+      <div class="create-tool" onclick="showToast('Speed')"><div class="create-tool-icon">⚡</div><span>Speed</span></div>
+      <div class="create-tool" onclick="showToast('Beauty mode')"><div class="create-tool-icon">✨</div><span>Beauty</span></div>
+      <div class="create-tool" onclick="showToast('Filters')"><div class="create-tool-icon">🎨</div><span>Filters</span></div>
+      <div class="create-tool" onclick="showToast('Timer')"><div class="create-tool-icon">⏱️</div><span>Timer</span></div>
+    </div>
+    <div class="mode-selector">
+      <button class="mode-btn">10m</button>
+      <button class="mode-btn">60s</button>
+      <button class="mode-btn">15s</button>
+      <button class="mode-btn active">PHOTO</button>
+      <button class="mode-btn">TEXT</button>
+    </div>
+    <div class="capture-wrap">
+      <div style="width:50px;height:50px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid rgba(255,255,255,.4)" onclick="showToast('Gallery opened')">
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" style="width:100%;height:100%;object-fit:cover" alt="">
+      </div>
+      <div class="capture-btn-outer" onclick="showToast('📸 Photo captured!')">
+        <div class="capture-btn-inner"></div>
+      </div>
+      <div class="flip-btn" onclick="showToast('Camera flipped')">🔄</div>
+    </div>
+  </div>
+
+  <!-- INBOX PAGE -->
+  <div id="page-inbox" class="page" style="background:#fff">
+    <div class="inbox-header">
+      <div class="inbox-title">Inbox</div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="cursor:pointer" onclick="showToast('Settings')"><circle cx="12" cy="12" r="3" stroke="#000" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="#000" stroke-width="2"/></svg>
+    </div>
+    <div class="notif-item" onclick="showToast('kenDoll liked your post')">
+      <div class="notif-avatar"><img src="https://randomuser.me/api/portraits/men/65.jpg" alt=""></div>
+      <div class="notif-content"><div class="notif-text"><strong>kenDoll</strong> liked your post ❤️</div><div class="notif-time">2h ago</div></div>
+      <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt=""></div>
+    </div>
+    <div class="notif-item" onclick="showToast('poonam3537 followed you')">
+      <div class="notif-avatar"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt=""></div>
+      <div class="notif-content"><div class="notif-text"><strong>poonam3537</strong> started following you</div><div class="notif-time">5h ago</div></div>
+      <button style="background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer" onclick="event.stopPropagation();showToast('Following poonam3537')">Follow</button>
+    </div>
+    <div class="notif-item" onclick="openComments()">
+      <div class="notif-avatar"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt=""></div>
+      <div class="notif-content"><div class="notif-text"><strong>aliofficial</strong> commented: "🔥🔥🔥"</div><div class="notif-time">1d ago</div></div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page" style="background:#fff">
+    <div class="profile-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer"><path d="M19 12H5M12 5l-7 7 7 7" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="profile-username">Saqib Saqib</div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="openMenu()" style="cursor:pointer"><line x1="3" y1="6" x2="21" y2="6" stroke="#000" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="21" y2="12" stroke="#000" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="21" y2="18" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="profile-body">
+      <div class="profile-avatar-section">
+        <div class="profile-avatar">S</div>
+        <div class="profile-name">Saqib Saqib</div>
+        <div class="profile-handle">@saqib.saqib693</div>
+        <button class="edit-profile-btn" onclick="showToast('Edit profile')">Edit profile</button>
+      </div>
+      <div class="profile-stats">
+        <div><span class="stat-num" id="followingCount">0</span><span class="stat-label">Following</span></div>
+        <div><span class="stat-num" id="followersCount">0</span><span class="stat-label">Followers</span></div>
+        <div><span class="stat-num">0</span><span class="stat-label">Likes</span></div>
+      </div>
+      <div class="add-bio" onclick="showToast('Bio feature coming soon!')">+ Add bio · My hobbies are...</div>
+      <div class="profile-tabs">
+        <div class="profile-tab active" onclick="switchProfileTab(this,'posts')">Posts</div>
+        <div class="profile-tab" onclick="switchProfileTab(this,'private')">Private</div>
+        <div class="profile-tab" onclick="switchProfileTab(this,'saved')">Saved</div>
+        <div class="profile-tab" onclick="switchProfileTab(this,'liked')">Liked</div>
+      </div>
+      <div id="profileTabPosts">
+        <div class="grid-posts">
+          <div class="grid-post"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt=""><div class="grid-post-views">▶ 89K</div></div>
+          <div class="grid-post"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&q=80" alt=""><div class="grid-post-views">▶ 421K</div></div>
+          <div class="grid-post"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80" alt=""><div class="grid-post-views">▶ 166K</div></div>
+        </div>
+      </div>
+      <div id="profileTabPrivate" style="display:none">
+        <div class="grid-posts">
+          <div class="grid-post" style="background:#111;display:flex;align-items:center;justify-content:center"><span style="font-size:28px">🔒</span></div>
+        </div>
+      </div>
+      <div id="profileTabSaved" style="display:none">
+        <div class="profile-yt-grid" id="savedYTGrid">
+          <div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div>
+        </div>
+      </div>
+      <div id="profileTabLiked" style="display:none">
+        <div class="profile-yt-grid" id="likedYTGrid">
+          <div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH PAGE -->
+  <div id="page-search" class="page" style="background:#fff">
+    <div class="search-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer"><path d="M19 12H5M12 5l-7 7 7 7" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#999" stroke-width="2"/></svg>
+        <input type="text" id="searchInput" placeholder="Search videos..." oninput="onSearchInput(this.value)">
+      </div>
+    </div>
+    <div id="searchTrending">
+      <div class="search-trending">
+        <div class="search-trending-title">Trending</div>
+        <span class="trending-tag" onclick="doSearch('viral shorts')">#shorts</span>
+        <span class="trending-tag" onclick="doSearch('trending music')">#music</span>
+        <span class="trending-tag" onclick="doSearch('funny videos')">#funny</span>
+        <span class="trending-tag" onclick="doSearch('pakistan')">#pakistan</span>
+        <span class="trending-tag" onclick="doSearch('dance')">#dance</span>
+        <span class="trending-tag" onclick="doSearch('aesthetic')">#aesthetic</span>
+        <span class="trending-tag" onclick="doSearch('gaming')">#gaming</span>
+      </div>
+    </div>
+    <div id="searchResults" style="display:none"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+      <svg width="26" height="26" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="white"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" id="nav-friends" onclick="showPage('friends')">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#888" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="#888" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#888" stroke-width="2"/></svg>
+      <span>Friends</span>
+    </div>
+    <div class="nav-create" onclick="showPage('create')">
+      <div class="nav-create-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="3" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="nav-item" id="nav-inbox" onclick="showPage('inbox')">
+      <div style="position:relative">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#888" stroke-width="2"/></svg>
+        <span class="nav-badge">3</span>
+      </div>
+      <span>Inbox</span>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#888" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="#888" stroke-width="2"/></svg>
+      <span>Profile</span>
+    </div>
+  </nav>
+
+  <!-- SIDE MENU -->
+  <div id="menu-overlay" onclick="closeMenu()"></div>
+  <div id="side-menu">
+    <div class="menu-profile">
+      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">S</div>
+      <div><div class="menu-name">Saqib Saqib</div><div class="menu-handle">@saqib.saqib693</div></div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Creator Tools</div>
+      <div class="menu-item" onclick="showToast('Creator dashboard')"><div class="menu-item-left">📊 Creator dashboard</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('LIVE Studio')"><div class="menu-item-left">🎙️ LIVE Studio</div><span class="menu-arrow">›</span></div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Personal tools</div>
+      <div class="menu-item" onclick="showToast('Watch history')"><div class="menu-item-left">⏱️ Watch history</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('Offline videos')"><div class="menu-item-left">💾 Offline videos</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="showToast('Settings and privacy')"><div class="menu-item-left">⚙️ Settings and privacy</div><span class="menu-arrow">›</span></div>
+    </div>
+  </div>
+
+  <!-- COMMENT SHEET -->
+  <div id="sheet-overlay" onclick="closeSheets()"></div>
+  <div id="comment-sheet">
+    <div class="comment-header">
+      <div></div>
+      <div class="comment-header-title">Comments</div>
+      <span onclick="closeSheets()" style="cursor:pointer;font-size:20px;color:#999">✕</span>
+    </div>
+    <div class="comment-list" id="commentList">
+      <div class="comment-item">
+        <div class="comment-av"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt=""></div>
+        <div class="comment-body"><div class="comment-name">poonam3537</div><div class="comment-text">Omg this is so cute 😍😍</div><div class="comment-time">2h · Reply</div></div>
+      </div>
+      <div class="comment-item">
+        <div class="comment-av"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt=""></div>
+        <div class="comment-body"><div class="comment-name">aliofficial</div><div class="comment-text">🔥🔥🔥 fire content bro</div><div class="comment-time">5h · Reply</div></div>
+      </div>
+    </div>
+    <div class="comment-input-row">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0">S</div>
+      <input class="comment-input" id="commentInput" placeholder="Add comment...">
+      <button class="comment-post-btn" onclick="postComment()">Post</button>
+    </div>
+  </div>
+
+  <!-- VIDEO MODAL -->
+  <div id="video-modal">
+    <button class="modal-close" onclick="closeVideoModal()">✕</button>
+    <div class="modal-iframe-wrap" id="modalIframeWrap">
+      <div id="modalPlayerContainer" style="width:100%;height:100%;background:#000;position:relative;">
+        <div id="modalSpinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;z-index:5;">
+          <div class="spinner" style="width:40px;height:40px;border-width:3px;border-top-color:#fe2c55;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-info">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-channel" id="modalChannel"></div>
+      <div class="modal-stats" id="modalStats"></div>
+      <div class="modal-actions">
+        <button class="modal-action-btn modal-like-btn" id="modalLikeBtn" onclick="modalToggleLike()">❤️ Like</button>
+        <button class="modal-action-btn modal-save-btn" id="modalSaveBtn" onclick="modalToggleSave()">🔖 Save</button>
+      </div>
+      <a id="modalYTLink" class="modal-open-yt" href="#" target="_blank">▶ YouTube par khuljao</a>
+    </div>
+    <div class="modal-comments-title">Comments</div>
+    <div id="modalComments"><div class="modal-comments-loading">Loading comments...</div></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────
+const API_KEY = 'AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
+
+// ─── STATE ────────────────────────────────────────────────────
+let currentVideoId = null;
+let currentVideoData = null;
+let ytPlayer = null;
+let ytApiReady = false;
+let pendingVideoId = null;
+let searchDebounce = null;
+let allFeedVideos = [];
+
+// ─── STORAGE HELPERS ──────────────────────────────────────────
+function getLiked() { try { return JSON.parse(localStorage.getItem('likedYT')||'[]'); } catch(e){ return []; } }
+function getSaved() { try { return JSON.parse(localStorage.getItem('savedYT')||'[]'); } catch(e){ return []; } }
+function getLikedData() { try { return JSON.parse(localStorage.getItem('likedYTData')||'[]'); } catch(e){ return []; } }
+function getSavedData() { try { return JSON.parse(localStorage.getItem('savedYTData')||'[]'); } catch(e){ return []; } }
+function saveLiked(a) { localStorage.setItem('likedYT', JSON.stringify(a)); }
+function saveSaved(a) { localStorage.setItem('savedYT', JSON.stringify(a)); }
+function saveLikedData(a) { localStorage.setItem('likedYTData', JSON.stringify(a)); }
+function saveSavedData(a) { localStorage.setItem('savedYTData', JSON.stringify(a)); }
+
+// ─── UTILITIES ────────────────────────────────────────────────
+function fmt(n) {
+  const num = parseInt(n)||0;
+  if(num>=1000000) return (num/1000000).toFixed(1)+'M';
+  if(num>=1000) return (num/1000).toFixed(1)+'K';
+  return num.toString();
+}
+function esc(s) { return (s||'').replace(/'/g,"&#39;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  const t=document.getElementById('toast');
+  t.innerText=msg; t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const ni=document.getElementById('nav-'+page);
+  if(ni) ni.classList.add('active');
+  closeSheets(); closeMenu();
+  if(page==='profile') renderProfileYT();
+}
+function switchTab(el) {
+  document.querySelectorAll('.home-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function switchProfileTab(el,tab) {
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['posts','private','saved','liked'].forEach(t=>{
+    document.getElementById('profileTab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = t===tab?'':'none';
+  });
+  if(tab==='saved'||tab==='liked') renderProfileYT();
+}
+
+// ─── PROFILE YT GRIDS ─────────────────────────────────────────
+function renderProfileYT() {
+  const likedData=getLikedData(), savedData=getSavedData();
+  const lg=document.getElementById('likedYTGrid'), sg=document.getElementById('savedYTGrid');
+  if(!likedData.length) lg.innerHTML='<div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div>';
+  else lg.innerHTML=likedData.map(v=>`<div class="profile-yt-post" onclick="openVideoModal('${v.id}','${esc(v.title)}','${esc(v.channel)}',null,null,null,'${v.thumb}')"><img src="${v.thumb}" loading="lazy" alt=""><div class="grid-post-views">▶ YT</div></div>`).join('');
+  if(!savedData.length) sg.innerHTML='<div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div>';
+  else sg.innerHTML=savedData.map(v=>`<div class="profile-yt-post" onclick="openVideoModal('${v.id}','${esc(v.title)}','${esc(v.channel)}',null,null,null,'${v.thumb}')"><img src="${v.thumb}" loading="lazy" alt=""><div class="grid-post-views">▶ YT</div></div>`).join('');
+}
+
+// ─── YOUTUBE IFRAME API ───────────────────────────────────────
+// Load YT script once
+(function loadYTScript(){
+  if(document.getElementById('ytScript')) return;
+  const s=document.createElement('script');
+  s.id='ytScript';
+  s.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+
+window.onYouTubeIframeAPIReady = function() {
+  ytApiReady = true;
+  if(pendingVideoId) { createModalPlayer(pendingVideoId); pendingVideoId=null; }
+};
+
+function createModalPlayer(videoId) {
+  // Destroy old player
+  if(ytPlayer) { try{ ytPlayer.destroy(); }catch(e){} ytPlayer=null; }
+  const container=document.getElementById('modalPlayerContainer');
+  container.innerHTML='<div id="ytModalPlayer" style="width:100%;height:100%;"></div><div id="modalSpinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;z-index:5;"><div class="spinner" style="width:40px;height:40px;border-width:3px;border-top-color:#fe2c55;"></div></div>';
+  ytPlayer = new YT.Player('ytModalPlayer', {
+    videoId: videoId,
+    playerVars: {
+      autoplay: 1,
+      playsinline: 1,
+      controls: 1,
+      rel: 0,
+      modestbranding: 1,
+      origin: window.location.origin||'http://localhost:8887'
+    },
+    events: {
+      onReady: function(e) {
+        const sp=document.getElementById('modalSpinner');
+        if(sp) sp.style.display='none';
+        e.target.playVideo();
+      },
+      onError: function(e) {
+        // Video cannot be embedded
+        const sp=document.getElementById('modalSpinner');
+        if(sp) sp.style.display='none';
+        const container=document.getElementById('modalPlayerContainer');
+        if(container) container.innerHTML=`
+          <div style="width:100%;height:100%;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;">
+            <div style="font-size:32px">⚠️</div>
+            <p style="color:#ccc;font-size:13px;">Ye video embed nahi ho sakti (copyright / age restriction).</p>
+            <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" style="background:#fe2c55;color:#fff;padding:10px 20px;border-radius:22px;font-weight:700;font-size:14px;text-decoration:none;">▶ YouTube par dekhein</a>
+          </div>`;
+      }
+    }
+  });
+}
+
+// ─── VIDEO MODAL ──────────────────────────────────────────────
+function openVideoModal(videoId, title, channel, views, likes, comments, thumb) {
+  currentVideoId = videoId;
+  currentVideoData = { id:videoId, title, channel, thumb };
+
+  document.getElementById('modalTitle').textContent = decodeEntities(title);
+  document.getElementById('modalChannel').textContent = '📺 ' + decodeEntities(channel);
+  document.getElementById('modalYTLink').href = 'https://www.youtube.com/watch?v='+videoId;
+
+  const stats = document.getElementById('modalStats');
+  stats.innerHTML = '';
+  if(views) stats.innerHTML += `<span class="modal-stat">👁 ${views}</span>`;
+  if(likes) stats.innerHTML += `<span class="modal-stat">❤️ ${likes}</span>`;
+  if(comments) stats.innerHTML += `<span class="modal-stat">💬 ${comments}</span>`;
+
+  // Like/Save button state
+  const likedBtn=document.getElementById('modalLikeBtn'), savedBtn=document.getElementById('modalSaveBtn');
+  likedBtn.classList.toggle('liked', getLiked().includes(videoId));
+  likedBtn.textContent = getLiked().includes(videoId) ? '❤️ Liked' : '❤️ Like';
+  savedBtn.classList.toggle('saved', getSaved().includes(videoId));
+  savedBtn.textContent = getSaved().includes(videoId) ? '🔖 Saved' : '🔖 Save';
+
+  document.getElementById('video-modal').classList.add('open');
+  document.getElementById('video-modal').scrollTop=0;
+
+  // Reset player container
+  const container=document.getElementById('modalPlayerContainer');
+  container.innerHTML='<div id="ytModalPlayer" style="width:100%;height:100%;"></div><div id="modalSpinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;z-index:5;"><div class="spinner" style="width:40px;height:40px;border-width:3px;border-top-color:#fe2c55;"></div></div>';
+
+  if(!ytApiReady) { pendingVideoId=videoId; }
+  else { createModalPlayer(videoId); }
+
+  // Load comments
+  loadModalComments(videoId);
+}
+
+function decodeEntities(s) {
+  const txt=document.createElement('textarea');
+  txt.innerHTML=s; return txt.value;
+}
+
+function closeVideoModal() {
+  document.getElementById('video-modal').classList.remove('open');
+  if(ytPlayer) { try{ ytPlayer.destroy(); }catch(e){} ytPlayer=null; }
+  document.getElementById('modalPlayerContainer').innerHTML='';
+}
+
+function modalToggleLike() {
+  if(!currentVideoId) return;
+  const liked=getLiked(), likedData=getLikedData();
+  const btn=document.getElementById('modalLikeBtn');
+  if(liked.includes(currentVideoId)) {
+    liked.splice(liked.indexOf(currentVideoId),1);
+    const i=likedData.findIndex(v=>v.id===currentVideoId); if(i>-1) likedData.splice(i,1);
+    btn.classList.remove('liked'); btn.textContent='❤️ Like'; showToast('Removed from liked');
+  } else {
+    liked.push(currentVideoId);
+    likedData.push(currentVideoData);
+    btn.classList.add('liked'); btn.textContent='❤️ Liked'; showToast('❤️ Liked!');
+  }
+  saveLiked(liked); saveLikedData(likedData);
+}
+function modalToggleSave() {
+  if(!currentVideoId) return;
+  const saved=getSaved(), savedData=getSavedData();
+  const btn=document.getElementById('modalSaveBtn');
+  if(saved.includes(currentVideoId)) {
+    saved.splice(saved.indexOf(currentVideoId),1);
+    const i=savedData.findIndex(v=>v.id===currentVideoId); if(i>-1) savedData.splice(i,1);
+    btn.classList.remove('saved'); btn.textContent='🔖 Save'; showToast('Removed from saved');
+  } else {
+    saved.push(currentVideoId);
+    savedData.push(currentVideoData);
+    btn.classList.add('saved'); btn.textContent='🔖 Saved'; showToast('🔖 Saved!');
+  }
+  saveSaved(saved); saveSavedData(savedData);
+}
+
+async function loadModalComments(videoId) {
+  const el=document.getElementById('modalComments');
+  el.innerHTML='<div class="modal-comments-loading">Loading comments...</div>';
+  try {
+    const res=await fetch(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=15&key=${API_KEY}`);
+    const data=await res.json();
+    if(!data.items||data.items.length===0) { el.innerHTML='<div class="modal-comments-loading">No comments available.</div>'; return; }
+    el.innerHTML=data.items.map(item=>{
+      const c=item.snippet.topLevelComment.snippet;
+      const av=c.authorProfileImageUrl||'';
+      return `<div class="modal-comment-item">
+        <div class="modal-comment-av"><img src="${av}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.authorDisplayName||'U')}&size=50&background=random'" alt=""></div>
+        <div class="modal-comment-body">
+          <div class="modal-comment-name">${c.authorDisplayName||'Anonymous'}</div>
+          <div class="modal-comment-text">${(c.textDisplay||'').substring(0,200)}</div>
+          <div class="modal-comment-likes">👍 ${fmt(c.likeCount||0)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML='<div class="modal-comments-loading">Comments load nahi ho sake.</div>';
+  }
+}
+
+// ─── YOUTUBE API FETCH ─────────────────────────────────────────
+async function fetchFeedVideos() {
+  try {
+    // Trending videos
+    const trendRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode=US&maxResults=20&key=${API_KEY}`
+    );
+    const trendData = await trendRes.json();
+    let videos = trendData.items || [];
+
+    // Shorts (search query)
+    const shortsRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=shorts+2024&type=video&videoDuration=short&maxResults=15&key=${API_KEY}`
+    );
+    const shortsData = await shortsRes.json();
+    if(shortsData.items) {
+      const shortsVideos = shortsData.items.map(item=>({
+        id: item.id.videoId,
+        snippet: item.snippet,
+        statistics: { viewCount: Math.floor(Math.random()*2000000+50000), likeCount: Math.floor(Math.random()*100000+1000), commentCount: Math.floor(Math.random()*5000) }
+      }));
+      videos = [...videos, ...shortsVideos];
+    }
+
+    // Shuffle
+    for(let i=videos.length-1;i>0;i--) {
+      const j=Math.floor(Math.random()*(i+1));
+      [videos[i],videos[j]]=[videos[j],videos[i]];
+    }
+    return videos.filter(v=>v&&(v.id||(v.id&&v.id.videoId)));
+  } catch(e) {
+    throw e;
+  }
+}
+
+// ─── BUILD FEED POST ──────────────────────────────────────────
+function getThumb(snippet) {
+  const t=snippet.thumbnails;
+  return (t.maxres||t.high||t.medium||t.default||{url:''}).url;
+}
+function getVideoId(v) {
+  if(typeof v.id==='string') return v.id;
+  if(v.id&&v.id.videoId) return v.id.videoId;
+  return '';
+}
+
+function buildFeedPost(video, index) {
+  const vid = getVideoId(video);
+  if(!vid) return '';
+  const snippet = video.snippet;
+  const stats = video.statistics || {};
+  const thumb = getThumb(snippet);
+  const title = (snippet.title||'').substring(0,80);
+  const channel = snippet.channelTitle||'YouTube';
+  const views = fmt(stats.viewCount||0);
+  const likes = fmt(stats.likeCount||0);
+  const comments = fmt(stats.commentCount||0);
+  const channelThumb = `https://ui-avatars.com/api/?name=${encodeURIComponent(channel)}&background=random&size=100&color=fff`;
+  const pid = 'p'+index;
+
+  return `<div class="feed-post" id="post_${pid}">
+    <div class="post-video-area" id="videoArea_${pid}" ondblclick="feedDoubleTap('${pid}','${vid}','${esc(title)}','${esc(channel)}','${esc(thumb)}')" onclick="handleFeedTap('${pid}','${vid}','${esc(title)}','${esc(channel)}','${views}','${likes}','${comments}','${esc(thumb)}')">
+      <div class="post-thumb-overlay" id="thumb_${pid}" style="background-image:url('${thumb}')"></div>
+      <div class="play-btn-big" id="playBtn_${pid}">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+      <div id="ytFeedPlayer_${pid}" style="position:absolute;inset:0;width:100%;height:100%;z-index:2;display:none;"></div>
+    </div>
+    <div class="like-animation" id="likeAnim_${pid}">❤️</div>
+    <div class="post-actions">
+      <div class="author-wrap">
+        <div class="author-avatar"><img src="${channelThumb}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'"></div>
+        <div class="follow-dot" id="fd_${pid}" onclick="toggleFollowDot('fd_${pid}')">+</div>
+      </div>
+      <div class="action-btn" onclick="feedToggleLike('${pid}','${vid}','${esc(title)}','${esc(channel)}','${esc(thumb)}')">
+        <div class="action-icon" id="likeIcon_${pid}">
+          <svg width="28" height="28" viewBox="0 0 24 24"><path id="likePath_${pid}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/></svg>
+        </div>
+        <span class="action-count" id="likeCount_${pid}">${likes}</span>
+      </div>
+      <div class="action-btn" onclick="openVideoModal('${vid}','${esc(title)}','${esc(channel)}','${views}','${likes}','${comments}','${esc(thumb)}')">
+        <div class="action-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/></svg>
+        </div>
+        <span class="action-count">${comments}</span>
+      </div>
+      <div class="action-btn" onclick="feedToggleSave('${pid}','${vid}','${esc(title)}','${esc(channel)}','${esc(thumb)}')">
+        <div class="action-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path id="savePath_${pid}" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="white" stroke-width="1.8" fill="none"/></svg>
+        </div>
+        <span class="action-count">${views}</span>
+      </div>
+      <div class="action-btn" onclick="showToast('Link copied! 📋')">
+        <div class="action-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <span class="action-count">Share</span>
+      </div>
+      <div class="music-disk" onclick="showToast('🎵 ${esc(channel)}')">
+        <div class="music-disk-inner"></div>
+      </div>
+    </div>
+    <div class="post-overlay">
+      <div class="post-author-row">
+        <div class="post-mini-avatar"><img src="${channelThumb}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'"></div>
+        <div class="post-username">${channel.substring(0,22)} <button class="follow-btn-feed" onclick="toggleFollowFeedBtn(this)">Follow</button></div>
+      </div>
+      <div class="post-caption">${title}${snippet.title&&snippet.title.length>80?'...':''}</div>
+      <div class="post-sound">🎵 <span class="sound-ticker">${channel} · ${views} views</span></div>
+    </div>
+    <div class="post-progress"><div class="post-progress-fill" style="width:${Math.floor(Math.random()*60)+10}%"></div></div>
+  </div>`;
+}
+
+// Feed tap: open modal directly (most reliable approach)
+function handleFeedTap(pid, videoId, title, channel, views, likes, comments, thumb) {
+  openVideoModal(videoId, title, channel, views, likes, comments, thumb);
+}
+
+async function loadFeed() {
+  const container = document.getElementById('feedContainer');
+  container.innerHTML = '<div class="feed-loading"><div class="spinner"></div><p>Loading videos...</p></div>';
+  try {
+    const videos = await fetchFeedVideos();
+    if(!videos||videos.length===0) throw new Error('No videos');
+    allFeedVideos = videos;
+    container.innerHTML = videos.map((v,i)=>buildFeedPost(v,i)).join('');
+    // Restore states
+    const likedIds=getLiked(), savedIds=getSaved();
+    videos.forEach((v,i)=>{
+      const vid=getVideoId(v), pid='p'+i;
+      if(likedIds.includes(vid)) { const p=document.getElementById('likePath_'+pid); if(p) p.setAttribute('fill','#fe2c55'); }
+      if(savedIds.includes(vid)) { const p=document.getElementById('savePath_'+pid); if(p){ p.setAttribute('fill','#ffc107'); p.setAttribute('stroke','#ffc107'); } }
+    });
+  } catch(e) {
+    console.error(e);
+    container.innerHTML=`<div class="feed-loading"><div style="font-size:40px">📡</div><p>Videos load nahi ho sake.</p><p style="font-size:12px;color:#555;margin-top:8px">Check API key ya internet connection.</p><button onclick="loadFeed()" style="margin-top:16px;background:#fe2c55;color:#fff;border:none;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer">Retry</button></div>`;
+  }
+}
+
+// ─── FEED LIKE / SAVE ─────────────────────────────────────────
+function feedToggleLike(pid, videoId, title, channel, thumb) {
+  const liked=getLiked(), likedData=getLikedData();
+  const path=document.getElementById('likePath_'+pid);
+  if(liked.includes(videoId)) {
+    liked.splice(liked.indexOf(videoId),1);
+    const i=likedData.findIndex(v=>v.id===videoId); if(i>-1) likedData.splice(i,1);
+    if(path) path.setAttribute('fill','white');
+    showToast('Removed from liked');
+  } else {
+    liked.push(videoId);
+    likedData.push({id:videoId, title:decodeEntities(title), channel:decodeEntities(channel), thumb});
+    if(path) path.setAttribute('fill','#fe2c55');
+    showToast('❤️ Liked!');
+  }
+  saveLiked(liked); saveLikedData(likedData);
+}
+
+function feedToggleSave(pid, videoId, title, channel, thumb) {
+  const saved=getSaved(), savedData=getSavedData();
+  const path=document.getElementById('savePath_'+pid);
+  if(saved.includes(videoId)) {
+    saved.splice(saved.indexOf(videoId),1);
+    const i=savedData.findIndex(v=>v.id===videoId); if(i>-1) savedData.splice(i,1);
+    if(path){ path.setAttribute('fill','none'); path.setAttribute('stroke','white'); }
+    showToast('Removed from saved');
+  } else {
+    saved.push(videoId);
+    savedData.push({id:videoId, title:decodeEntities(title), channel:decodeEntities(channel), thumb});
+    if(path){ path.setAttribute('fill','#ffc107'); path.setAttribute('stroke','#ffc107'); }
+    showToast('🔖 Saved!');
+  }
+  saveSaved(saved); saveSavedData(savedData);
+}
+
+function feedDoubleTap(pid, videoId, title, channel, thumb) {
+  event.stopPropagation();
+  feedToggleLike(pid, videoId, title, channel, thumb);
+  const a=document.getElementById('likeAnim_'+pid);
+  if(a){ a.classList.remove('show'); void a.offsetWidth; a.classList.add('show'); setTimeout(()=>a.classList.remove('show'),700); }
+}
+
+// ─── SEARCH ───────────────────────────────────────────────────
+function onSearchInput(val) {
+  clearTimeout(searchDebounce);
+  if(val.trim().length<2) {
+    document.getElementById('searchTrending').style.display='';
+    document.getElementById('searchResults').style.display='none';
+    return;
+  }
+  searchDebounce = setTimeout(()=>doSearch(val.trim()), 600);
+}
+
+async function doSearch(query) {
+  const input=document.getElementById('searchInput');
+  if(input) input.value=query;
+  document.getElementById('searchTrending').style.display='none';
+  const resultsEl=document.getElementById('searchResults');
+  resultsEl.style.display='';
+  resultsEl.innerHTML='<div class="search-loading">🔍 Searching...</div>';
+  try {
+    const res=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=20&key=${API_KEY}`);
+    const data=await res.json();
+    if(!data.items||data.items.length===0){ resultsEl.innerHTML='<div class="search-loading">No results found.</div>'; return; }
+    resultsEl.innerHTML=data.items.map(item=>{
+      const vid=item.id.videoId;
+      const thumb=(item.snippet.thumbnails.medium||item.snippet.thumbnails.default||{url:''}).url;
+      const title=item.snippet.title;
+      const channel=item.snippet.channelTitle;
+      return `<div class="search-result-item" onclick="openVideoModal('${vid}','${esc(title)}','${esc(channel)}',null,null,null,'${esc(thumb)}')">
+        <div class="search-result-thumb"><img src="${thumb}" loading="lazy" alt=""></div>
+        <div class="search-result-info">
+          <div class="search-result-title">${title}</div>
+          <div class="search-result-channel">📺 ${channel}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    resultsEl.innerHTML='<div class="search-loading">Search fail ho gayi. Dobara try karein.</div>';
+  }
+}
+
+// ─── FOLLOW / OTHER ACTIONS ───────────────────────────────────
+function toggleFollowDot(id) {
+  const el=document.getElementById(id);
+  if(el.classList.contains('done')){ el.classList.remove('done'); el.textContent='+'; showToast('Unfollowed'); }
+  else { el.classList.add('done'); el.textContent='✓'; showToast('Following!'); }
+}
+function toggleFollowFeedBtn(btn) {
+  btn.classList.toggle('following');
+  btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+  showToast(btn.classList.contains('following') ? 'Following!' : 'Unfollowed');
+}
+function toggleFollow(btn) {
+  btn.classList.toggle('following');
+  btn.textContent = btn.classList.contains('following') ? 'Following' : 'Follow';
+  showToast(btn.classList.contains('following') ? 'Following!' : 'Unfollowed');
+}
+
+// ─── MENU / SHEETS ────────────────────────────────────────────
+function openMenu() {
+  document.getElementById('menu-overlay').classList.add('open');
+  document.getElementById('side-menu').classList.add('open');
+}
+function closeMenu() {
+  document.getElementById('menu-overlay').classList.remove('open');
+  document.getElementById('side-menu').classList.remove('open');
+}
+function openComments() {
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('comment-sheet').classList.add('open');
+}
+function closeSheets() {
+  document.getElementById('sheet-overlay').classList.remove('open');
+  document.getElementById('comment-sheet').classList.remove('open');
+}
+function postComment() {
+  const input=document.getElementById('commentInput');
+  const text=input.value.trim();
+  if(!text) return;
+  const list=document.getElementById('commentList');
+  const div=document.createElement('div'); div.className='comment-item';
+  div.innerHTML=`<div class="comment-av"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px">S</div></div><div class="comment-body"><div class="comment-name">saqib.saqib693</div><div class="comment-text">${text}</div><div class="comment-time">Just now · Reply</div></div>`;
+  list.prepend(div);
+  input.value='';
+  showToast('Comment posted! 💬');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+loadFeed();
+</script>
+</body>
+</html>
