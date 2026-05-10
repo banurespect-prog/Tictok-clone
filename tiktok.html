@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Shorts</title>
+<title>YouTube Shorts</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
 body{
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-family:'Roboto',-apple-system,BlinkMacSystemFont,sans-serif;
   background:#000;height:100vh;
   display:flex;justify-content:center;align-items:center;overflow:hidden;
 }
@@ -26,50 +26,49 @@ body{
 
 /* ── BOTTOM NAV ── */
 #bottom-nav{
-  position:absolute;bottom:0;left:0;right:0;height:68px;
-  background:rgba(0,0,0,0.96);
+  position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:rgba(0,0,0,.97);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:0.5px solid rgba(255,255,255,0.1);
+  border-top:.5px solid rgba(255,255,255,.1);
   display:flex;align-items:center;justify-content:space-around;
   z-index:100;padding-bottom:env(safe-area-inset-bottom,0);
 }
 .nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;padding:6px 10px;user-select:none;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;padding:5px 10px;user-select:none;
   transition:opacity .2s;
 }
-.nav-item span{font-size:10px;color:#666;font-weight:500;transition:color .2s;}
+.nav-item span{font-size:10px;color:#555;font-weight:500;transition:color .2s;}
 .nav-item.active span{color:#fff;}
-.nav-item svg path,.nav-item svg circle,.nav-item svg line{transition:stroke .2s,fill .2s;}
-.nav-create{cursor:pointer;position:relative;top:-4px;}
+.nav-create{cursor:pointer;}
 .nav-create-btn{
-  width:46px;height:30px;background:#fff;border-radius:7px;
+  width:46px;height:28px;background:#fff;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
   position:relative;transition:transform .15s;
 }
 .nav-create-btn:active{transform:scale(.92);}
-.nav-create-btn::before{content:'';position:absolute;left:-6px;width:8px;height:100%;background:#25f4ee;border-radius:4px;}
-.nav-create-btn::after{content:'';position:absolute;right:-6px;width:8px;height:100%;background:#fe2c55;border-radius:4px;}
+.nav-create-btn::before{content:'';position:absolute;left:-6px;width:8px;height:100%;background:#25f4ee;border-radius:3px;}
+.nav-create-btn::after{content:'';position:absolute;right:-6px;width:8px;height:100%;background:#fe2c55;border-radius:3px;}
 .nav-badge{
-  position:absolute;top:-5px;right:-8px;
+  position:absolute;top:-4px;right:-6px;
   background:#fe2c55;color:#fff;font-size:9px;font-weight:700;
-  min-width:16px;height:16px;border-radius:8px;
+  min-width:15px;height:15px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;padding:0 3px;
 }
 
 /* ── HOME HEADER ── */
 .home-header{
   position:absolute;top:0;left:0;right:0;
-  background:linear-gradient(180deg,rgba(0,0,0,0.8) 0%,transparent 100%);
-  z-index:20;padding:14px 16px 30px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.8) 0%,transparent 100%);
+  z-index:20;padding:12px 16px 28px;pointer-events:none;
 }
 .home-header>*{pointer-events:all;}
-.home-tabs{display:flex;align-items:center;justify-content:center;gap:22px;}
+.home-tabs{display:flex;align-items:center;justify-content:center;gap:24px;}
 .home-tab{font-size:15px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;padding-bottom:4px;transition:.2s;}
-.home-tab.active{color:#fff;font-weight:700;border-bottom:2.5px solid #fff;}
-.home-search-icon{position:absolute;right:16px;top:14px;cursor:pointer;}
-.home-live{position:absolute;left:16px;top:14px;}
-.live-badge{background:#fe2c55;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.home-tab.active{color:#fff;font-weight:700;border-bottom:2px solid #fff;}
+.home-search-icon{position:absolute;right:16px;top:12px;cursor:pointer;background:rgba(0,0,0,.3);border-radius:50%;padding:4px;display:flex;}
+.home-live{position:absolute;left:16px;top:12px;}
+.live-badge{background:#fe2c55;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.3px;}
 
 /* ── FEED ── */
 .feed-container{
@@ -82,99 +81,101 @@ body{
 .feed-post{
   height:100vh;height:100dvh;width:100%;
   position:relative;scroll-snap-align:start;
-  overflow:hidden;background:#111;cursor:pointer;
+  overflow:hidden;background:#0a0a0a;
 }
 
-/* THUMBNAIL — fills entire post */
+/* VIDEO ELEMENT */
+.post-video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:1;background:#000;
+}
+/* thumbnail fallback */
 .post-bg{
   position:absolute;inset:0;
   background-size:cover;background-position:center;
-  background-repeat:no-repeat;
-  transition:transform .3s ease;
+  background-repeat:no-repeat;z-index:0;
 }
-.feed-post:active .post-bg{transform:scale(1.02);}
-
-/* gradient overlays */
 .post-grad-top{
   position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 28%,transparent 55%,rgba(0,0,0,.85) 100%);
-  z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 25%,transparent 50%,rgba(0,0,0,.88) 100%);
+  z-index:3;pointer-events:none;
 }
 
-/* big centered play button */
-.post-play{
+/* big play icon (shown when paused) */
+.post-play-icon{
   position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%);
-  width:72px;height:72px;border-radius:50%;
-  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;
-  z-index:3;pointer-events:none;
-  transition:opacity .2s;
+  z-index:5;pointer-events:none;
+  opacity:0;transition:opacity .25s;
 }
-.feed-post:active .post-play{opacity:.6;}
+.post-play-icon.visible{opacity:1;}
+.feed-post.paused .post-play-icon{opacity:1;}
 
-/* "Tap to watch" label */
-.post-watch-label{
-  position:absolute;top:calc(50% + 46px);left:50%;
-  transform:translateX(-50%);
-  background:rgba(255,255,255,.18);backdrop-filter:blur(8px);
-  color:#fff;font-size:12px;font-weight:600;
-  padding:5px 14px;border-radius:20px;
-  z-index:3;pointer-events:none;white-space:nowrap;
-  border:1px solid rgba(255,255,255,.25);
+/* mute icon */
+.mute-icon{
+  position:absolute;top:50%;right:14px;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,.55);border-radius:50%;
+  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  z-index:6;cursor:pointer;
+  opacity:0;transition:opacity .3s;
 }
+.mute-icon.visible{opacity:1;}
 
 /* like heart pop */
 .like-pop{
   position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%) scale(0);
-  font-size:96px;pointer-events:none;z-index:30;opacity:0;
+  transform:translate(-50%,-60%) scale(0);
+  font-size:90px;pointer-events:none;z-index:30;opacity:0;
 }
 .like-pop.show{animation:likePop .7s ease-out forwards;}
 @keyframes likePop{
-  0%  {transform:translate(-50%,-50%) scale(0);opacity:1;}
-  40% {transform:translate(-50%,-50%) scale(1.5);opacity:1;}
-  70% {transform:translate(-50%,-50%) scale(1.1);opacity:.9;}
-  100%{transform:translate(-50%,-50%) scale(1);opacity:0;}
+  0%  {transform:translate(-50%,-60%) scale(0);opacity:1;}
+  40% {transform:translate(-50%,-60%) scale(1.6);opacity:1;}
+  70% {transform:translate(-50%,-60%) scale(1.1);opacity:.9;}
+  100%{transform:translate(-50%,-60%) scale(1);opacity:0;}
 }
 
 /* ── RIGHT ACTIONS ── */
 .post-actions{
-  position:absolute;right:10px;bottom:96px;
-  display:flex;flex-direction:column;align-items:center;gap:20px;
+  position:absolute;right:8px;bottom:90px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
   z-index:10;
 }
 .action-btn{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
   cursor:pointer;user-select:none;
 }
 .action-icon{
-  width:46px;height:46px;border-radius:50%;
-  background:rgba(20,20,20,.6);backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(20,20,20,.65);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
   display:flex;align-items:center;justify-content:center;
   transition:transform .15s,background .2s;
 }
-.action-icon:active{transform:scale(.84);}
-.action-count{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);}
+.action-icon:active{transform:scale(.82);}
+.action-count{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9);}
 
-.author-wrap{position:relative;margin-bottom:2px;}
-.author-avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;overflow:hidden;cursor:pointer;}
+.author-wrap{position:relative;margin-bottom:4px;}
+.author-avatar{width:48px;height:48px;border-radius:50%;border:2.5px solid #fff;overflow:hidden;cursor:pointer;background:#333;}
 .author-avatar img{width:100%;height:100%;object-fit:cover;}
 .follow-dot{
-  position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
   width:22px;height:22px;background:#fe2c55;border-radius:50%;
   border:2px solid #000;
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:700;color:#fff;cursor:pointer;
+  font-size:15px;font-weight:700;color:#fff;cursor:pointer;
   transition:background .2s,transform .15s;
 }
 .follow-dot.done{background:#25f4ee;font-size:10px;}
-.follow-dot:active{transform:translateX(-50%) scale(.86);}
+.follow-dot:active{transform:translateX(-50%) scale(.84);}
 
 .music-disk{
   width:44px;height:44px;border-radius:50%;
-  background:rgba(20,20,20,.6);border:2px solid rgba(255,255,255,.22);
+  background:rgba(20,20,20,.7);border:2px solid rgba(255,255,255,.25);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   animation:spin 4s linear infinite;
 }
@@ -184,355 +185,391 @@ body{
 /* ── BOTTOM OVERLAY ── */
 .post-overlay{
   position:absolute;bottom:0;left:0;right:0;
-  padding:14px 12px 80px;z-index:5;pointer-events:none;
+  padding:12px 12px 72px;z-index:5;
 }
-.post-overlay>*{pointer-events:all;}
-.post-author-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.post-mini-av{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;}
+.post-author-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.post-mini-av{width:28px;height:28px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#333;}
 .post-mini-av img{width:100%;height:100%;object-fit:cover;}
-.post-username{font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+.post-username{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;text-shadow:0 1px 4px rgba(0,0,0,.7);}
 .follow-btn-feed{
-  background:transparent;border:1px solid rgba(255,255,255,.7);
-  color:#fff;font-size:11px;font-weight:600;padding:3px 10px;
+  background:transparent;border:1.5px solid rgba(255,255,255,.8);
+  color:#fff;font-size:11px;font-weight:700;padding:3px 10px;
   border-radius:4px;cursor:pointer;transition:all .2s;font-family:inherit;
 }
-.follow-btn-feed.following{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.45);}
-.post-caption{font-size:13px;line-height:1.5;color:#fff;margin-bottom:7px;text-shadow:0 1px 3px rgba(0,0,0,.5);}
-.post-sound{font-size:12px;color:rgba(255,255,255,.9);display:flex;align-items:center;gap:6px;}
-.sound-ticker{white-space:nowrap;animation:ticker 10s linear infinite;max-width:190px;overflow:hidden;text-overflow:ellipsis;}
-@keyframes ticker{0%{transform:translateX(0)}50%{transform:translateX(-25%)}100%{transform:translateX(0)}}
+.follow-btn-feed.following{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.4);}
+.post-caption{font-size:13px;line-height:1.45;color:#fff;margin-bottom:6px;text-shadow:0 1px 3px rgba(0,0,0,.6);max-height:52px;overflow:hidden;}
+.post-sound{font-size:11px;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:5px;}
+.sound-ticker{white-space:nowrap;animation:ticker 12s linear infinite;max-width:180px;overflow:hidden;}
+@keyframes ticker{0%{transform:translateX(0)}50%{transform:translateX(-30%)}100%{transform:translateX(0)}}
 
 /* progress bar */
-.post-progress{position:absolute;bottom:66px;left:0;right:0;height:2px;background:rgba(255,255,255,.2);z-index:6;}
-.post-progress-fill{height:100%;background:rgba(255,255,255,.8);}
-
-/* tap area (whole post is clickable → opens YT) */
-.post-tap{position:absolute;inset:0;z-index:4;}
+.post-progress{position:absolute;bottom:60px;left:0;right:0;height:2px;background:rgba(255,255,255,.2);z-index:6;}
+.post-progress-fill{height:100%;background:rgba(255,255,255,.85);width:0;transition:width .5s linear;}
 
 /* ── LOADING ── */
 .feed-loading{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.spinner{width:44px;height:44px;border:4px solid rgba(255,255,255,.1);border-top-color:#fe2c55;border-radius:50%;animation:spinLoader .8s linear infinite;}
+.spinner{width:44px;height:44px;border:4px solid rgba(255,255,255,.1);border-top-color:#ff0000;border-radius:50%;animation:spinLoader .7s linear infinite;}
 @keyframes spinLoader{to{transform:rotate(360deg);}}
-.feed-loading p{color:rgba(255,255,255,.45);font-size:14px;}
+.feed-loading p{color:rgba(255,255,255,.4);font-size:14px;}
 
-/* ── VIDEO INFO SHEET (tapping shows sheet, then opens YT) ── */
+/* ── INFO SHEET ── */
 #info-sheet{
   position:absolute;bottom:-100%;left:0;right:0;
-  background:#111;border-radius:18px 18px 0 0;
+  background:#181818;border-radius:18px 18px 0 0;
   z-index:200;transition:bottom .32s cubic-bezier(.4,0,.2,1);
+  max-height:85vh;overflow-y:auto;
   padding-bottom:env(safe-area-inset-bottom,0);
 }
+#info-sheet::-webkit-scrollbar{display:none;}
 #info-sheet.open{bottom:0;}
-#info-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:190;display:none;}
+#info-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:190;display:none;}
 #info-overlay.open{display:block;}
-.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin:12px auto 6px;}
-.sheet-thumb-row{display:flex;gap:14px;padding:12px 16px 10px;}
-.sheet-thumb{width:70px;height:125px;border-radius:8px;object-fit:cover;background:#222;flex-shrink:0;}
-.sheet-meta{flex:1;padding-top:4px;}
-.sheet-title{font-size:14px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:6px;}
-.sheet-channel{font-size:13px;color:#aaa;margin-bottom:10px;}
-.sheet-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.sheet-stat{background:rgba(255,255,255,.1);border-radius:14px;padding:4px 11px;font-size:11px;color:#ccc;}
-.sheet-actions{display:flex;gap:10px;padding:0 16px 16px;}
+.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:12px auto 8px;}
+.sheet-thumb-row{display:flex;gap:14px;padding:10px 16px 12px;}
+.sheet-thumb{width:68px;height:120px;border-radius:8px;object-fit:cover;background:#222;flex-shrink:0;}
+.sheet-meta{flex:1;padding-top:2px;}
+.sheet-title{font-size:14px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:5px;}
+.sheet-channel{font-size:12px;color:#aaa;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.sheet-channel-av{width:22px;height:22px;border-radius:50%;object-fit:cover;background:#333;}
+.sheet-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.sheet-stat{background:rgba(255,255,255,.09);border-radius:14px;padding:4px 11px;font-size:11px;color:#ccc;}
+.sheet-actions{display:flex;gap:8px;padding:0 16px 14px;}
 .sheet-btn{
-  flex:1;padding:12px;border-radius:10px;border:none;cursor:pointer;
-  font-size:14px;font-weight:700;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;gap:8px;
+  flex:1;padding:11px 8px;border-radius:10px;border:none;cursor:pointer;
+  font-size:13px;font-weight:700;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   transition:transform .15s,opacity .2s;
 }
-.sheet-btn:active{transform:scale(.96);}
+.sheet-btn:active{transform:scale(.95);}
 .sheet-btn-yt{background:#ff0000;color:#fff;}
 .sheet-btn-like{background:rgba(254,44,85,.15);color:#fe2c55;border:1.5px solid rgba(254,44,85,.3);}
 .sheet-btn-like.liked{background:#fe2c55;color:#fff;border-color:#fe2c55;}
-.sheet-btn-save{background:rgba(255,193,7,.1);color:#ffc107;border:1.5px solid rgba(255,193,7,.25);}
+.sheet-btn-save{background:rgba(255,193,7,.1);color:#ffc107;border:1.5px solid rgba(255,193,7,.2);}
 .sheet-btn-save.saved{background:#ffc107;color:#000;border-color:#ffc107;}
-.sheet-comments-title{font-size:14px;font-weight:700;color:#fff;padding:0 16px 10px;border-top:1px solid rgba(255,255,255,.07);padding-top:12px;}
-.sheet-comment-item{display:flex;gap:10px;padding:8px 16px;border-bottom:.5px solid rgba(255,255,255,.06);}
+.sheet-btn-share{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.15);}
+.sheet-divider{height:.5px;background:rgba(255,255,255,.08);margin:0 16px;}
+.sheet-comments-title{font-size:14px;font-weight:700;color:#fff;padding:12px 16px 10px;}
+.sheet-comment-item{display:flex;gap:10px;padding:8px 16px;border-bottom:.5px solid rgba(255,255,255,.05);}
 .sheet-comment-av{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#333;}
 .sheet-comment-av img{width:100%;height:100%;object-fit:cover;}
 .sheet-comment-body .sheet-comment-name{font-size:11px;font-weight:700;color:#bbb;margin-bottom:2px;}
 .sheet-comment-body .sheet-comment-text{font-size:13px;color:#fff;line-height:1.4;}
-.sheet-comment-body .sheet-comment-likes{font-size:10px;color:#777;margin-top:3px;}
+.sheet-comment-body .sheet-comment-meta{font-size:10px;color:#666;margin-top:3px;display:flex;gap:10px;}
 .sheet-pad{height:24px;}
 
-/* ── PROFILE ── */
-#page-profile{background:#fff;}
-.profile-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:.5px solid #f0f0f0;position:sticky;top:0;z-index:10;}
-.profile-username{font-size:16px;font-weight:700;}
-.profile-body{padding:20px 16px 110px;}
-.profile-avatar-section{display:flex;flex-direction:column;align-items:center;margin-bottom:16px;}
-.profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#fff;}
-.profile-name{font-size:19px;font-weight:700;margin-top:8px;}
-.profile-handle{font-size:13px;color:#666;margin-top:2px;}
-.edit-profile-btn{background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px 28px;font-size:14px;font-weight:600;margin-top:12px;cursor:pointer;font-family:inherit;}
-.edit-profile-btn:active{background:#f5f5f5;}
-.profile-stats{display:flex;justify-content:center;gap:36px;margin:20px 0;text-align:center;}
-.stat-num{font-size:20px;font-weight:700;display:block;}
-.stat-label{font-size:12px;color:#666;}
-.add-bio{width:100%;border:1px dashed #ccc;border-radius:20px;padding:10px;text-align:center;font-size:13px;color:#666;cursor:pointer;margin-bottom:20px;}
-.profile-tabs{display:flex;border-top:.5px solid #eee;}
-.profile-tab{flex:1;text-align:center;padding:10px 8px;cursor:pointer;color:#999;font-weight:600;font-size:13px;border-bottom:2px solid transparent;transition:.2s;}
-.profile-tab.active{color:#000;border-bottom:2px solid #000;}
-.grid-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;}
-.grid-post{aspect-ratio:.56;background:#111;overflow:hidden;cursor:pointer;position:relative;}
-.grid-post img{width:100%;height:100%;object-fit:cover;}
-.grid-post-views{position:absolute;bottom:4px;left:4px;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;}
-.profile-yt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;}
-.profile-yt-post{aspect-ratio:.56;background:#f0f0f0;overflow:hidden;cursor:pointer;position:relative;}
-.profile-yt-post img{width:100%;height:100%;object-fit:cover;}
-.profile-yt-empty{padding:32px 16px;text-align:center;color:#999;font-size:14px;grid-column:1/-1;line-height:1.6;}
+/* ── COMMENT SHEET ── */
+#comment-sheet{
+  position:absolute;bottom:-100%;left:0;right:0;height:70vh;
+  background:#181818;border-radius:18px 18px 0 0;
+  z-index:200;transition:bottom .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+}
+#comment-sheet.open{bottom:0;}
+#sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:190;display:none;}
+#sheet-overlay.open{display:block;}
+.comment-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;border-bottom:.5px solid rgba(255,255,255,.08);
+  flex-shrink:0;
+}
+.comment-count-title{font-size:15px;font-weight:700;color:#fff;}
+.comment-list{flex:1;overflow-y:auto;padding-bottom:8px;}
+.comment-list::-webkit-scrollbar{display:none;}
+.comment-item{display:flex;gap:10px;padding:10px 16px;border-bottom:.5px solid rgba(255,255,255,.04);}
+.comment-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#333;}
+.comment-av img{width:100%;height:100%;object-fit:cover;}
+.comment-body .comment-name{font-size:12px;font-weight:700;color:#ccc;margin-bottom:2px;}
+.comment-body .comment-text{font-size:14px;color:#fff;line-height:1.45;}
+.comment-body .comment-meta{font-size:11px;color:#666;margin-top:4px;display:flex;gap:10px;align-items:center;}
+.comment-like-icon{cursor:pointer;}
+.comment-input-row{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-top:.5px solid rgba(255,255,255,.08);
+  background:#181818;flex-shrink:0;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0));
+}
+.comment-input{
+  flex:1;background:rgba(255,255,255,.08);border:none;border-radius:22px;
+  padding:10px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;
+}
+.comment-input::placeholder{color:rgba(255,255,255,.35);}
+.comment-post-btn{background:#fe2c55;color:#fff;border:none;border-radius:20px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
 
-/* ── FRIENDS ── */
-#page-friends{background:#fff;}
-.friends-header{padding:14px 16px;background:#fff;border-bottom:.5px solid #eee;position:sticky;top:0;z-index:5;}
-.friends-title{font-size:20px;font-weight:700;margin-bottom:12px;}
-.friends-search{background:#f0f0f0;border-radius:20px;display:flex;align-items:center;gap:8px;padding:10px 14px;}
-.friends-search input{flex:1;border:none;background:transparent;outline:none;font-size:14px;font-family:inherit;}
-.friend-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid #f5f5f5;}
-.friend-avatar{width:54px;height:54px;border-radius:50%;overflow:hidden;flex-shrink:0;}
-.friend-avatar img{width:100%;height:100%;object-fit:cover;}
-.friend-info{flex:1;}
-.friend-name{font-weight:600;font-size:15px;}
-.friend-mutual{font-size:11px;color:#999;margin-top:2px;}
-.follow-btn{background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
-.follow-btn.following{background:transparent;color:#000;border:1px solid #ddd;}
+/* ── SEARCH PAGE ── */
+#page-search{background:#0f0f0f;}
+.search-header{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:#0f0f0f;border-bottom:.5px solid rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:5;
+}
+.search-input-wrap{
+  flex:1;background:rgba(255,255,255,.1);border-radius:22px;
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+}
+.search-input-wrap input{flex:1;border:none;background:transparent;outline:none;font-size:14px;font-family:inherit;color:#fff;}
+.search-input-wrap input::placeholder{color:#555;}
+.search-loading{padding:40px 20px;text-align:center;color:#666;font-size:14px;}
+.search-trending{padding:16px;}
+.search-trending-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;}
+.trending-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.08);border-radius:20px;
+  padding:8px 14px;margin:4px;font-size:13px;color:#fff;cursor:pointer;
+  transition:background .2s;
+}
+.trending-chip:active{background:rgba(255,255,255,.15);}
+.search-results-wrap{padding:8px;}
+.search-result-item{
+  display:flex;gap:12px;padding:10px 8px;border-bottom:.5px solid rgba(255,255,255,.06);
+  cursor:pointer;border-radius:8px;transition:background .2s;
+}
+.search-result-item:active{background:rgba(255,255,255,.06);}
+.search-result-thumb{width:90px;height:160px;border-radius:8px;overflow:hidden;background:#222;flex-shrink:0;}
+.search-result-thumb img{width:100%;height:100%;object-fit:cover;}
+.search-result-info{flex:1;padding-top:4px;}
+.search-result-title{font-size:13px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:6px;}
+.search-result-channel{font-size:12px;color:#aaa;margin-bottom:4px;}
+.search-result-stats{font-size:11px;color:#666;}
 
-/* ── INBOX ── */
-#page-inbox{background:#fff;}
-.inbox-header{padding:14px 16px;background:#fff;border-bottom:.5px solid #eee;display:flex;justify-content:space-between;align-items:center;}
-.inbox-title{font-size:20px;font-weight:700;}
-.notif-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid #f5f5f5;cursor:pointer;}
-.notif-avatar{width:46px;height:46px;border-radius:50%;overflow:hidden;flex-shrink:0;}
-.notif-avatar img{width:100%;height:100%;object-fit:cover;}
-.notif-content{flex:1;}
-.notif-text{font-size:13px;color:#000;line-height:1.4;}
-.notif-time{font-size:10px;color:#999;margin-top:2px;}
-.notif-thumb{width:42px;height:52px;border-radius:4px;overflow:hidden;}
-.notif-thumb img{width:100%;height:100%;object-fit:cover;}
-
-/* ── CREATE ── */
+/* ── CREATE PAGE ── */
 #page-create{background:#000;}
-.create-header{position:absolute;top:0;left:0;right:0;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;z-index:10;}
-.create-viewfinder{width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
-.camera-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:36px;}
-.create-tools{position:absolute;right:14px;top:80px;display:flex;flex-direction:column;gap:20px;align-items:center;}
-.create-tool{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
-.create-tool-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.create-tool span{font-size:10px;color:rgba(255,255,255,.7);}
-.mode-selector{position:absolute;bottom:110px;left:0;right:0;display:flex;justify-content:center;gap:6px;}
-.mode-btn{padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:none;font-size:13px;cursor:pointer;font-family:inherit;}
-.mode-btn.active{background:#fff;color:#000;font-weight:700;}
-.capture-wrap{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:40px;}
-.gallery-btn{width:50px;height:50px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid rgba(255,255,255,.4);}
+.create-viewfinder{
+  height:calc(100vh - 60px);background:#111;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+  position:relative;
+}
+.create-top{position:absolute;top:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 16px;}
+.create-close{color:#fff;font-size:22px;cursor:pointer;}
+.create-tools{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:18px;}
+.create-tool{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.create-tool-icon{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.create-tool span{font-size:10px;color:#fff;font-weight:500;}
+.mode-selector{display:flex;gap:10px;margin-bottom:14px;padding:0 8px;}
+.mode-btn{background:transparent;border:none;color:rgba(255,255,255,.5);font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;font-family:inherit;border-radius:16px;transition:all .2s;}
+.mode-btn.active{color:#fff;background:rgba(255,255,255,.15);}
+.capture-wrap{display:flex;align-items:center;justify-content:space-around;width:100%;padding:16px 24px 24px;}
+.gallery-btn{width:52px;height:52px;border-radius:8px;overflow:hidden;border:2px solid #fff;cursor:pointer;}
 .gallery-btn img{width:100%;height:100%;object-fit:cover;}
 .capture-btn-outer{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.capture-btn-inner{width:62px;height:62px;border-radius:50%;background:#fff;transition:.1s;}
-.capture-btn-outer:active .capture-btn-inner{transform:scale(.88);}
-.flip-btn{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;}
+.capture-btn-inner{width:58px;height:58px;border-radius:50%;background:#fff;transition:transform .15s;}
+.capture-btn-outer:active .capture-btn-inner{transform:scale(.85);}
+.flip-btn{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;}
 
-/* ── SEARCH ── */
-#page-search{background:#fff;}
-.search-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:.5px solid #eee;position:sticky;top:0;z-index:5;}
-.search-input-wrap{flex:1;background:#f0f0f0;border-radius:20px;display:flex;align-items:center;gap:8px;padding:9px 14px;}
-.search-input-wrap input{flex:1;border:none;background:transparent;outline:none;font-size:15px;font-family:inherit;}
-.search-trending{padding:14px 16px;}
-.search-trending-title{font-size:16px;font-weight:700;margin-bottom:12px;}
-.trending-tag{display:inline-block;background:#f5f5f5;border-radius:20px;padding:6px 14px;font-size:13px;margin:0 6px 8px 0;cursor:pointer;}
-.trending-tag:active{background:#eee;}
-.search-results-wrap{padding:8px 0;}
-.search-result-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-bottom:.5px solid #f5f5f5;}
-.search-result-item:active{background:#f9f9f9;}
-.search-result-thumb{width:80px;height:56px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#ddd;}
-.search-result-thumb img{width:100%;height:100%;object-fit:cover;}
-.search-result-info{flex:1;}
-.search-result-title{font-size:13px;font-weight:600;color:#000;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.search-result-channel{font-size:11px;color:#888;}
-.search-loading{padding:30px;text-align:center;color:#999;font-size:14px;}
+/* ── INBOX PAGE ── */
+#page-inbox{background:#0f0f0f;}
+.inbox-header{padding:14px 16px 12px;background:#0f0f0f;border-bottom:.5px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;}
+.inbox-title{font-size:20px;font-weight:700;color:#fff;}
+.inbox-tabs{display:flex;gap:0;padding:0 16px;border-bottom:.5px solid rgba(255,255,255,.08);}
+.inbox-tab{flex:1;text-align:center;padding:12px 8px;font-size:13px;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:.2s;}
+.inbox-tab.active{color:#fff;border-bottom:2px solid #fff;}
+.notif-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:.5px solid rgba(255,255,255,.06);cursor:pointer;}
+.notif-item:active{background:rgba(255,255,255,.04);}
+.notif-avatar{width:50px;height:50px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#333;}
+.notif-avatar img{width:100%;height:100%;object-fit:cover;}
+.notif-content{flex:1;}
+.notif-text{font-size:13px;color:#eee;line-height:1.4;}
+.notif-text strong{color:#fff;}
+.notif-time{font-size:11px;color:#666;margin-top:3px;}
+.notif-thumb{width:44px;height:52px;border-radius:6px;overflow:hidden;background:#222;flex-shrink:0;}
+.notif-thumb img{width:100%;height:100%;object-fit:cover;}
+.notif-dot{width:9px;height:9px;border-radius:50%;background:#fe2c55;flex-shrink:0;}
 
-/* ── SIDE MENU ── */
-#menu-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
-#menu-overlay.open{opacity:1;pointer-events:all;}
-#side-menu{position:absolute;top:0;right:-285px;bottom:0;width:285px;background:#fff;z-index:201;transition:right .3s;overflow-y:auto;}
-#side-menu.open{right:0;}
-#side-menu::-webkit-scrollbar{display:none;}
-.menu-profile{padding:24px 20px 16px;border-bottom:8px solid #f5f5f5;display:flex;align-items:center;gap:14px;}
-.menu-avatar{width:52px;height:52px;border-radius:50%;overflow:hidden;}
-.menu-name{font-weight:700;font-size:16px;}
-.menu-handle{font-size:12px;color:#999;}
-.menu-section{padding:6px 0;border-bottom:8px solid #f5f5f5;}
-.menu-section-title{font-size:11px;font-weight:700;color:#999;padding:8px 20px;text-transform:uppercase;letter-spacing:.5px;}
-.menu-item{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;cursor:pointer;transition:background .15s;}
-.menu-item:active{background:#f8f8f8;}
-.menu-item-left{display:flex;align-items:center;gap:14px;font-size:14px;}
-.menu-arrow{color:#ccc;font-size:16px;}
-
-/* ── COMMENT SHEET (local) ── */
-#sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:140;opacity:0;pointer-events:none;transition:opacity .3s;}
-#sheet-overlay.open{opacity:1;pointer-events:all;}
-#comment-sheet{position:absolute;bottom:-72%;left:0;right:0;height:72%;background:#fff;border-radius:16px 16px 0 0;z-index:150;transition:bottom .3s;}
-#comment-sheet.open{bottom:0;}
-.comment-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:.5px solid #eee;}
-.comment-header-title{font-size:15px;font-weight:700;}
-.comment-list{padding:12px 16px;height:calc(100% - 115px);overflow-y:auto;}
-.comment-item{display:flex;gap:10px;margin-bottom:18px;}
-.comment-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;}
-.comment-av img{width:100%;height:100%;object-fit:cover;}
-.comment-body{flex:1;}
-.comment-name{font-size:13px;font-weight:700;margin-bottom:2px;}
-.comment-text{font-size:13px;line-height:1.4;}
-.comment-time{font-size:10px;color:#999;margin-top:3px;}
-.comment-input-row{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:#fff;border-top:.5px solid #eee;display:flex;gap:10px;align-items:center;}
-.comment-input{flex:1;background:#f0f0f0;border:none;border-radius:22px;padding:10px 16px;outline:none;font-size:14px;font-family:inherit;}
-.comment-post-btn{color:#fe2c55;font-weight:700;border:none;background:none;font-size:14px;cursor:pointer;font-family:inherit;}
+/* ── PROFILE PAGE ── */
+#page-profile{background:#0f0f0f;}
+.profile-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0f0f0f;border-bottom:.5px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:10;}
+.profile-username{font-size:16px;font-weight:700;color:#fff;}
+.profile-body{padding:20px 16px 100px;}
+.profile-avatar-section{display:flex;flex-direction:column;align-items:center;margin-bottom:16px;}
+.profile-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0000,#cc0000);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff;}
+.profile-name{font-size:19px;font-weight:700;margin-top:8px;color:#fff;}
+.profile-handle{font-size:13px;color:#666;margin-top:2px;}
+.edit-profile-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:6px;padding:8px 28px;font-size:14px;font-weight:600;margin-top:12px;cursor:pointer;font-family:inherit;}
+.edit-profile-btn:active{background:rgba(255,255,255,.18);}
+.profile-stats{display:flex;justify-content:center;gap:32px;margin:20px 0;text-align:center;}
+.stat-num{font-size:20px;font-weight:700;display:block;color:#fff;}
+.stat-label{font-size:11px;color:#666;}
+.add-bio{width:100%;border:1px dashed rgba(255,255,255,.2);border-radius:20px;padding:10px;text-align:center;font-size:13px;color:#666;cursor:pointer;margin-bottom:18px;}
+.profile-tabs{display:flex;border-top:.5px solid rgba(255,255,255,.08);margin-bottom:2px;}
+.profile-tab{flex:1;text-align:center;padding:10px 8px;cursor:pointer;color:#555;font-weight:600;font-size:13px;border-bottom:2px solid transparent;transition:.2s;}
+.profile-tab.active{color:#fff;border-bottom:2px solid #fff;}
+.grid-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;margin-top:1.5px;}
+.grid-post{aspect-ratio:.56;background:#111;overflow:hidden;cursor:pointer;position:relative;}
+.grid-post img{width:100%;height:100%;object-fit:cover;}
+.grid-post-views{position:absolute;bottom:4px;left:4px;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;gap:2px;text-shadow:0 1px 3px rgba(0,0,0,.9);}
+.profile-yt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;margin-top:1.5px;}
+.profile-yt-post{aspect-ratio:.56;background:#111;overflow:hidden;cursor:pointer;position:relative;}
+.profile-yt-post img{width:100%;height:100%;object-fit:cover;}
+.profile-yt-empty{padding:40px 16px;text-align:center;color:#555;font-size:14px;grid-column:1/-1;line-height:1.6;}
 
 /* ── TOAST ── */
 #toast{
-  position:absolute;bottom:88px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.85);color:#fff;padding:8px 20px;
-  border-radius:22px;font-size:13px;z-index:600;
-  opacity:0;transition:opacity .3s;pointer-events:none;
-  white-space:nowrap;max-width:300px;text-align:center;
+  position:absolute;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(30,30,30,.96);color:#fff;font-size:13px;font-weight:600;
+  padding:10px 20px;border-radius:20px;z-index:500;
+  opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;
+  border:.5px solid rgba(255,255,255,.1);
 }
-#toast.show{opacity:1;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── SIDE MENU ── */
+#side-menu{
+  position:absolute;right:-280px;top:0;bottom:0;width:260px;
+  background:#181818;z-index:300;transition:right .3s cubic-bezier(.4,0,.2,1);
+  padding:48px 0 0;
+  box-shadow:-4px 0 24px rgba(0,0,0,.6);
+}
+#side-menu.open{right:0;}
+#menu-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:290;display:none;}
+#menu-overlay.open{display:block;}
+.menu-item{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;color:#ddd;font-size:15px;font-weight:500;transition:background .2s;}
+.menu-item:active{background:rgba(255,255,255,.07);}
+.menu-item-icon{font-size:20px;width:28px;text-align:center;}
+
+/* ── VIDEO PLAYER OVERLAY (full screen) ── */
+#video-player-overlay{
+  position:absolute;inset:0;z-index:400;background:#000;
+  display:none;flex-direction:column;
+}
+#video-player-overlay.open{display:flex;}
+#player-close{
+  position:absolute;top:14px;left:14px;z-index:5;
+  background:rgba(0,0,0,.6);border-radius:50%;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+#player-iframe{width:100%;height:100%;border:none;}
+
+/* scroll snap active post highlight */
+.feed-post.in-view .post-progress-fill{animation:progressAnim var(--dur,30s) linear;}
+@keyframes progressAnim{from{width:0}to{width:100%}}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ===== HOME ===== -->
+<!-- ===== HOME (FEED) ===== -->
 <div id="page-home" class="page active">
   <div class="home-header">
     <div class="home-live"><span class="live-badge">LIVE</span></div>
     <div class="home-tabs">
-      <span class="home-tab" onclick="switchTab(this)">Following</span>
-      <span class="home-tab active" onclick="switchTab(this)">For You</span>
+      <div class="home-tab" onclick="switchTab(this)">Following</div>
+      <div class="home-tab active" onclick="switchTab(this)">For You</div>
     </div>
     <div class="home-search-icon" onclick="showPage('search')">
-      <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="7" stroke="white" stroke-width="2.2"/>
-        <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="feed-container" id="feedContainer">
-    <div class="feed-loading">
-      <div class="spinner"></div>
-      <p>Loading shorts...</p>
-    </div>
-  </div>
+  <div class="feed-container" id="feedContainer"></div>
 </div>
 
-<!-- ===== FRIENDS ===== -->
-<div id="page-friends" class="page">
-  <div class="friends-header">
-    <div class="friends-title">Friends</div>
-    <div class="friends-search">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#999" stroke-width="2"/></svg>
-      <input type="text" id="friendSearch" placeholder="Search" oninput="filterFriends()">
+<!-- ===== SEARCH ===== -->
+<div id="page-search" class="page">
+  <div class="search-header">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer;flex-shrink:0">
+      <path d="M19 12H5M12 5l-7 7 7 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="search-input-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#555" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#555" stroke-width="2"/></svg>
+      <input type="text" id="searchInput" placeholder="Search videos..." oninput="onSearchInput(this.value)" autocomplete="off">
     </div>
   </div>
-  <div style="padding:10px 16px;font-size:12px;color:#999;font-weight:600">SUGGESTED FOR YOU</div>
-  <div id="friendsList">
-    <div class="friend-item" data-name="poonam3537">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">poonam3537</div><div class="friend-mutual">Recent search · 2.1M followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'poonam3537')">Follow</button>
-    </div>
-    <div class="friend-item" data-name="sakufects">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">sakufects</div><div class="friend-mutual">New posts · 890K followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'sakufects')">Follow</button>
-    </div>
-    <div class="friend-item" data-name="kenDoll">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">kenDoll ✓</div><div class="friend-mutual">Verified · 14.6M followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'kenDoll')">Follow</button>
-    </div>
-    <div class="friend-item" data-name="sarahlooks">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">sarahlooks</div><div class="friend-mutual">Suggested · 4.2M followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'sarahlooks')">Follow</button>
-    </div>
-    <div class="friend-item" data-name="aliofficial">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">aliofficial</div><div class="friend-mutual">3 mutual friends · 550K followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'aliofficial')">Follow</button>
-    </div>
-    <div class="friend-item" data-name="miramira">
-      <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" alt=""></div>
-      <div class="friend-info"><div class="friend-name">miramira</div><div class="friend-mutual">Suggested · 1.8M followers</div></div>
-      <button class="follow-btn" onclick="toggleFollow(this,'miramira')">Follow</button>
-    </div>
+  <div id="searchTrending" class="search-trending">
+    <div class="search-trending-title">🔥 Trending Searches</div>
+    <div id="trendingChips"></div>
   </div>
+  <div id="searchResults" style="display:none"></div>
 </div>
 
 <!-- ===== CREATE ===== -->
 <div id="page-create" class="page">
-  <div class="create-header">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer">
-      <line x1="18" y1="6" x2="6" y2="18" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-      <line x1="6" y1="6" x2="18" y2="18" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>
-    <div style="background:rgba(255,255,255,.18);padding:6px 18px;border-radius:20px;font-size:13px;color:#fff;cursor:pointer" onclick="showToast('🎵 Add sound')">🎵 Add sound</div>
-    <div style="font-size:13px;color:#fff;cursor:pointer" onclick="showToast('Settings')">⚙️</div>
-  </div>
   <div class="create-viewfinder">
-    <div class="camera-circle">📷</div>
-    <div style="color:rgba(255,255,255,.45);font-size:14px">Tap to enable camera</div>
-  </div>
-  <div class="create-tools">
-    <div class="create-tool" onclick="showToast('Flip')"><div class="create-tool-icon">🔄</div><span>Flip</span></div>
-    <div class="create-tool" onclick="showToast('Speed')"><div class="create-tool-icon">⚡</div><span>Speed</span></div>
-    <div class="create-tool" onclick="showToast('Beauty')"><div class="create-tool-icon">✨</div><span>Beauty</span></div>
-    <div class="create-tool" onclick="showToast('Filters')"><div class="create-tool-icon">🎨</div><span>Filters</span></div>
-    <div class="create-tool" onclick="showToast('Timer')"><div class="create-tool-icon">⏱️</div><span>Timer</span></div>
-  </div>
-  <div class="mode-selector">
-    <button class="mode-btn">10m</button>
-    <button class="mode-btn">60s</button>
-    <button class="mode-btn">15s</button>
-    <button class="mode-btn active">PHOTO</button>
-    <button class="mode-btn">TEXT</button>
-  </div>
-  <div class="capture-wrap">
-    <div class="gallery-btn" onclick="showToast('Gallery')">
-      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt="">
+    <div class="create-top">
+      <div class="create-close" onclick="showPage('home')">✕</div>
+      <div style="color:#fff;font-size:13px;font-weight:600">Create</div>
+      <div style="color:#fff;font-size:13px;cursor:pointer" onclick="showToast('Flash off')">⚡</div>
     </div>
-    <div class="capture-btn-outer" onclick="showToast('📸 Captured!')">
-      <div class="capture-btn-inner"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
+      <div style="font-size:60px;margin-bottom:12px">📸</div>
+      <div style="color:rgba(255,255,255,.4);font-size:14px">Camera access needed</div>
     </div>
-    <div class="flip-btn" onclick="showToast('Flipped')">🔄</div>
+    <div class="create-tools">
+      <div class="create-tool" onclick="showToast('Speed')"><div class="create-tool-icon">⚡</div><span>Speed</span></div>
+      <div class="create-tool" onclick="showToast('Beauty')"><div class="create-tool-icon">✨</div><span>Beauty</span></div>
+      <div class="create-tool" onclick="showToast('Filters')"><div class="create-tool-icon">🎨</div><span>Filters</span></div>
+      <div class="create-tool" onclick="showToast('Timer')"><div class="create-tool-icon">⏱️</div><span>Timer</span></div>
+    </div>
+    <div class="mode-selector">
+      <button class="mode-btn">10m</button>
+      <button class="mode-btn">60s</button>
+      <button class="mode-btn">15s</button>
+      <button class="mode-btn active">SHORT</button>
+      <button class="mode-btn">LIVE</button>
+    </div>
+    <div class="capture-wrap">
+      <div class="gallery-btn" onclick="showToast('Gallery')">
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt="">
+      </div>
+      <div class="capture-btn-outer" onclick="showToast('📹 Recording!')">
+        <div class="capture-btn-inner"></div>
+      </div>
+      <div class="flip-btn" onclick="showToast('Flipped')">🔄</div>
+    </div>
   </div>
 </div>
 
 <!-- ===== INBOX ===== -->
-<div id="page-inbox" class="page" style="background:#fff">
+<div id="page-inbox" class="page">
   <div class="inbox-header">
     <div class="inbox-title">Inbox</div>
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showToast('Settings')" style="cursor:pointer">
-      <circle cx="12" cy="12" r="3" stroke="#000" stroke-width="2"/>
-      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="#000" stroke-width="2"/>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="cursor:pointer" onclick="showToast('Settings')">
+      <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/>
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="white" stroke-width="2"/>
     </svg>
   </div>
-  <div class="notif-item" onclick="showToast('kenDoll liked your post')">
-    <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div>
-    <div class="notif-content"><div class="notif-text"><strong>kenDoll</strong> liked your post ❤️</div><div class="notif-time">2h ago</div></div>
-    <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt=""></div>
+  <div class="inbox-tabs">
+    <div class="inbox-tab active" onclick="switchInboxTab(this)">All Activity</div>
+    <div class="inbox-tab" onclick="switchInboxTab(this)">Mentions</div>
+    <div class="inbox-tab" onclick="switchInboxTab(this)">Messages</div>
   </div>
-  <div class="notif-item" onclick="showToast('poonam3537 followed you')">
+  <div class="notif-item" onclick="showToast('MrBeast liked your comment')">
+    <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80" alt=""></div>
+    <div class="notif-content">
+      <div class="notif-text"><strong>@mrbeast</strong> liked your comment 💛</div>
+      <div class="notif-time">2m ago</div>
+    </div>
+    <div class="notif-dot"></div>
+  </div>
+  <div class="notif-item" onclick="showToast('New subscriber!')">
     <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-    <div class="notif-content"><div class="notif-text"><strong>poonam3537</strong> started following you</div><div class="notif-time">5h ago</div></div>
-    <button style="background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit" onclick="event.stopPropagation();showToast('Following!')">Follow</button>
+    <div class="notif-content">
+      <div class="notif-text"><strong>@poonam_3537</strong> subscribed to your channel ✅</div>
+      <div class="notif-time">45m ago</div>
+    </div>
+    <div class="notif-dot"></div>
   </div>
-  <div class="notif-item" onclick="openComments()">
+  <div class="notif-item" onclick="openCommentSheet()">
     <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-    <div class="notif-content"><div class="notif-text"><strong>aliofficial</strong> commented: "🔥🔥🔥"</div><div class="notif-time">1d ago</div></div>
-    <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&q=80" alt=""></div>
+    <div class="notif-content">
+      <div class="notif-text"><strong>@aliofficial</strong> commented: "🔥🔥🔥 fire content"</div>
+      <div class="notif-time">3h ago</div>
+    </div>
+    <div class="notif-thumb"><img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt=""></div>
   </div>
-  <div class="notif-item" onclick="showToast('miramira mentioned you')">
+  <div class="notif-item" onclick="showToast('@techbhai mentioned you')">
     <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" alt=""></div>
-    <div class="notif-content"><div class="notif-text"><strong>miramira</strong> mentioned you 💬</div><div class="notif-time">2d ago</div></div>
-    <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&q=80" alt=""></div>
+    <div class="notif-content">
+      <div class="notif-text"><strong>@techbhai</strong> mentioned you in a comment 💬</div>
+      <div class="notif-time">1d ago</div>
+    </div>
+    <div class="notif-thumb"><img src="https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg" alt=""></div>
+  </div>
+  <div class="notif-item" onclick="showToast('YouTube Studio notification')">
+    <div class="notif-avatar" style="background:#ff0000;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.1 3 12 3 12 3s-4.1 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.2.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.9 12 22 12 22s4.1 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zm-13.5 8.7V8.3l8.1 3.7-8.1 3.7z" fill="white"/></svg>
+    </div>
+    <div class="notif-content">
+      <div class="notif-text"><strong>YouTube</strong> — Your Short got 10K views! 🎉</div>
+      <div class="notif-time">2d ago</div>
+    </div>
   </div>
 </div>
 
@@ -540,189 +577,107 @@ body{
 <div id="page-profile" class="page">
   <div class="profile-header">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer">
-      <path d="M19 12H5M12 5l-7 7 7 7" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+      <path d="M19 12H5M12 5l-7 7 7 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    <div class="profile-username">Saqib Saqib</div>
+    <div class="profile-username" id="profileNameHeader">Your Channel</div>
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="openMenu()" style="cursor:pointer">
-      <line x1="3" y1="6" x2="21" y2="6" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-      <line x1="3" y1="12" x2="21" y2="12" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-      <line x1="3" y1="18" x2="21" y2="18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+      <line x1="3" y1="6" x2="21" y2="6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <line x1="3" y1="12" x2="21" y2="12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <line x1="3" y1="18" x2="21" y2="18" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
   </div>
   <div class="profile-body">
     <div class="profile-avatar-section">
-      <div class="profile-avatar">S</div>
-      <div class="profile-name" id="profileName">Saqib Saqib</div>
-      <div class="profile-handle">@saqib.saqib693</div>
+      <div class="profile-avatar">▶</div>
+      <div class="profile-name" id="profileName">My Channel</div>
+      <div class="profile-handle" id="profileHandle">@mychannel</div>
       <button class="edit-profile-btn" onclick="editProfile()">Edit profile</button>
     </div>
     <div class="profile-stats">
       <div><span class="stat-num" id="followingCount">0</span><span class="stat-label">Following</span></div>
-      <div><span class="stat-num" id="followersCount">0</span><span class="stat-label">Followers</span></div>
-      <div><span class="stat-num">0</span><span class="stat-label">Likes</span></div>
+      <div><span class="stat-num" id="followersCount">0</span><span class="stat-label">Subscribers</span></div>
+      <div><span class="stat-num" id="likedCount">0</span><span class="stat-label">Liked</span></div>
     </div>
-    <div class="add-bio" id="bioBox" onclick="addBio()">+ Add bio · My hobbies are...</div>
+    <div class="add-bio" id="bioBox" onclick="addBio()">+ Add bio · Tell people about your channel...</div>
     <div class="profile-tabs">
-      <div class="profile-tab active" onclick="switchProfileTab(this,'posts')">Posts</div>
-      <div class="profile-tab" onclick="switchProfileTab(this,'private')">Private</div>
-      <div class="profile-tab" onclick="switchProfileTab(this,'saved')">Saved</div>
-      <div class="profile-tab" onclick="switchProfileTab(this,'liked')">Liked</div>
+      <div class="profile-tab active" onclick="switchProfileTab(this,'posts')">▶ Posts</div>
+      <div class="profile-tab" onclick="switchProfileTab(this,'saved')">🔖 Saved</div>
+      <div class="profile-tab" onclick="switchProfileTab(this,'liked')">❤️ Liked</div>
     </div>
     <div id="profileTabPosts">
       <div class="grid-posts">
-        <div class="grid-post"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt=""><div class="grid-post-views">▶ 89K</div></div>
-        <div class="grid-post"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&q=80" alt=""><div class="grid-post-views">▶ 421K</div></div>
-        <div class="grid-post"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80" alt=""><div class="grid-post-views">▶ 166K</div></div>
+        <div class="grid-post"><img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt=""><div class="grid-post-views">▶ 89K</div></div>
+        <div class="grid-post"><img src="https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg" alt=""><div class="grid-post-views">▶ 421K</div></div>
+        <div class="grid-post"><img src="https://i.ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg" alt=""><div class="grid-post-views">▶ 166K</div></div>
       </div>
-    </div>
-    <div id="profileTabPrivate" style="display:none">
-      <div class="grid-posts"><div class="grid-post" style="background:#111;display:flex;align-items:center;justify-content:center"><span style="font-size:28px">🔒</span></div></div>
     </div>
     <div id="profileTabSaved" style="display:none">
-      <div class="profile-yt-grid" id="savedGrid"><div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any short to save.</div></div>
+      <div class="profile-yt-grid" id="savedGrid"><div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any Short to save.</div></div>
     </div>
     <div id="profileTabLiked" style="display:none">
-      <div class="profile-yt-grid" id="likedGrid"><div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any short to like.</div></div>
+      <div class="profile-yt-grid" id="likedGrid"><div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any Short to like.</div></div>
     </div>
   </div>
-</div>
-
-<!-- ===== SEARCH ===== -->
-<div id="page-search" class="page" style="background:#fff">
-  <div class="search-header">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer">
-      <path d="M19 12H5M12 5l-7 7 7 7" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <div class="search-input-wrap">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#999" stroke-width="2"/></svg>
-      <input type="text" id="searchInput" placeholder="Search videos..." oninput="onSearchInput(this.value)">
-    </div>
-  </div>
-  <div id="searchTrending">
-    <div class="search-trending">
-      <div class="search-trending-title">Trending</div>
-      <span class="trending-tag" onclick="doSearch('funny shorts')">#funny</span>
-      <span class="trending-tag" onclick="doSearch('grwm shorts')">#grwm</span>
-      <span class="trending-tag" onclick="doSearch('viral shorts')">#viral</span>
-      <span class="trending-tag" onclick="doSearch('pakistan shorts')">#pakistan</span>
-      <span class="trending-tag" onclick="doSearch('music shorts')">#music</span>
-      <span class="trending-tag" onclick="doSearch('aesthetic shorts')">#aesthetic</span>
-      <span class="trending-tag" onclick="doSearch('fyp shorts')">#fyp</span>
-      <span class="trending-tag" onclick="doSearch('trending 2025')">#trending</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px">
-      <div style="border-radius:10px;overflow:hidden;aspect-ratio:.8;cursor:pointer" onclick="doSearch('trending music shorts')">
-        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" style="width:100%;height:100%;object-fit:cover" alt="">
-      </div>
-      <div style="border-radius:10px;overflow:hidden;aspect-ratio:.8;cursor:pointer" onclick="doSearch('viral videos shorts')">
-        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&q=80" style="width:100%;height:100%;object-fit:cover" alt="">
-      </div>
-    </div>
-  </div>
-  <div id="searchResults" style="display:none"></div>
 </div>
 
 <!-- ===== BOTTOM NAV ===== -->
-<nav id="bottom-nav">
+<div id="bottom-nav">
+  <!-- Home -->
   <div class="nav-item active" id="nav-home" onclick="showPage('home')">
-    <svg width="26" height="26" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="white"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12L12 3L21 12V20a1 1 0 01-1 1H15v-6H9v6H4a1 1 0 01-1-1V12z" id="nav-home-icon" stroke="white" stroke-width="2" fill="white"/>
+    </svg>
     <span>Home</span>
   </div>
-  <div class="nav-item" id="nav-friends" onclick="showPage('friends')">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#666" stroke-width="2"/>
-      <circle cx="9" cy="7" r="4" stroke="#666" stroke-width="2"/>
-      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#666" stroke-width="2"/>
+  <!-- Search -->
+  <div class="nav-item" id="nav-search" onclick="showPage('search')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/>
+      <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    <span>Friends</span>
+    <span>Search</span>
   </div>
-  <div class="nav-create" onclick="showPage('create')">
+  <!-- Create -->
+  <div class="nav-item nav-create" id="nav-create" onclick="showPage('create')">
     <div class="nav-create-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-        <line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="#000" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="#000" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
+    <span style="margin-top:4px">Create</span>
   </div>
-  <div class="nav-item" id="nav-inbox" onclick="showPage('inbox')">
-    <div style="position:relative">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#666" stroke-width="2"/>
-      </svg>
-      <span class="nav-badge">3</span>
-    </div>
+  <!-- Inbox -->
+  <div class="nav-item" id="nav-inbox" onclick="showPage('inbox')" style="position:relative">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="nav-badge" style="position:absolute;top:0;right:4px">3</div>
     <span>Inbox</span>
   </div>
+  <!-- Profile -->
   <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#666" stroke-width="2"/>
-      <circle cx="12" cy="7" r="4" stroke="#666" stroke-width="2"/>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
     <span>Profile</span>
   </div>
-</nav>
-
-<!-- ===== SIDE MENU ===== -->
-<div id="menu-overlay" onclick="closeMenu()"></div>
-<div id="side-menu">
-  <div class="menu-profile">
-    <div class="menu-avatar">
-      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">S</div>
-    </div>
-    <div><div class="menu-name">Saqib Saqib</div><div class="menu-handle">@saqib.saqib693</div></div>
-  </div>
-  <div class="menu-section">
-    <div class="menu-section-title">Creator Tools</div>
-    <div class="menu-item" onclick="menuAction('Creator dashboard')"><div class="menu-item-left">📊 Creator dashboard</div><span class="menu-arrow">›</span></div>
-    <div class="menu-item" onclick="menuAction('LIVE Studio')"><div class="menu-item-left">🎙️ LIVE Studio</div><span class="menu-arrow">›</span></div>
-  </div>
-  <div class="menu-section">
-    <div class="menu-section-title">Assets</div>
-    <div class="menu-item" onclick="menuAction('Balance')"><div class="menu-item-left">💰 Balance</div><span class="menu-arrow">›</span></div>
-  </div>
-  <div class="menu-section">
-    <div class="menu-section-title">Personal Tools</div>
-    <div class="menu-item" onclick="menuAction('Watch history')"><div class="menu-item-left">⏱️ Watch history</div><span class="menu-arrow">›</span></div>
-    <div class="menu-item" onclick="menuAction('Offline videos')"><div class="menu-item-left">💾 Offline videos</div><span class="menu-arrow">›</span></div>
-    <div class="menu-item" onclick="menuAction('Your QR code')"><div class="menu-item-left">📱 Your QR code</div><span class="menu-arrow">›</span></div>
-  </div>
-  <div class="menu-section">
-    <div class="menu-section-title">Settings</div>
-    <div class="menu-item" onclick="menuAction('Studio')"><div class="menu-item-left">🎬 Studio</div><span class="menu-arrow">›</span></div>
-    <div class="menu-item" onclick="menuAction('Settings and privacy')"><div class="menu-item-left">⚙️ Settings and privacy</div><span class="menu-arrow">›</span></div>
-  </div>
 </div>
 
-<!-- ===== LOCAL COMMENT SHEET ===== -->
+<!-- ===== COMMENT SHEET ===== -->
 <div id="sheet-overlay" onclick="closeSheets()"></div>
 <div id="comment-sheet">
   <div class="comment-header">
-    <div></div>
-    <div class="comment-header-title">Comments</div>
-    <span onclick="closeSheets()" style="cursor:pointer;font-size:20px;color:#999">✕</span>
+    <div class="comment-count-title" id="commentCountTitle">Comments</div>
+    <span onclick="closeSheets()" style="cursor:pointer;font-size:20px;color:#666">✕</span>
   </div>
-  <div class="comment-list" id="commentList">
-    <div class="comment-item">
-      <div class="comment-av"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-      <div class="comment-body"><div class="comment-name">poonam3537</div><div class="comment-text">Omg this is so cute 😍😍</div><div class="comment-time">2h · Reply</div></div>
-    </div>
-    <div class="comment-item">
-      <div class="comment-av"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-      <div class="comment-body"><div class="comment-name">aliofficial</div><div class="comment-text">🔥🔥🔥 fire content bro</div><div class="comment-time">5h · Reply</div></div>
-    </div>
-    <div class="comment-item">
-      <div class="comment-av"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div>
-      <div class="comment-body"><div class="comment-name">kenDoll</div><div class="comment-text">Going viral fr 🚀</div><div class="comment-time">1d · Reply</div></div>
-    </div>
-  </div>
+  <div class="comment-list" id="commentList"></div>
   <div class="comment-input-row">
-    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0">S</div>
-    <input class="comment-input" id="commentInput" placeholder="Add comment...">
+    <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff0000,#cc0000);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0">▶</div>
+    <input class="comment-input" id="commentInput" placeholder="Add a comment...">
     <button class="comment-post-btn" onclick="postComment()">Post</button>
   </div>
 </div>
 
-<!-- ===== INFO SHEET (replaces modal — no iframe) ===== -->
+<!-- ===== INFO SHEET (tap thumbnail → details) ===== -->
 <div id="info-overlay" onclick="closeInfoSheet()"></div>
 <div id="info-sheet">
   <div class="sheet-handle"></div>
@@ -736,17 +691,42 @@ body{
   </div>
   <div class="sheet-actions">
     <button class="sheet-btn sheet-btn-yt" id="sheetYTBtn" onclick="openOnYT()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.1 3 12 3 12 3s-4.1 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.2.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.9 12 22 12 22s4.1 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zm-13.5 8.7V8.3l8.1 3.7-8.1 3.7z"/></svg>
-      ▶ Watch on YouTube
+      <svg width="16" height="16" viewBox="0 0 24 24"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.1 3 12 3 12 3s-4.1 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.2.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.9 12 22 12 22s4.1 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zm-13.5 8.7V8.3l8.1 3.7-8.1 3.7z" fill="white"/></svg>
+      Watch on YouTube
     </button>
   </div>
   <div class="sheet-actions" style="padding-top:0">
     <button class="sheet-btn sheet-btn-like" id="sheetLikeBtn" onclick="sheetToggleLike()">❤️ Like</button>
     <button class="sheet-btn sheet-btn-save" id="sheetSaveBtn" onclick="sheetToggleSave()">🔖 Save</button>
+    <button class="sheet-btn sheet-btn-share" onclick="shareVideoFromSheet()">🔗 Share</button>
   </div>
-  <div class="sheet-comments-title">Comments</div>
+  <div class="sheet-divider"></div>
+  <div class="sheet-comments-title">Top Comments</div>
   <div id="sheetComments"></div>
   <div class="sheet-pad"></div>
+</div>
+
+<!-- ===== SIDE MENU ===== -->
+<div id="menu-overlay" onclick="closeMenu()"></div>
+<div id="side-menu">
+  <div class="menu-item" onclick="menuAction('Settings')"><div class="menu-item-icon">⚙️</div>Settings</div>
+  <div class="menu-item" onclick="menuAction('Creator Studio')"><div class="menu-item-icon">🎬</div>Creator Studio</div>
+  <div class="menu-item" onclick="menuAction('Watch History')"><div class="menu-item-icon">📋</div>Watch History</div>
+  <div class="menu-item" onclick="menuAction('Your Videos')"><div class="menu-item-icon">▶️</div>Your Videos</div>
+  <div class="menu-item" onclick="menuAction('Analytics')"><div class="menu-item-icon">📊</div>Analytics</div>
+  <div class="menu-item" onclick="menuAction('QR Code')"><div class="menu-item-icon">🔳</div>QR Code</div>
+  <div class="menu-item" onclick="menuAction('Dark Mode')"><div class="menu-item-icon">🌙</div>Dark Mode</div>
+  <div style="border-top:.5px solid rgba(255,255,255,.08);margin:8px 0"></div>
+  <div class="menu-item" onclick="menuAction('Help & Feedback')"><div class="menu-item-icon">❓</div>Help & Feedback</div>
+  <div class="menu-item" onclick="closeMenu()"><div class="menu-item-icon">✕</div>Close</div>
+</div>
+
+<!-- ===== VIDEO PLAYER (embedded, opens on Watch) ===== -->
+<div id="video-player-overlay">
+  <div id="player-close" onclick="closePlayer()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+  <iframe id="player-iframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 </div>
 
 <div id="toast"></div>
@@ -754,315 +734,526 @@ body{
 
 <script>
 // ================================================================
-// NO IFRAMES — NO EMBEDS — 100% thumbnail based
-// Click opens YouTube app/browser directly
+// YouTube Shorts Player — Real YouTube Data API v3
 // ================================================================
 
-// ── Fallback video IDs ──────────────────────────────────────────
+const API_KEY = 'AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
+const BASE_URL = 'https://www.googleapis.com/youtube/v3';
+
+// ── Fallback IDs (used if API fails) ─────────────────────────────
 const FALLBACK_IDS = [
-  "dQw4w9WgXcQ","M7lc1UVf-VE","kJQP7kiw5Fk","9bZkp7q19f0",
-  "hT_nvWreIhg","jNQXAC9IVRw","fRh_vgS2dFE","hTWKbfoikeg",
-  "LsoLEjrDogU","2Vv-BfVoq4g","CevxZvSJLk8","sON68ibZxs0",
-  "LXb3EKWsInQ","C0DPdy98e4c","YQHsXMglC9A"
+  'dQw4w9WgXcQ','M7lc1UVf-VE','kJQP7kiw5Fk','9bZkp7q19f0',
+  'hT_nvWreIhg','jNQXAC9IVRw','fRh_vgS2dFE','hTWKbfoikeg',
+  'LsoLEjrDogU','2Vv-BfVoq4g','CevxZvSJLk8','sON68ibZxs0',
+  'LXb3EKWsInQ','C0DPdy98e4c','YQHsXMglC9A','OPf0YbXqDm0',
+  'pRpeEdMmmQ0','JGwWNGJdvx8','RgKAFK5djSk','09R8_2nJtjg'
 ];
 
-const PIPED_INSTANCES = [
-  'https://pipedapi.kavin.rocks',
-  'https://pipedapi.adminforge.de',
-  'https://piped-api.garudalinux.org',
-  'https://api.piped.yt',
-  'https://pipedapi.in.projectsegfau.lt',
+const TRENDING_TOPICS = [
+  '🔥 Trending','💃 Dance','😂 Funny','🎵 Music','🍕 Food',
+  '⚽ Sports','🐶 Animals','😮 Satisfying','🎮 Gaming','✈️ Travel'
 ];
 
-// ── State ────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────
 let feedVideos = [];
 let currentSheetVideo = null;
 let searchDebounce = null;
+let activePostIndex = 0;
+let globalMuted = true;
 
-// ── Helpers ──────────────────────────────────────────────────────
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/'/g,"&#39;").replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+// ── Helpers ───────────────────────────────────────────────────────
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/'/g,"&#39;").replace(/"/g,'&quot;').replace(/</g,'&lt;');
 function decode(s){ const t=document.createElement('textarea'); t.innerHTML=s||''; return t.value; }
-function fmt(n){ const v=parseInt(n)||0; if(v>=1e9) return (v/1e9).toFixed(1)+'B'; if(v>=1e6) return (v/1e6).toFixed(1)+'M'; if(v>=1e3) return (v/1e3).toFixed(0)+'K'; return v>0?v.toString():''; }
-function rndFmt(a,b){ return fmt(Math.floor(Math.random()*(b-a)+a)); }
-function shuffle(a){ const r=[...a]; for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
-function thumb(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+function fmt(n){
+  const v = parseInt(n) || 0;
+  if(v >= 1e9) return (v/1e9).toFixed(1).replace('.0','') + 'B';
+  if(v >= 1e6) return (v/1e6).toFixed(1).replace('.0','') + 'M';
+  if(v >= 1e3) return (v/1e3).toFixed(0) + 'K';
+  return v > 0 ? v.toLocaleString() : '–';
+}
+function thumb(id,q='hqdefault'){ return `https://i.ytimg.com/vi/${id}/${q}.jpg`; }
 function ytURL(id){ return `https://www.youtube.com/shorts/${id}`; }
-function avURL(name){ return `https://ui-avatars.com/api/?name=${encodeURIComponent(name||'YT')}&background=random&color=fff&size=100`; }
+function avURL(name){ return `https://ui-avatars.com/api/?name=${encodeURIComponent(name||'YT')}&background=ff0000&color=fff&size=100`; }
+function shuffle(a){ const r=[...a]; for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
 
-// ── Toast ────────────────────────────────────────────────────────
+// ── Toast ─────────────────────────────────────────────────────────
 let toastTimer;
 function showToast(msg){
   clearTimeout(toastTimer);
   const t=document.getElementById('toast');
   t.innerText=msg; t.classList.add('show');
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-// ── Storage ──────────────────────────────────────────────────────
-function getLiked()    { try{return JSON.parse(localStorage.getItem('lk')||'[]');}catch(e){return[];} }
-function getSaved()    { try{return JSON.parse(localStorage.getItem('sv')||'[]');}catch(e){return[];} }
-function getLikedData(){ try{return JSON.parse(localStorage.getItem('lkd')||'[]');}catch(e){return[];} }
-function getSavedData(){ try{return JSON.parse(localStorage.getItem('svd')||'[]');}catch(e){return[];} }
-function saveLiked(a)    { localStorage.setItem('lk',JSON.stringify(a)); }
-function saveSaved(a)    { localStorage.setItem('sv',JSON.stringify(a)); }
-function saveLikedData(a){ localStorage.setItem('lkd',JSON.stringify(a)); }
-function saveSavedData(a){ localStorage.setItem('svd',JSON.stringify(a)); }
+// ── Storage ───────────────────────────────────────────────────────
+const LS = {
+  get: (k,d=[]) => { try{ return JSON.parse(localStorage.getItem(k)||'null') ?? d; }catch(e){ return d; } },
+  set: (k,v) => { try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+const getLiked    = () => LS.get('yt_liked',[]);
+const getSaved    = () => LS.get('yt_saved',[]);
+const getLikedData= () => LS.get('yt_liked_data',[]);
+const getSavedData= () => LS.get('yt_saved_data',[]);
+const saveLiked   = a  => LS.set('yt_liked',a);
+const saveSaved   = a  => LS.set('yt_saved',a);
+const saveLikedData= a => LS.set('yt_liked_data',a);
+const saveSavedData= a => LS.set('yt_saved_data',a);
 
-// ── Navigation ───────────────────────────────────────────────────
-function showPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const ni=document.getElementById('nav-'+page);
-  if(ni) ni.classList.add('active');
-  closeSheets(); closeMenu(); closeInfoSheet();
-  if(page==='profile') renderProfileGrids();
+// ── YouTube Data API v3 ───────────────────────────────────────────
+async function ytFetch(endpoint, params){
+  const url = new URL(BASE_URL + endpoint);
+  url.searchParams.set('key', API_KEY);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k,v));
+  const res = await fetch(url.toString(), { signal: AbortSignal.timeout(10000) });
+  if(!res.ok) throw new Error('API error ' + res.status);
+  return res.json();
 }
-function switchTab(el){
-  document.querySelectorAll('.home-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-}
-function switchProfileTab(el,tab){
-  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['posts','private','saved','liked'].forEach(t=>{
-    document.getElementById('profileTab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display=t===tab?'':'none';
+
+// Search for Shorts by keyword
+async function searchShorts(query, maxResults=20){
+  const data = await ytFetch('/search', {
+    part: 'snippet',
+    q: query + ' #shorts',
+    type: 'video',
+    videoDuration: 'short',
+    order: 'relevance',
+    maxResults,
+    safeSearch: 'moderate'
   });
-  if(tab==='saved'||tab==='liked') renderProfileGrids();
+  const ids = (data.items||[]).map(i => i.id.videoId).filter(Boolean);
+  if(!ids.length) return [];
+  return getVideoDetails(ids);
 }
 
-// ── Profile grids ─────────────────────────────────────────────
-function renderProfileGrids(){
-  const likedData=getLikedData(), savedData=getSavedData();
-  const lg=document.getElementById('likedGrid'), sg=document.getElementById('savedGrid');
-  lg.innerHTML=!likedData.length
-    ? '<div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any short to like.</div>'
-    : likedData.map(v=>`<div class="profile-yt-post" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','','','')"><img src="${v.thumb}" loading="lazy" alt="" onerror="this.src='${avURL(v.channel)}'"><div class="grid-post-views">▶ YT</div></div>`).join('');
-  sg.innerHTML=!savedData.length
-    ? '<div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any short to save.</div>'
-    : savedData.map(v=>`<div class="profile-yt-post" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','','','')"><img src="${v.thumb}" loading="lazy" alt="" onerror="this.src='${avURL(v.channel)}'"><div class="grid-post-views">▶ YT</div></div>`).join('');
-}
-
-// ── Piped API (for feed data only — no embeds) ────────────────────
-async function fetchPipedTrending(){
-  for(const base of PIPED_INSTANCES){
+// Get trending shorts (using chart=mostPopular with videoCategoryId)
+async function getTrendingShorts(maxResults=20){
+  // Try videos.list with chart first
+  const cats = ['10','23','24','1','2']; // Music, Comedy, Entertainment, Film, Autos
+  let allIds = [];
+  for(const cat of cats.slice(0,3)){
     try{
-      const res=await fetch(base+'/trending?region=US',{signal:AbortSignal.timeout(5000)});
-      if(!res.ok) continue;
-      const data=await res.json();
-      if(!Array.isArray(data)||data.length<3) continue;
-      return data.map(item=>{
-        const id=(item.url||'').match(/[?&]v=([A-Za-z0-9_-]{11})/)?.[1]||(item.url||'').match(/youtu\.be\/([A-Za-z0-9_-]{11})/)?.[1]||'';
-        return { id, title:item.title||'Trending', channel:item.uploaderName||'YouTube',
-          views:fmt(item.views||0), likes:rndFmt(1000,500000), comments:rndFmt(50,50000),
-          thumb:item.thumbnail||thumb(id) };
-      }).filter(v=>v.id);
-    } catch(e){ /* next */ }
+      const data = await ytFetch('/videos', {
+        part: 'id',
+        chart: 'mostPopular',
+        videoCategoryId: cat,
+        regionCode: 'IN',
+        maxResults: 10,
+        videoDuration: 'short'
+      });
+      allIds.push(...(data.items||[]).map(i=>i.id).filter(Boolean));
+    }catch(e){}
+    if(allIds.length >= maxResults) break;
   }
-  return null;
-}
-
-async function fetchPipedSearch(query){
-  for(const base of PIPED_INSTANCES.slice(0,3)){
+  // Supplement with search
+  if(allIds.length < 10){
     try{
-      const res=await fetch(base+'/search?filter=videos&q='+encodeURIComponent(query+' shorts'),{signal:AbortSignal.timeout(6000)});
-      if(!res.ok) continue;
-      const data=await res.json();
-      const items=data.items||[];
-      if(!items.length) continue;
-      return items.map(item=>{
-        const id=(item.url||'').match(/[?&]v=([A-Za-z0-9_-]{11})/)?.[1]||(item.url||'').match(/youtu\.be\/([A-Za-z0-9_-]{11})/)?.[1]||'';
-        return { id, title:item.title||'Video', channel:item.uploaderName||'YouTube',
-          views:fmt(item.views||0), likes:rndFmt(500,200000), comments:rndFmt(20,20000),
-          thumb:item.thumbnail||thumb(id) };
-      }).filter(v=>v.id);
-    } catch(e){ /* next */ }
+      const srch = await ytFetch('/search',{
+        part:'snippet', q:'shorts trending 2024', type:'video',
+        videoDuration:'short', order:'viewCount', maxResults:15,
+        regionCode:'IN', safeSearch:'moderate'
+      });
+      allIds.push(...(srch.items||[]).map(i=>i.id.videoId).filter(Boolean));
+    }catch(e){}
   }
-  return null;
+  const unique = [...new Set(allIds)].slice(0,maxResults);
+  return unique.length ? getVideoDetails(unique) : [];
 }
 
+// Get real statistics for video IDs
+async function getVideoDetails(ids){
+  if(!ids.length) return [];
+  // Batch max 50 per request
+  const chunks = [];
+  for(let i=0;i<ids.length;i+=50) chunks.push(ids.slice(i,i+50));
+  let allItems = [];
+  for(const chunk of chunks){
+    try{
+      const data = await ytFetch('/videos',{
+        part: 'snippet,statistics,contentDetails',
+        id: chunk.join(',')
+      });
+      allItems.push(...(data.items||[]));
+    }catch(e){}
+  }
+  return allItems.map(item => {
+    const s = item.statistics || {};
+    const sn = item.snippet || {};
+    const channelName = sn.channelTitle || 'YouTube';
+    return {
+      id: item.id,
+      title: sn.title || 'YouTube Short',
+      channel: channelName,
+      channelId: sn.channelId || '',
+      description: sn.description || '',
+      views: fmt(s.viewCount || 0),
+      viewsRaw: parseInt(s.viewCount||0),
+      likes: fmt(s.likeCount || 0),
+      likesRaw: parseInt(s.likeCount||0),
+      comments: s.commentCount ? fmt(s.commentCount) : '–',
+      commentsRaw: parseInt(s.commentCount||0),
+      thumb: sn.thumbnails?.maxres?.url || sn.thumbnails?.high?.url || sn.thumbnails?.medium?.url || thumb(item.id),
+      publishedAt: sn.publishedAt || ''
+    };
+  }).filter(v => v.id);
+}
+
+// Get real comments for a video
+async function getVideoComments(videoId, maxResults=10){
+  try{
+    const data = await ytFetch('/commentThreads',{
+      part: 'snippet',
+      videoId,
+      order: 'relevance',
+      maxResults,
+      textFormat: 'plainText'
+    });
+    return (data.items||[]).map(item => {
+      const c = item.snippet?.topLevelComment?.snippet || {};
+      return {
+        author: c.authorDisplayName || 'Anonymous',
+        avatar: c.authorProfileImageUrl || '',
+        text: c.textDisplay || '',
+        likes: fmt(c.likeCount||0),
+        time: timeAgo(c.publishedAt||'')
+      };
+    });
+  }catch(e){
+    return [];
+  }
+}
+
+// Get channel avatar URL
+async function getChannelAvatar(channelId){
+  if(!channelId) return null;
+  try{
+    const data = await ytFetch('/channels',{
+      part:'snippet', id:channelId
+    });
+    return data.items?.[0]?.snippet?.thumbnails?.default?.url || null;
+  }catch(e){ return null; }
+}
+
+// ── Time helpers ──────────────────────────────────────────────────
+function timeAgo(dateStr){
+  if(!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const s=Math.floor(diff/1000), m=Math.floor(s/60), h=Math.floor(m/60),
+        d=Math.floor(h/24), w=Math.floor(d/7), mo=Math.floor(d/30), y=Math.floor(d/365);
+  if(y>0) return y+'y ago'; if(mo>0) return mo+'mo ago'; if(w>0) return w+'w ago';
+  if(d>0) return d+'d ago'; if(h>0) return h+'h ago'; if(m>0) return m+'m ago';
+  return 'Just now';
+}
+
+// ── Build fallback videos ─────────────────────────────────────────
 function buildFallbackVideos(){
-  const titles=['Amazing viral short 🔥',"You won't believe this 😲",'POV: This is 100% you 😂',
+  const titles=[
+    'Amazing viral short 🔥',"You won't believe this 😲",'POV: This is 100% you 😂',
     'Satisfying moment ✨','Best clip ever 🎉','Watch till the end 👀','Trending now 📈',
     'Made my day 🌟','Absolutely incredible 😮','Crazy talent 🎸','Weekend vibes 🎶',
-    'Real life magic ✨','This is why internet exists 😂','Mind-blowing 🤯','Pure happiness 💛'];
+    'Real life magic ✨','This is why internet exists 😂','Mind-blowing 🤯','Pure happiness 💛',
+    'Viral moment of the week 🔥','Can\'t stop watching 😭','Bro really did that 💀',
+    'Not me crying 😭💕','This hits different at midnight 🌙'
+  ];
   const channels=['ViralWorld','TrendHub','DailyFun','ShortClips','WowMoments',
     'JoyVibes','QuickFlix','HitShorts','CoolTube','TopViral'];
+  const fmtRnd = (a,b) => fmt(Math.floor(Math.random()*(b-a)+a));
   return shuffle(FALLBACK_IDS).map((id,i)=>({
     id, title:titles[i%titles.length], channel:channels[i%channels.length],
-    views:rndFmt(50000,50000000), likes:rndFmt(1000,5000000),
-    comments:rndFmt(100,200000), thumb:thumb(id),
+    channelId:'', views:fmtRnd(50000,50000000), viewsRaw:0,
+    likes:fmtRnd(1000,5000000), likesRaw:0,
+    comments:fmtRnd(100,200000), commentsRaw:0,
+    thumb:thumb(id), publishedAt:''
   }));
 }
 
-// ── BUILD POST (NO iframe — just thumbnail + tap to open YT) ──────
-const tapTimers={};
-function handlePostTap(pid,id,title,channel,views,likes,comments,th){
+// ── Build Fake Comments (fallback) ───────────────────────────────
+const FAKE_COMMENTS = [
+  {name:'@techie_raj',   text:'This is actually 🔥🔥🔥',                         likes:'4.5K'},
+  {name:'@viralking99',  text:'Been watching this on repeat 😂',                  likes:'2.1K'},
+  {name:'@simraaan',     text:'Why is no one talking about this?!',                likes:'8.3K'},
+  {name:'@_.anonymous._',text:'Literally made my day 😂❤️',                       likes:'1.2K'},
+  {name:'@sunflower.era',text:'Sending this to my whole contact list 😭',          likes:'956'},
+  {name:'@therealfaizan',text:'Peak content. No notes. 🙌',                        likes:'3.7K'},
+  {name:'@gulshankhan01',text:'Not me watching this at 3AM again 😭',             likes:'5.2K'},
+  {name:'@mehwishk',     text:'Algorithm blessed me today ✨',                     likes:'788'},
+  {name:'@rizz.era',     text:'The way I gasped 😭',                              likes:'1.4K'},
+  {name:'@noor_vlogs',   text:'Bro really said "hold my tea" 💀',                 likes:'2.9K'},
+];
+const AVATAR_POOL = [
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&q=70',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=60&q=70',
+  'https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=60&q=70',
+  'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&q=70',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=70',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&q=70',
+];
+
+function buildCommentHTML(comments){
+  if(!comments || !comments.length){
+    // fallback to fake
+    return shuffle(FAKE_COMMENTS).slice(0,6).map((c,i)=>`
+      <div class="sheet-comment-item">
+        <div class="sheet-comment-av"><img src="${AVATAR_POOL[i%AVATAR_POOL.length]}" alt="" loading="lazy"></div>
+        <div class="sheet-comment-body">
+          <div class="sheet-comment-name">${c.name}</div>
+          <div class="sheet-comment-text">${c.text}</div>
+          <div class="sheet-comment-meta"><span>❤️ ${c.likes}</span><span>Reply</span></div>
+        </div>
+      </div>`).join('');
+  }
+  return comments.map(c=>`
+    <div class="sheet-comment-item">
+      <div class="sheet-comment-av">
+        ${c.avatar ? `<img src="${c.avatar}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<div style="width:32px;height:32px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff">${(c.author||'?')[0]}</div>`}
+      </div>
+      <div class="sheet-comment-body">
+        <div class="sheet-comment-name">${esc(c.author)}</div>
+        <div class="sheet-comment-text">${esc(c.text)}</div>
+        <div class="sheet-comment-meta"><span>❤️ ${c.likes}</span><span>${c.time}</span><span>Reply</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Build Post HTML ───────────────────────────────────────────────
+const tapTimers = {};
+function handlePostTap(pid, id, title, channel, views, likes, comments, th){
   if(tapTimers[pid]){
-    clearTimeout(tapTimers[pid]);
-    delete tapTimers[pid];
-    // double tap = like animation + like
-    feedLike(pid,id,title,channel,th);
-    const a=document.getElementById('la_'+pid);
-    if(a){a.classList.remove('show');void a.offsetWidth;a.classList.add('show');setTimeout(()=>a.classList.remove('show'),750);}
+    clearTimeout(tapTimers[pid]); delete tapTimers[pid];
+    // Double tap = like
+    feedLike(pid, id, title, channel, th);
+    const el = document.getElementById('la_'+pid);
+    if(el){ el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),750); }
     return;
   }
-  tapTimers[pid]=setTimeout(()=>{
+  tapTimers[pid] = setTimeout(()=>{
     delete tapTimers[pid];
-    openInfoSheet(id,title,channel,th,views,likes,comments);
-  },230);
+    openInfoSheet(id, title, channel, th, views, likes, comments);
+  }, 240);
 }
 
-function buildPost(v,index){
-  const pid='p'+index;
-  const av=avURL(v.channel);
-  const titleShort=(v.title||'').substring(0,80);
-  const bgImg=v.thumb||thumb(v.id);
-
-  return `<div class="feed-post" id="post_${pid}" onclick="handlePostTap('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(v.views)}','${esc(v.likes)}','${esc(v.comments)}','${esc(bgImg)}')">
-    <div class="post-bg" style="background-image:url('${bgImg}')"></div>
-    <div class="post-grad-top"></div>
-    <div class="post-play">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+function buildPost(v, index){
+  const pid = 'p'+index;
+  const av = avURL(v.channel);
+  const titleShort = (v.title||'').substring(0,90);
+  const bg = v.thumb || thumb(v.id);
+  return `
+<div class="feed-post" id="post_${pid}" onclick="handlePostTap('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(v.views)}','${esc(v.likes)}','${esc(v.comments)}','${esc(bg)}')">
+  <div class="post-bg" style="background-image:url('${bg}')"></div>
+  <div class="post-grad-top"></div>
+  <div class="post-play-icon" id="play_${pid}">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+  </div>
+  <div class="mute-icon" id="mute_${pid}" onclick="event.stopPropagation();toggleMute('${pid}')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="white" id="mutesvg_${pid}">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <line x1="23" y1="9" x2="17" y2="15" stroke="white" stroke-width="2" stroke-linecap="round" id="muteline1_${pid}"/>
+      <line x1="17" y1="9" x2="23" y2="15" stroke="white" stroke-width="2" stroke-linecap="round" id="muteline2_${pid}"/>
+    </svg>
+  </div>
+  <div class="like-pop" id="la_${pid}">❤️</div>
+  <div class="post-actions" onclick="event.stopPropagation()">
+    <div class="author-wrap">
+      <div class="author-avatar"><img src="${av}" alt="" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(v.channel)}&background=ff0000&color=fff&size=100'"></div>
+      <div class="follow-dot" id="fd_${pid}" onclick="toggleFollowDot('fd_${pid}')">+</div>
     </div>
-    <div class="post-watch-label">Tap to watch</div>
-    <div class="like-pop" id="la_${pid}">❤️</div>
-    <div class="post-actions" onclick="event.stopPropagation()">
-      <div class="author-wrap">
-        <div class="author-avatar"><img src="${av}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'"></div>
-        <div class="follow-dot" id="fd_${pid}" onclick="toggleFollowDot('fd_${pid}')">+</div>
+    <div class="action-btn" onclick="feedLike('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(bg)}')">
+      <div class="action-icon" id="li_${pid}">
+        <svg width="27" height="27" viewBox="0 0 24 24"><path id="lp_${pid}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/></svg>
       </div>
-      <div class="action-btn" onclick="feedLike('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(bgImg)}')">
-        <div class="action-icon" id="li_${pid}">
-          <svg width="26" height="26" viewBox="0 0 24 24"><path id="lp_${pid}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/></svg>
-        </div>
-        <span class="action-count" id="lc_${pid}">${v.likes}</span>
+      <span class="action-count" id="lc_${pid}">${v.likes}</span>
+    </div>
+    <div class="action-btn" onclick="openCommentSheetFor('${v.id}','${esc(titleShort)}','${esc(v.comments)}')">
+      <div class="action-icon">
+        <svg width="25" height="25" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/></svg>
       </div>
-      <div class="action-btn" onclick="openInfoSheet('${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(bgImg)}','${esc(v.views)}','${esc(v.likes)}','${esc(v.comments)}')">
-        <div class="action-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/></svg>
-        </div>
-        <span class="action-count">${v.comments}</span>
+      <span class="action-count">${v.comments}</span>
+    </div>
+    <div class="action-btn" onclick="feedSave('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(bg)}')">
+      <div class="action-icon">
+        <svg width="23" height="23" viewBox="0 0 24 24"><path id="sp_${pid}" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="white" stroke-width="2" fill="none"/></svg>
       </div>
-      <div class="action-btn" onclick="feedSave('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(bgImg)}')">
-        <div class="action-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24"><path id="sp_${pid}" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="white" stroke-width="1.8" fill="none"/></svg>
-        </div>
-        <span class="action-count">${v.views}</span>
+      <span class="action-count" id="sc_${pid}">${v.views}</span>
+    </div>
+    <div class="action-btn" onclick="shareVideo('${v.id}')">
+      <div class="action-icon">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
-      <div class="action-btn" onclick="shareVideo('${v.id}')">
-        <div class="action-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-        </div>
-        <span class="action-count">Share</span>
-      </div>
-      <div class="music-disk" onclick="showToast('🎵 ${esc(v.channel)}')">
-        <div class="music-disk-inner"></div>
+      <span class="action-count">Share</span>
+    </div>
+    <div class="music-disk" onclick="showToast('♪ ${esc(v.channel)} · Original Sound')">
+      <div class="music-disk-inner"></div>
+    </div>
+  </div>
+  <div class="post-overlay">
+    <div class="post-author-row">
+      <div class="post-mini-av"><img src="${av}" alt="" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(v.channel)}&background=ff0000&color=fff&size=100'"></div>
+      <div class="post-username">
+        @${esc((v.channel||'').replace(/\s+/g,'').toLowerCase().substring(0,20))}
+        <button class="follow-btn-feed" onclick="event.stopPropagation();toggleFollowFeedBtn(this,'${esc(v.channel)}')">Subscribe</button>
       </div>
     </div>
-    <div class="post-overlay" style="pointer-events:none">
-      <div class="post-author-row">
-        <div class="post-mini-av"><img src="${av}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'"></div>
-        <div class="post-username" style="pointer-events:all">
-          ${(v.channel||'').substring(0,22)}
-          <button class="follow-btn-feed" onclick="toggleFollowFeedBtn(this)">Follow</button>
-        </div>
-      </div>
-      <div class="post-caption">${decode(titleShort)}${(v.title||'').length>80?'...':''}</div>
-      <div class="post-sound">🎵 <span class="sound-ticker">${v.channel} · ${v.views} views</span></div>
-    </div>
-    <div class="post-progress"><div class="post-progress-fill" style="width:${Math.floor(Math.random()*65)+10}%"></div></div>
-  </div>`;
+    <div class="post-caption">${decode(titleShort)}${(v.title||'').length>90?'...':''}</div>
+    <div class="post-sound">♪ <span class="sound-ticker">${esc(v.channel)} · ${v.views} views · Original Sound</span></div>
+  </div>
+  <div class="post-progress"><div class="post-progress-fill" id="prog_${pid}" style="width:${Math.floor(Math.random()*55)+5}%"></div></div>
+</div>`;
 }
 
-// ── LOAD FEED ──────────────────────────────────────────────────
+// ── LOAD FEED ─────────────────────────────────────────────────────
 async function loadFeed(){
-  const container=document.getElementById('feedContainer');
-  container.innerHTML='<div class="feed-loading"><div class="spinner"></div><p>Loading shorts...</p></div>';
-  let videos=null;
+  const container = document.getElementById('feedContainer');
+  container.innerHTML = '<div class="feed-loading"><div class="spinner"></div><p>Loading Shorts...</p></div>';
+
+  let videos = null;
   try{
-    videos=await fetchPipedTrending();
-    if(!videos||videos.length<3) throw new Error('Not enough');
-  } catch(e){
-    console.warn('Piped failed, using fallback');
-    videos=null;
+    videos = await getTrendingShorts(20);
+    if(!videos || videos.length < 3) throw new Error('Not enough videos');
+  }catch(e){
+    console.warn('YouTube API issue, using fallback. Error:', e.message);
+    videos = null;
   }
-  if(!videos||!videos.length) videos=buildFallbackVideos();
-  feedVideos=videos;
+  if(!videos || !videos.length) videos = buildFallbackVideos();
+  feedVideos = videos;
 
-  container.innerHTML=videos.map((v,i)=>buildPost(v,i)).join('');
+  container.innerHTML = videos.map((v,i) => buildPost(v,i)).join('');
 
-  // restore like/save colors
-  const liked=getLiked(), saved=getSaved();
+  // Restore liked/saved colors
+  const liked = getLiked(), saved = getSaved();
   videos.forEach((v,i)=>{
-    const pid='p'+i;
-    if(liked.includes(v.id)){ const p=document.getElementById('lp_'+pid); if(p) p.setAttribute('fill','#fe2c55'); }
-    if(saved.includes(v.id)){ const p=document.getElementById('sp_'+pid); if(p){p.setAttribute('fill','#ffc107');p.setAttribute('stroke','#ffc107');} }
+    const pid = 'p'+i;
+    if(liked.includes(v.id)){
+      const p = document.getElementById('lp_'+pid);
+      if(p) p.setAttribute('fill','#fe2c55');
+    }
+    if(saved.includes(v.id)){
+      const p = document.getElementById('sp_'+pid);
+      if(p){ p.setAttribute('fill','#ffc107'); p.setAttribute('stroke','#ffc107'); }
+    }
   });
+
+  // Setup intersection observer for mute icon visibility
+  setupScrollObserver();
 }
 
-// ── LIKE / SAVE ──────────────────────────────────────────────
-function feedLike(pid,id,title,channel,th){
-  const liked=getLiked(), likedData=getLikedData();
-  const path=document.getElementById('lp_'+pid);
+// ── Scroll observer for active post ──────────────────────────────
+function setupScrollObserver(){
+  const opts = { root: document.getElementById('feedContainer'), threshold: 0.7 };
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const pid = entry.target.id.replace('post_','');
+        const muteEl = document.getElementById('mute_'+pid);
+        if(muteEl){
+          muteEl.classList.add('visible');
+          setTimeout(()=>muteEl.classList.remove('visible'), 3000);
+        }
+      }
+    });
+  }, opts);
+  document.querySelectorAll('.feed-post').forEach(el=>obs.observe(el));
+}
+
+// ── Mute toggle (visual only — thumbnails, no real video) ─────────
+function toggleMute(pid){
+  globalMuted = !globalMuted;
+  const l1 = document.getElementById('muteline1_'+pid);
+  const l2 = document.getElementById('muteline2_'+pid);
+  if(l1) l1.style.display = globalMuted ? '' : 'none';
+  if(l2) l2.style.display = globalMuted ? '' : 'none';
+  showToast(globalMuted ? '🔇 Muted' : '🔊 Unmuted');
+}
+
+// ── Social Actions ────────────────────────────────────────────────
+function feedLike(pid, id, title, channel, th){
+  const liked = getLiked(); const likedData = getLikedData();
+  const pEl = document.getElementById('lp_'+pid);
   if(liked.includes(id)){
     liked.splice(liked.indexOf(id),1);
-    const di=likedData.findIndex(v=>v.id===id); if(di>-1) likedData.splice(di,1);
-    if(path) path.setAttribute('fill','white');
+    const di = likedData.findIndex(v=>v.id===id); if(di>-1) likedData.splice(di,1);
+    if(pEl) pEl.setAttribute('fill','white');
     showToast('Removed from liked');
   } else {
-    liked.push(id); likedData.push({id,title,channel,thumb:th});
-    if(path) path.setAttribute('fill','#fe2c55');
+    liked.push(id);
+    likedData.push({id, title, channel, thumb: th});
+    if(pEl) pEl.setAttribute('fill','#fe2c55');
     showToast('❤️ Liked!');
   }
   saveLiked(liked); saveLikedData(likedData);
+  updateLikedCount();
 }
 
-function feedSave(pid,id,title,channel,th){
-  const saved=getSaved(), savedData=getSavedData();
-  const path=document.getElementById('sp_'+pid);
+function feedSave(pid, id, title, channel, th){
+  const saved = getSaved(); const savedData = getSavedData();
+  const pEl = document.getElementById('sp_'+pid);
   if(saved.includes(id)){
     saved.splice(saved.indexOf(id),1);
-    const di=savedData.findIndex(v=>v.id===id); if(di>-1) savedData.splice(di,1);
-    if(path){path.setAttribute('fill','none');path.setAttribute('stroke','white');}
+    const di = savedData.findIndex(v=>v.id===id); if(di>-1) savedData.splice(di,1);
+    if(pEl){ pEl.setAttribute('fill','none'); pEl.setAttribute('stroke','white'); }
     showToast('Removed from saved');
   } else {
-    saved.push(id); savedData.push({id,title,channel,thumb:th});
-    if(path){path.setAttribute('fill','#ffc107');path.setAttribute('stroke','#ffc107');}
+    saved.push(id);
+    savedData.push({id, title, channel, thumb: th});
+    if(pEl){ pEl.setAttribute('fill','#ffc107'); pEl.setAttribute('stroke','#ffc107'); }
     showToast('🔖 Saved!');
   }
   saveSaved(saved); saveSavedData(savedData);
 }
 
 function shareVideo(id){
-  const url=ytURL(id);
-  if(navigator.share){ navigator.share({url}).catch(()=>{}); }
-  else { navigator.clipboard?navigator.clipboard.writeText(url).then(()=>showToast('📋 Link copied!')):showToast('📋 Link copied!'); }
+  const url = ytURL(id);
+  if(navigator.share){ navigator.share({title:'Check out this Short!', url}); }
+  else { navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link copied!')).catch(()=>showToast('🔗 ' + url)); }
 }
 
-// ── INFO SHEET (no iframe — just info + open YT button) ───────
-function openInfoSheet(id,title,channel,th,views,likes,comments){
-  currentSheetVideo={id,title:decode(title),channel:decode(channel),thumb:th};
-  document.getElementById('sheetThumb').src=th;
-  document.getElementById('sheetTitle').innerText=decode(title)||'Video';
-  document.getElementById('sheetChannel').innerText='📺 '+decode(channel);
-  document.getElementById('sheetStats').innerHTML=[
-    views?`<span class="sheet-stat">👁️ ${views}</span>`:'',
-    likes?`<span class="sheet-stat">❤️ ${likes}</span>`:'',
-    comments?`<span class="sheet-stat">💬 ${comments}</span>`:'',
-  ].filter(Boolean).join('')||'<span class="sheet-stat">YouTube Short</span>';
+function toggleFollowDot(id){
+  const el = document.getElementById(id); if(!el) return;
+  const done = el.classList.contains('done');
+  el.classList.toggle('done'); el.innerHTML = done ? '+' : '✓';
+  showToast(done ? 'Unsubscribed' : 'Subscribed! ✅');
+  updateFollowCount(done ? -1 : 1);
+}
+function toggleFollowFeedBtn(btn, name){
+  const f = btn.classList.contains('following');
+  btn.classList.toggle('following'); btn.innerText = f ? 'Subscribe' : 'Subscribed';
+  showToast(f ? 'Unsubscribed' : `Subscribed to ${name}! ✅`);
+  updateFollowCount(f ? -1 : 1);
+}
+function updateFollowCount(d){
+  const el = document.getElementById('followingCount');
+  if(el) el.innerText = Math.max(0, parseInt(el.innerText||'0') + d);
+}
+function updateLikedCount(){
+  const el = document.getElementById('likedCount');
+  if(el) el.innerText = getLiked().length;
+}
 
-  const likedIds=getLiked(), savedIds=getSaved();
-  const lb=document.getElementById('sheetLikeBtn');
-  const sb=document.getElementById('sheetSaveBtn');
-  lb.className='sheet-btn sheet-btn-like'+(likedIds.includes(id)?' liked':'');
-  lb.innerHTML=likedIds.includes(id)?'❤️ Liked':'❤️ Like';
-  sb.className='sheet-btn sheet-btn-save'+(savedIds.includes(id)?' saved':'');
-  sb.innerHTML=savedIds.includes(id)?'🔖 Saved':'🔖 Save';
+// ── Info Sheet ────────────────────────────────────────────────────
+async function openInfoSheet(id, title, channel, th, views, likes, comments){
+  currentSheetVideo = {id, title, channel, thumb: th, views, likes, comments};
+  document.getElementById('sheetThumb').src = th || thumb(id);
+  document.getElementById('sheetTitle').innerText = decode(title);
+  document.getElementById('sheetChannel').innerHTML = `
+    <img class="sheet-channel-av" src="${avURL(channel)}" alt="" onerror="this.style.display='none'">
+    ${esc(channel)}`;
+  document.getElementById('sheetStats').innerHTML = `
+    <span class="sheet-stat">👁 ${views}</span>
+    <span class="sheet-stat">❤️ ${likes}</span>
+    <span class="sheet-stat">💬 ${comments}</span>`;
 
-  document.getElementById('sheetComments').innerHTML=buildSampleComments(decode(channel));
+  const liked = getLiked(), saved = getSaved();
+  const lb = document.getElementById('sheetLikeBtn'), sb = document.getElementById('sheetSaveBtn');
+  lb.className = 'sheet-btn sheet-btn-like' + (liked.includes(id) ? ' liked' : '');
+  lb.innerHTML = liked.includes(id) ? '❤️ Liked' : '❤️ Like';
+  sb.className = 'sheet-btn sheet-btn-save' + (saved.includes(id) ? ' saved' : '');
+  sb.innerHTML = saved.includes(id) ? '🔖 Saved' : '🔖 Save';
+
+  // Load real comments async
+  document.getElementById('sheetComments').innerHTML = '<div style="padding:16px;text-align:center"><div class="spinner" style="width:24px;height:24px;border-width:2px;margin:0 auto"></div></div>';
   document.getElementById('info-overlay').classList.add('open');
   document.getElementById('info-sheet').classList.add('open');
+
+  const realComments = await getVideoComments(id, 8);
+  document.getElementById('sheetComments').innerHTML = buildCommentHTML(realComments);
 }
 
 function closeInfoSheet(){
@@ -1072,75 +1263,143 @@ function closeInfoSheet(){
 
 function openOnYT(){
   if(!currentSheetVideo) return;
-  window.open(ytURL(currentSheetVideo.id),'_blank','noopener');
+  closeInfoSheet();
+  openPlayer(currentSheetVideo.id);
+}
+
+function shareVideoFromSheet(){
+  if(!currentSheetVideo) return;
+  shareVideo(currentSheetVideo.id);
 }
 
 function sheetToggleLike(){
   if(!currentSheetVideo) return;
-  const {id,title,channel,thumb}=currentSheetVideo;
-  const liked=getLiked(), likedData=getLikedData();
-  const btn=document.getElementById('sheetLikeBtn');
+  const {id,title,channel,thumb} = currentSheetVideo;
+  const liked = getLiked(), likedData = getLikedData();
+  const btn = document.getElementById('sheetLikeBtn');
   if(liked.includes(id)){
     liked.splice(liked.indexOf(id),1);
-    const di=likedData.findIndex(v=>v.id===id); if(di>-1) likedData.splice(di,1);
-    btn.className='sheet-btn sheet-btn-like'; btn.innerHTML='❤️ Like';
+    const di = likedData.findIndex(v=>v.id===id); if(di>-1) likedData.splice(di,1);
+    btn.className = 'sheet-btn sheet-btn-like'; btn.innerHTML = '❤️ Like';
     showToast('Removed from liked');
   } else {
     liked.push(id); likedData.push({id,title,channel,thumb});
-    btn.className='sheet-btn sheet-btn-like liked'; btn.innerHTML='❤️ Liked';
+    btn.className = 'sheet-btn sheet-btn-like liked'; btn.innerHTML = '❤️ Liked';
     showToast('❤️ Liked!');
   }
   saveLiked(liked); saveLikedData(likedData);
+  updateLikedCount();
 }
 
 function sheetToggleSave(){
   if(!currentSheetVideo) return;
-  const {id,title,channel,thumb}=currentSheetVideo;
-  const saved=getSaved(), savedData=getSavedData();
-  const btn=document.getElementById('sheetSaveBtn');
+  const {id,title,channel,thumb} = currentSheetVideo;
+  const saved = getSaved(), savedData = getSavedData();
+  const btn = document.getElementById('sheetSaveBtn');
   if(saved.includes(id)){
     saved.splice(saved.indexOf(id),1);
-    const di=savedData.findIndex(v=>v.id===id); if(di>-1) savedData.splice(di,1);
-    btn.className='sheet-btn sheet-btn-save'; btn.innerHTML='🔖 Save';
+    const di = savedData.findIndex(v=>v.id===id); if(di>-1) savedData.splice(di,1);
+    btn.className = 'sheet-btn sheet-btn-save'; btn.innerHTML = '🔖 Save';
     showToast('Removed from saved');
   } else {
     saved.push(id); savedData.push({id,title,channel,thumb});
-    btn.className='sheet-btn sheet-btn-save saved'; btn.innerHTML='🔖 Saved';
+    btn.className = 'sheet-btn sheet-btn-save saved'; btn.innerHTML = '🔖 Saved';
     showToast('🔖 Saved!');
   }
   saveSaved(saved); saveSavedData(savedData);
 }
 
-function buildSampleComments(channel){
-  const names=['@techie_raj','@viralking99','@simraaan','@_.anonymous._','@sunflower.era','@therealfaizan','@gulshankhan01'];
-  const texts=['This is actually 🔥🔥🔥','Been watching this on repeat 😂','Why is no one talking about this?!',
-    'Literally made my day 😂❤️','Sending this to my whole contact list',
-    'The comments are almost as good as the video 😂','Not me watching this at 3AM again 😭',
-    'Peak content. No notes.','Algorithm is blessed today ✨','How did this end up on my feed? Staying 😂'];
-  const avatars=[
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&q=80',
-    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=60&q=80',
-    'https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=60&q=80',
-    'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=80',
-  ];
-  const count=5+Math.floor(Math.random()*4);
-  let html='';
-  for(let i=0;i<count;i++){
-    const av=avatars[i%avatars.length], nm=names[i%names.length];
-    const tx=texts[(i+Math.floor(Math.random()*3))%texts.length];
-    html+=`<div class="sheet-comment-item">
-      <div class="sheet-comment-av"><img src="${av}" alt="" onerror="this.style.display='none'"></div>
-      <div class="sheet-comment-body">
-        <div class="sheet-comment-name">${nm}</div>
-        <div class="sheet-comment-text">${tx}</div>
-        <div class="sheet-comment-likes">❤️ ${rndFmt(10,20000)}</div>
-      </div></div>`;
-  }
-  return html;
+// ── Embedded Player ───────────────────────────────────────────────
+function openPlayer(videoId){
+  const overlay = document.getElementById('video-player-overlay');
+  const iframe = document.getElementById('player-iframe');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0&playsinline=1&enablejsapi=1`;
+  overlay.classList.add('open');
+}
+function closePlayer(){
+  document.getElementById('video-player-overlay').classList.remove('open');
+  document.getElementById('player-iframe').src = '';
 }
 
-// ── SEARCH ──────────────────────────────────────────────────────
+// ── Comment Sheet (feed) ──────────────────────────────────────────
+let commentSheetVideoId = null;
+async function openCommentSheetFor(videoId, title, countStr){
+  commentSheetVideoId = videoId;
+  document.getElementById('commentCountTitle').innerText = `💬 ${countStr} Comments`;
+  const list = document.getElementById('commentList');
+  list.innerHTML = '<div style="padding:24px;text-align:center"><div class="spinner" style="margin:0 auto;width:28px;height:28px;border-width:2px;border-top-color:#fe2c55"></div></div>';
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('comment-sheet').classList.add('open');
+
+  const realComments = await getVideoComments(videoId, 20);
+  if(realComments.length){
+    list.innerHTML = realComments.map(c=>`
+      <div class="comment-item">
+        <div class="comment-av">${c.avatar ? `<img src="${c.avatar}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<div style="width:36px;height:36px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;color:#fff">${(c.author||'?')[0]}</div>`}</div>
+        <div class="comment-body">
+          <div class="comment-name">${esc(c.author)}</div>
+          <div class="comment-text">${esc(c.text)}</div>
+          <div class="comment-meta">
+            <span>${c.time}</span>
+            <span class="comment-like-icon" onclick="showToast('Liked comment')">❤️ ${c.likes}</span>
+            <span onclick="showToast('Reply posted!')">Reply</span>
+          </div>
+        </div>
+      </div>`).join('');
+  } else {
+    // Fallback comments
+    list.innerHTML = shuffle(FAKE_COMMENTS).slice(0,8).map((c,i)=>`
+      <div class="comment-item">
+        <div class="comment-av"><img src="${AVATAR_POOL[i%AVATAR_POOL.length]}" alt="" loading="lazy"></div>
+        <div class="comment-body">
+          <div class="comment-name">${c.name}</div>
+          <div class="comment-text">${c.text}</div>
+          <div class="comment-meta">
+            <span>${Math.floor(Math.random()*23)+1}h ago</span>
+            <span class="comment-like-icon" onclick="showToast('Liked!')">❤️ ${c.likes}</span>
+            <span onclick="showToast('Reply!')">Reply</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function openCommentSheet(){
+  if(feedVideos.length > 0){
+    const v = feedVideos[0];
+    openCommentSheetFor(v.id, v.title, v.comments);
+  }
+}
+
+function postComment(){
+  const inp = document.getElementById('commentInput');
+  const txt = (inp.value||'').trim(); if(!txt) return;
+  const list = document.getElementById('commentList');
+  const d = document.createElement('div'); d.className = 'comment-item';
+  d.innerHTML = `
+    <div class="comment-av"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff0000,#cc0000);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px">▶</div></div>
+    <div class="comment-body">
+      <div class="comment-name">@mychannel</div>
+      <div class="comment-text">${esc(txt)}</div>
+      <div class="comment-meta"><span>Just now</span><span class="comment-like-icon">❤️ 0</span><span>Reply</span></div>
+    </div>`;
+  list.prepend(d); inp.value=''; showToast('💬 Comment posted!');
+}
+
+function closeSheets(){
+  document.getElementById('comment-sheet').classList.remove('open');
+  document.getElementById('sheet-overlay').classList.remove('open');
+}
+
+// ── Search ────────────────────────────────────────────────────────
+function buildTrendingChips(){
+  const el = document.getElementById('trendingChips');
+  el.innerHTML = TRENDING_TOPICS.map(t => `
+    <span class="trending-chip" onclick="doSearch('${t.replace(/[^\w\s]/g,'')}')">
+      ${t}
+    </span>`).join('');
+}
+
 function onSearchInput(val){
   clearTimeout(searchDebounce);
   if(!val.trim()){
@@ -1148,104 +1407,131 @@ function onSearchInput(val){
     document.getElementById('searchResults').style.display='none';
     return;
   }
-  searchDebounce=setTimeout(()=>doSearch(val.trim()),500);
+  searchDebounce = setTimeout(()=>doSearch(val.trim()), 600);
 }
 
 async function doSearch(query){
-  const inp=document.getElementById('searchInput');
-  if(inp) inp.value=query;
-  document.getElementById('searchTrending').style.display='none';
-  const resultsEl=document.getElementById('searchResults');
-  resultsEl.style.display='';
-  resultsEl.innerHTML='<div class="search-loading"><div class="spinner" style="width:30px;height:30px;border-width:3px;margin:0 auto 10px;border-top-color:#fe2c55"></div>Searching...</div>';
+  const inp = document.getElementById('searchInput');
+  if(inp) inp.value = query;
+  document.getElementById('searchTrending').style.display = 'none';
+  const resultsEl = document.getElementById('searchResults');
+  resultsEl.style.display = '';
+  resultsEl.innerHTML = '<div class="search-loading"><div class="spinner" style="width:28px;height:28px;border-width:3px;margin:0 auto 10px;border-top-color:#ff0000"></div>Searching Shorts...</div>';
 
-  let results=await fetchPipedSearch(query).catch(()=>null);
-  if(!results||!results.length){
-    const q=query.toLowerCase();
-    results=feedVideos.filter(v=>(v.title||'').toLowerCase().includes(q)||(v.channel||'').toLowerCase().includes(q));
+  let results = null;
+  try{
+    results = await searchShorts(query, 20);
+  }catch(e){
+    console.warn('Search API error:', e);
   }
-  if(!results.length){
-    resultsEl.innerHTML='<div class="search-loading">No results found.</div>';
+
+  // Fallback: filter from feed
+  if(!results || !results.length){
+    const q = query.toLowerCase();
+    results = feedVideos.filter(v =>
+      (v.title||'').toLowerCase().includes(q) ||
+      (v.channel||'').toLowerCase().includes(q)
+    );
+  }
+
+  if(!results || !results.length){
+    resultsEl.innerHTML = '<div class="search-loading">No results found for "' + esc(query) + '"</div>';
     return;
   }
-  resultsEl.innerHTML='<div class="search-results-wrap">'+results.map(v=>`
-    <div class="search-result-item" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','${v.views}','${v.likes}','${v.comments}')">
-      <div class="search-result-thumb"><img src="${v.thumb}" loading="lazy" alt="" onerror="this.style.background='#ddd'"></div>
-      <div class="search-result-info">
-        <div class="search-result-title">${decode(v.title)}</div>
-        <div class="search-result-channel">📺 ${v.channel}</div>
-      </div>
-    </div>`).join('')+'</div>';
+
+  resultsEl.innerHTML = '<div class="search-results-wrap">' +
+    results.map(v=>`
+      <div class="search-result-item" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','${esc(v.views)}','${esc(v.likes)}','${esc(v.comments)}')">
+        <div class="search-result-thumb"><img src="${esc(v.thumb)}" loading="lazy" alt="" onerror="this.style.background='#222'"></div>
+        <div class="search-result-info">
+          <div class="search-result-title">${esc(decode(v.title))}</div>
+          <div class="search-result-channel">📺 ${esc(v.channel)}</div>
+          <div class="search-result-stats">👁 ${v.views} · ❤️ ${v.likes} · 💬 ${v.comments}</div>
+        </div>
+      </div>`).join('') + '</div>';
 }
 
-// ── SOCIAL ──────────────────────────────────────────────────────
-function toggleFollowDot(id){
-  const el=document.getElementById(id); if(!el) return;
-  const done=el.classList.contains('done');
-  el.classList.toggle('done'); el.innerHTML=done?'+':'✓';
-  showToast(done?'Unfollowed':'Following! ✅');
-  updateFollowCount(done?-1:1);
+// ── Navigation ────────────────────────────────────────────────────
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const ni = document.getElementById('nav-'+page);
+  if(ni) ni.classList.add('active');
+  closeSheets(); closeInfoSheet(); closeMenu();
+  if(page==='profile') renderProfileGrids();
+  if(page==='search') buildTrendingChips();
 }
-function toggleFollowFeedBtn(btn){
-  const f=btn.classList.contains('following');
-  btn.classList.toggle('following'); btn.innerText=f?'Follow':'Following';
-  showToast(f?'Unfollowed':'Following! ✅'); updateFollowCount(f?-1:1);
+
+function switchTab(el){
+  document.querySelectorAll('.home-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(el.innerText === 'Following') showToast('Subscribe to channels to see their Shorts here');
 }
-function toggleFollow(btn,name){
-  const f=btn.classList.contains('following');
-  btn.classList.toggle('following'); btn.innerText=f?'Follow':'Following';
-  showToast(f?'Unfollowed':`Following ${name}! ✅`); updateFollowCount(f?-1:1);
+function switchInboxTab(el){
+  document.querySelectorAll('.inbox-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
 }
-function updateFollowCount(d){
-  const el=document.getElementById('followingCount');
-  if(el) el.innerText=Math.max(0,parseInt(el.innerText||'0')+d);
-}
-function filterFriends(){
-  const q=(document.getElementById('friendSearch').value||'').toLowerCase();
-  document.querySelectorAll('#friendsList .friend-item').forEach(el=>{
-    el.style.display=(!q||(el.dataset.name||'').toLowerCase().includes(q))?'':'none';
+function switchProfileTab(el, tab){
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['posts','saved','liked'].forEach(t=>{
+    const tid = 'profileTab'+t.charAt(0).toUpperCase()+t.slice(1);
+    const el2 = document.getElementById(tid);
+    if(el2) el2.style.display = t===tab?'':'none';
   });
+  if(tab==='saved'||tab==='liked') renderProfileGrids();
 }
 
-// ── PROFILE ─────────────────────────────────────────────────────
+// ── Profile ───────────────────────────────────────────────────────
+function renderProfileGrids(){
+  const likedData = getLikedData(), savedData = getSavedData();
+  const lg = document.getElementById('likedGrid'), sg = document.getElementById('savedGrid');
+  lg.innerHTML = !likedData.length
+    ? '<div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any Short to like.</div>'
+    : likedData.map(v=>`
+        <div class="profile-yt-post" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','','','')">
+          <img src="${esc(v.thumb)}" loading="lazy" alt="">
+          <div class="grid-post-views">▶</div>
+        </div>`).join('');
+  sg.innerHTML = !savedData.length
+    ? '<div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any Short to save.</div>'
+    : savedData.map(v=>`
+        <div class="profile-yt-post" onclick="openInfoSheet('${v.id}','${esc(v.title)}','${esc(v.channel)}','${esc(v.thumb)}','','','')">
+          <img src="${esc(v.thumb)}" loading="lazy" alt="">
+          <div class="grid-post-views">▶</div>
+        </div>`).join('');
+  updateLikedCount();
+}
+
 function editProfile(){
-  const n=prompt('Enter new name:',document.getElementById('profileName').innerText||'Saqib Saqib');
-  if(n&&n.trim()){document.getElementById('profileName').innerText=n.trim();showToast('✅ Profile updated!');}
+  const n = prompt('Enter channel name:', document.getElementById('profileName').innerText||'My Channel');
+  if(n&&n.trim()){
+    document.getElementById('profileName').innerText = n.trim();
+    document.getElementById('profileNameHeader').innerText = n.trim();
+    document.getElementById('profileHandle').innerText = '@' + n.trim().toLowerCase().replace(/\s+/g,'');
+    showToast('✅ Profile updated!');
+  }
 }
 function addBio(){
-  const b=prompt('Add your bio:','');
-  if(b&&b.trim()){document.getElementById('bioBox').innerText=b.trim();showToast('✅ Bio updated!');}
+  const b = prompt('Add your bio:', '');
+  if(b&&b.trim()){ document.getElementById('bioBox').innerText = b.trim(); showToast('✅ Bio updated!'); }
 }
 
-// ── LOCAL COMMENTS ──────────────────────────────────────────────
-function openComments(){
-  document.getElementById('comment-sheet').classList.add('open');
-  document.getElementById('sheet-overlay').classList.add('open');
-}
-function postComment(){
-  const inp=document.getElementById('commentInput');
-  const txt=(inp.value||'').trim(); if(!txt) return;
-  const list=document.getElementById('commentList');
-  const d=document.createElement('div'); d.className='comment-item';
-  d.innerHTML=`<div class="comment-av"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px">S</div></div>
-    <div class="comment-body"><div class="comment-name">saqib.saqib693</div><div class="comment-text">${txt}</div><div class="comment-time">Just now · Reply</div></div>`;
-  list.prepend(d); inp.value=''; showToast('💬 Comment posted!');
-}
-
-// ── MENUS ────────────────────────────────────────────────────────
+// ── Menus ─────────────────────────────────────────────────────────
 function openMenu(){ document.getElementById('side-menu').classList.add('open'); document.getElementById('menu-overlay').classList.add('open'); }
 function closeMenu(){ document.getElementById('side-menu').classList.remove('open'); document.getElementById('menu-overlay').classList.remove('open'); }
-function closeSheets(){ document.getElementById('comment-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('open'); }
-function menuAction(item){ closeMenu(); showToast(`${item} — coming soon`); }
+function menuAction(item){ closeMenu(); showToast(item + ' — coming soon'); }
 
-// mode buttons
+// Mode buttons
 document.querySelectorAll('.mode-btn').forEach(b=>b.onclick=function(){
   document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active'));
   this.classList.add('active');
 });
 
-// ── INIT ────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────
+updateLikedCount();
 loadFeed();
 </script>
 </body>
-      </html>
+</html>
