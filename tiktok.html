@@ -249,6 +249,18 @@
   .sound-ticker { display:inline-block; white-space:nowrap; animation:ticker 10s linear infinite; max-width:200px; overflow:hidden; text-overflow:ellipsis; }
   @keyframes ticker { 0%{transform:translateX(0)} 50%{transform:translateX(-28%)} 100%{transform:translateX(0)} }
 
+  /* YouTube fallback button when embed is blocked */
+  .post-yt-fallback {
+    position:absolute; bottom:140px; left:50%; transform:translateX(-50%);
+    background:rgba(255,40,40,0.88); color:#fff; font-size:13px; font-weight:700;
+    padding:10px 22px; border-radius:24px; z-index:20;
+    display:none; align-items:center; gap:8px; white-space:nowrap;
+    text-decoration:none; backdrop-filter:blur(8px);
+    box-shadow:0 2px 16px rgba(0,0,0,.4);
+    transition:background .2s;
+  }
+  .post-yt-fallback:active { background:rgba(200,20,20,0.95); }
+
   /* Progress bar */
   .post-progress { position:absolute; bottom:68px; left:0; right:0; height:2px; background:rgba(255,255,255,.22); z-index:16; }
   .post-progress-fill { height:100%; background:rgba(255,255,255,.85); }
@@ -860,9 +872,17 @@ const FALLBACK_IDS = [
   "LXb3EKWsInQ","C0DPdy98e4c","YQHsXMglC9A"
 ];
 
-// Piped API endpoints (no key needed)
-const PIPED_TRENDING = 'https://pipedapi.kavin.rocks/trending?region=US';
-const PIPED_SEARCH_BASE = 'https://pipedapi.kavin.rocks/search?filter=videos&q=';
+// Piped API endpoints — multiple instances, tried in order (no key needed)
+const PIPED_INSTANCES = [
+  'https://pipedapi.kavin.rocks',
+  'https://pipedapi.adminforge.de',
+  'https://piped-api.garudalinux.org',
+  'https://api.piped.yt',
+  'https://pipedapi.in.projectsegfau.lt',
+];
+// Will be set dynamically after probing
+let PIPED_BASE = PIPED_INSTANCES[0];
+const PIPED_SEARCH_SUFFIX = '/search?filter=videos&q=';
 
 // ── State ────────────────────────────────────────────────────────
 let currentVideoId = null;
@@ -982,11 +1002,28 @@ function renderProfileGrids() {
 // PIPED API FETCH
 // ================================================================
 
+// Try each Piped instance in order until one works
+async function probePipedInstance() {
+  for (const base of PIPED_INSTANCES) {
+    try {
+      const res = await fetch(base + '/trending?region=US', {
+        signal: AbortSignal.timeout(5000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          PIPED_BASE = base;
+          return data;
+        }
+      }
+    } catch (e) { /* try next */ }
+  }
+  return null; // all failed
+}
+
 async function fetchPipedTrending() {
-  const res = await fetch(PIPED_TRENDING, { signal: AbortSignal.timeout(7000) });
-  if (!res.ok) throw new Error('Piped trending error ' + res.status);
-  const data = await res.json();
-  if (!Array.isArray(data) || data.length === 0) throw new Error('Empty trending');
+  const data = await probePipedInstance();
+  if (!data) throw new Error('All Piped instances failed');
   return data.map(item => ({
     id: extractId(item.url || ''),
     title: item.title || 'Trending Video',
@@ -999,21 +1036,30 @@ async function fetchPipedTrending() {
 }
 
 async function fetchPipedSearch(query) {
-  const url = PIPED_SEARCH_BASE + encodeURIComponent(query + ' shorts');
-  const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
-  if (!res.ok) throw new Error('Piped search error ' + res.status);
-  const data = await res.json();
-  const items = data.items || [];
-  if (!items.length) throw new Error('No search results');
-  return items.map(item => ({
-    id: extractId(item.url || ''),
-    title: item.title || 'Video',
-    channel: item.uploaderName || 'YouTube',
-    views: fmt(item.views || 0),
-    likes: rndFmt(500, 200000),
-    comments: rndFmt(20, 20000),
-    thumb: item.thumbnail || thumb(extractId(item.url || '')),
-  })).filter(v => v.id);
+  // Make sure we have a working instance
+  if (!PIPED_BASE) await probePipedInstance();
+  // Try up to 3 instances for search
+  const instancesToTry = [PIPED_BASE, ...PIPED_INSTANCES.filter(b => b !== PIPED_BASE)].slice(0,3);
+  for (const base of instancesToTry) {
+    try {
+      const url = base + PIPED_SEARCH_SUFFIX + encodeURIComponent(query + ' shorts');
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const items = data.items || [];
+      if (!items.length) continue;
+      return items.map(item => ({
+        id: extractId(item.url || ''),
+        title: item.title || 'Video',
+        channel: item.uploaderName || 'YouTube',
+        views: fmt(item.views || 0),
+        likes: rndFmt(500, 200000),
+        comments: rndFmt(20, 20000),
+        thumb: item.thumbnail || thumb(extractId(item.url || '')),
+      })).filter(v => v.id);
+    } catch (e) { /* try next */ }
+  }
+  throw new Error('All Piped search instances failed');
 }
 
 function extractId(url) {
@@ -1081,7 +1127,7 @@ function buildPost(v, index) {
         frameborder="0"
         loading="lazy"
         title="${esc(v.title)}"
-        onerror="hidePost('${pid}')"
+        onerror="showThumbOnly('${pid}')"
       ></iframe>
     </div>
     <div class="post-thumb" id="thumb_${pid}" style="background-image:url('${v.thumb}'),url('${av}')">
@@ -1089,6 +1135,12 @@ function buildPost(v, index) {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
       </div>
     </div>
+    <!-- Watch on YT fallback button (shown if iframe fails) -->
+    <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener"
+       class="post-yt-fallback" id="ytfb_${pid}" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.1 3 12 3 12 3s-4.1 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.2.3 4.3.3 4.3s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.3 21.9 12 22 12 22s4.1 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.3v-2C23.3 9.1 23 7 23 7zm-13.5 8.7V8.3l8.1 3.7-8.1 3.7z"/></svg>
+      Watch on YouTube
+    </a>
     <div class="post-tap-area"
       id="tap_${pid}"
       onclick="handleTap('${pid}','${v.id}','${esc(titleShort)}','${esc(v.channel)}','${esc(v.views)}','${esc(v.likes)}','${esc(v.comments)}','${esc(v.thumb)}')"
@@ -1147,6 +1199,15 @@ function hidePost(pid) {
   if (el) el.style.display = 'none';
 }
 
+// Called when iframe fails to load — keep thumbnail visible, show "Watch on YT" button
+function showThumbOnly(pid) {
+  const fb = document.getElementById('ytfb_' + pid);
+  if (fb) fb.style.display = 'flex';
+  // Keep thumbnail, hide loading iframe
+  const iw = document.getElementById('iw_' + pid);
+  if (iw) iw.style.display = 'none';
+}
+
 // ── Intersection observer for lazy iframe loading ─────────────────
 let observer;
 function setupObserver() {
@@ -1179,14 +1240,40 @@ function activateIframe(iframe, pid) {
   iframe.src = iframe.getAttribute('data-src');
   iframe.removeAttribute('data-src');
 
-  // Fade out thumbnail after delay
+  // Detect if YouTube blocked the embed — after 6s check if iframe is blank
+  // (YouTube sets X-Frame-Options for some videos, causing empty frame)
   if (pid) {
+    // Fade out thumbnail after delay if video loaded
+    let thumbFaded = false;
+    iframe.onload = () => {
+      // Small delay to see if content actually rendered
+      setTimeout(() => {
+        try {
+          // If contentDocument is null/blocked, iframe.contentWindow.location throws
+          // This will throw on cross-origin — means it's actually loaded (blocked same-origin check = good)
+          const th = document.getElementById('thumb_' + pid);
+          const pb = document.getElementById('pbtn_' + pid);
+          if (!thumbFaded && th) {
+            th.classList.add('fade-out');
+            if (pb) pb.classList.add('hidden');
+            thumbFaded = true;
+          }
+        } catch(e) {
+          // Cross-origin access denied = iframe loaded with content, fade thumb
+          const th = document.getElementById('thumb_' + pid);
+          const pb = document.getElementById('pbtn_' + pid);
+          if (!thumbFaded && th) {
+            th.classList.add('fade-out');
+            if (pb) pb.classList.add('hidden');
+            thumbFaded = true;
+          }
+        }
+      }, 2500);
+    };
+    // If iframe doesn't fire onload in 10s, show fallback button
     setTimeout(() => {
-      const th = document.getElementById('thumb_' + pid);
-      const pb = document.getElementById('pbtn_' + pid);
-      if (th) th.classList.add('fade-out');
-      if (pb) pb.classList.add('hidden');
-    }, 2000);
+      if (!thumbFaded) showThumbOnly(pid);
+    }, 10000);
   }
 }
 
@@ -1570,4 +1657,4 @@ document.querySelectorAll('.mode-btn').forEach(b => b.onclick = function() {
 loadFeed();
 </script>
 </body>
-  </html>
+        </html>
