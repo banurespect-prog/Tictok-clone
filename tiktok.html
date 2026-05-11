@@ -3,83 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TikTok</title>
+<title>VidFeed</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-  body {
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-    background:#000;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-  }
-
-  #app {
-    width:100%;
-    max-width:430px;
-    height:100vh;
-    background:#000;
-    position:relative;
-    overflow:hidden;
-    box-shadow:0 0 60px rgba(0,0,0,0.8);
-  }
-
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:#000; height:100vh; display:flex; justify-content:center; align-items:center; }
+  #app { width:100%; max-width:430px; height:100vh; background:#000; position:relative; overflow:hidden; box-shadow:0 0 60px rgba(0,0,0,0.8); }
   .page { position:absolute; top:0; left:0; right:0; bottom:0; overflow-y:auto; display:none; background:#000; }
   .page.active { display:block; }
   .page::-webkit-scrollbar { display:none; }
 
   /* Bottom Nav */
-  #bottom-nav {
-    position:absolute; bottom:0; left:0; right:0; height:70px;
-    background:rgba(0,0,0,0.96);
-    backdrop-filter:blur(20px);
-    border-top:0.5px solid rgba(255,255,255,0.1);
-    display:flex; align-items:center; justify-content:space-around;
-    z-index:100;
-    padding-bottom:env(safe-area-inset-bottom,0);
-  }
+  #bottom-nav { position:absolute; bottom:0; left:0; right:0; height:70px; background:rgba(0,0,0,0.96); backdrop-filter:blur(20px); border-top:0.5px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:space-around; z-index:100; padding-bottom:env(safe-area-inset-bottom,0); }
   .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 10px; }
   .nav-item span { font-size:10px; color:#888; font-weight:500; }
   .nav-item.active span { color:#fff; }
   .nav-create { cursor:pointer; position:relative; top:-6px; }
-  .nav-create-btn {
-    width:46px; height:32px;
-    background:#fff;
-    border-radius:8px;
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  }
-  .nav-create-btn::before {
-    content:'';
-    position:absolute; left:-6px;
-    width:8px; height:100%;
-    background:#25f4ee;
-    border-radius:4px;
-  }
-  .nav-create-btn::after {
-    content:'';
-    position:absolute; right:-6px;
-    width:8px; height:100%;
-    background:#fe2c55;
-    border-radius:4px;
-  }
-  .nav-badge {
-    position:absolute; top:-5px; right:-8px;
-    background:#fe2c55; color:#fff; font-size:9px; font-weight:700;
-    min-width:17px; height:17px; border-radius:9px;
-    display:flex; align-items:center; justify-content:center; padding:0 4px;
-  }
+  .nav-create-btn { width:46px; height:32px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .nav-create-btn::before { content:''; position:absolute; left:-6px; width:8px; height:100%; background:#25f4ee; border-radius:4px; }
+  .nav-create-btn::after { content:''; position:absolute; right:-6px; width:8px; height:100%; background:#fe2c55; border-radius:4px; }
+  .nav-badge { position:absolute; top:-5px; right:-8px; background:#fe2c55; color:#fff; font-size:9px; font-weight:700; min-width:17px; height:17px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
 
   /* Home Header */
-  .home-header {
-    position:fixed; top:0; left:0; right:0; max-width:430px; margin:0 auto;
-    background:linear-gradient(180deg,rgba(0,0,0,0.7) 0%,transparent 100%);
-    z-index:20; padding:14px 16px 20px;
-  }
+  .home-header { position:fixed; top:0; left:0; right:0; max-width:430px; margin:0 auto; background:linear-gradient(180deg,rgba(0,0,0,0.7) 0%,transparent 100%); z-index:20; padding:14px 16px 20px; }
   .home-tabs { display:flex; align-items:center; justify-content:center; gap:20px; }
   .home-tab { font-size:15px; font-weight:500; color:rgba(255,255,255,0.55); cursor:pointer; padding-bottom:4px; transition:.2s; }
   .home-tab.active { color:#fff; font-weight:700; border-bottom:2px solid #fff; }
@@ -87,232 +33,154 @@
   .home-live { position:absolute; left:16px; top:14px; }
   .live-badge { background:#fe2c55; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; }
 
-  /* Feed */
-  .feed-container { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; }
-  .feed-container::-webkit-scrollbar { display:none; }
-  .feed-post { height:100vh; width:100%; position:relative; scroll-snap-align:start; overflow:hidden; }
+  /* ===== HOME PAGE GRID (YouTube-style) ===== */
+  #page-home { background:#0f0f0f; }
+  .home-grid-area { padding:60px 0 80px; }
+  .home-section-label { color:#fff; font-size:13px; font-weight:700; padding:12px 12px 6px; opacity:0.7; text-transform:uppercase; letter-spacing:.5px; }
 
-  .post-bg {
-    position:absolute; inset:0;
-    background-size:cover; background-position:center; background-repeat:no-repeat;
-    cursor:pointer;
-  }
-  .post-bg::after {
-    content:'';
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 55%, rgba(0,0,0,0.75) 100%);
-  }
+  /* Long video card (YouTube horizontal card) */
+  .long-card { display:flex; gap:10px; padding:10px 12px; cursor:pointer; transition:background .15s; }
+  .long-card:active { background:rgba(255,255,255,0.05); }
+  .long-thumb-wrap { position:relative; width:160px; min-width:160px; height:90px; border-radius:8px; overflow:hidden; background:#1a1a1a; flex-shrink:0; }
+  .long-thumb-wrap img { width:100%; height:100%; object-fit:cover; }
+  .long-duration { position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.85); color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:3px; }
+  .long-info { flex:1; overflow:hidden; }
+  .long-title { font-size:13px; font-weight:600; color:#fff; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:5px; }
+  .long-channel-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+  .long-ch-avatar { width:20px; height:20px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+  .long-ch-avatar img { width:100%; height:100%; object-fit:cover; }
+  .long-channel { font-size:11px; color:#aaa; }
+  .long-meta { font-size:11px; color:#888; }
+  .long-card-unavail { opacity:0.4; pointer-events:none; }
 
-  .play-indicator {
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:70px; height:70px;
-    background:rgba(0,0,0,0.5);
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; transition:opacity .2s;
-    z-index:5;
-    pointer-events:none;
-  }
-  .post-bg:hover .play-indicator { opacity:1; }
+  /* Short card grid */
+  .shorts-scroll-wrap { overflow-x:auto; padding:0 12px 8px; display:flex; gap:8px; }
+  .shorts-scroll-wrap::-webkit-scrollbar { display:none; }
+  .short-grid-card { flex-shrink:0; width:100px; cursor:pointer; position:relative; }
+  .short-grid-thumb { width:100px; height:168px; border-radius:10px; overflow:hidden; background:#1a1a1a; position:relative; }
+  .short-grid-thumb img { width:100%; height:100%; object-fit:cover; }
+  .short-grid-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.5); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; }
+  .short-grid-title { font-size:11px; color:#ccc; margin-top:5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.3; }
+  .short-grid-unavail { opacity:0.35; pointer-events:none; }
 
-  .like-animation {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%) scale(0);
-    font-size:90px;
-    pointer-events:none; z-index:30; opacity:0;
-  }
-  .like-animation.show { animation:likePop .7s ease-out forwards; }
-  @keyframes likePop {
-    0% { transform:translate(-50%,-50%) scale(0); opacity:1; }
-    40% { transform:translate(-50%,-50%) scale(1.4); opacity:1; }
-    70% { transform:translate(-50%,-50%) scale(1.1); opacity:.9; }
-    100% { transform:translate(-50%,-50%) scale(1); opacity:0; }
-  }
-
-  .post-actions {
-    position:absolute; right:10px; bottom:110px;
-    display:flex; flex-direction:column; align-items:center; gap:18px; z-index:15;
-  }
-  .action-btn { display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; }
-  .action-icon {
-    width:46px; height:46px; border-radius:50%;
-    background:rgba(20,20,20,0.5);
-    backdrop-filter:blur(6px);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .15s;
-  }
-  .action-icon:active { transform:scale(.88); }
-  .action-count { font-size:11px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
-
-  .author-wrap { position:relative; margin-bottom:4px; }
-  .author-avatar {
-    width:48px; height:48px; border-radius:50%;
-    border:2px solid #fff;
-    overflow:hidden; cursor:pointer;
-  }
-  .author-avatar img { width:100%; height:100%; object-fit:cover; }
-  .follow-dot {
-    position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
-    width:22px; height:22px;
-    background:#fe2c55; border-radius:50%; border:2px solid #000;
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; font-weight:700; color:#fff; cursor:pointer;
-    transition:background .2s;
-  }
-  .follow-dot.done { background:#25f4ee; font-size:11px; }
-
-  .music-disk {
-    width:44px; height:44px; border-radius:50%;
-    background:rgba(20,20,20,0.6);
-    border:2px solid rgba(255,255,255,0.2);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-    animation:spin 4s linear infinite;
-  }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .music-disk-inner {
-    width:14px; height:14px; border-radius:50%;
-    background:#fff;
-  }
-
-  .post-overlay {
-    position:absolute; bottom:0; left:0; right:0;
-    padding:16px 14px 85px;
-    z-index:10;
-  }
-  .post-author-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .post-mini-avatar {
-    width:32px; height:32px; border-radius:50%;
-    overflow:hidden; flex-shrink:0;
-  }
-  .post-mini-avatar img { width:100%; height:100%; object-fit:cover; }
-  .post-username {
-    font-size:15px; font-weight:700; color:#fff;
-    display:flex; align-items:center; gap:5px;
-    text-shadow:0 1px 4px rgba(0,0,0,.5);
-  }
-  .verified { color:#20d5ec; font-size:13px; }
-  .follow-btn-feed {
-    background:transparent; border:1px solid rgba(255,255,255,.7);
-    color:#fff; font-size:11px; font-weight:600;
-    padding:3px 10px; border-radius:4px; cursor:pointer;
-    transition:all .2s;
-  }
-  .follow-btn-feed.following { border-color:rgba(255,255,255,.35); color:rgba(255,255,255,.5); }
-
-  .post-caption { font-size:13px; line-height:1.5; color:#fff; margin-bottom:8px; text-shadow:0 1px 3px rgba(0,0,0,.4); }
-  .post-caption strong { font-weight:700; }
-
-  .post-sound {
-    font-size:12px; color:rgba(255,255,255,.9);
-    display:flex; align-items:center; gap:6px;
-  }
-  .sound-ticker {
-    display:inline-block;
-    white-space:nowrap;
-    animation:ticker 10s linear infinite;
-    max-width:200px; overflow:hidden; text-overflow:ellipsis;
-  }
-  @keyframes ticker { 0%{transform:translateX(0)} 50%{transform:translateX(-30%)} 100%{transform:translateX(0)} }
-
-  .post-progress { position:absolute; bottom:70px; left:0; right:0; height:2px; background:rgba(255,255,255,.25); }
-  .post-progress-fill { height:100%; background:rgba(255,255,255,.85); }
+  /* Shorts header row */
+  .shorts-header-row { display:flex; align-items:center; gap:8px; padding:10px 12px 4px; }
+  .shorts-logo { display:flex; align-items:center; gap:6px; }
+  .shorts-logo svg { width:28px; }
+  .shorts-logo-text { font-size:16px; font-weight:800; color:#fff; }
+  .shorts-see-all { margin-left:auto; font-size:12px; color:#aaa; cursor:pointer; }
 
   /* Loading Spinner */
-  .feed-loading {
-    height:100vh; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:16px;
-  }
-  .spinner {
-    width:48px; height:48px; border:4px solid rgba(255,255,255,0.15);
-    border-top-color:#fe2c55; border-radius:50%;
-    animation:spinLoader 0.8s linear infinite;
-  }
+  .feed-loading { height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+  .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.15); border-top-color:#fe2c55; border-radius:50%; animation:spinLoader 0.8s linear infinite; }
   @keyframes spinLoader { to { transform:rotate(360deg); } }
   .feed-loading p { color:rgba(255,255,255,.5); font-size:14px; }
 
-  /* ======= VIDEO MODAL ======= */
-  #video-modal {
-    position:absolute; inset:0; background:#000; z-index:500;
-    display:none; flex-direction:column; overflow-y:auto;
-  }
-  #video-modal.open { display:flex; }
-  #video-modal::-webkit-scrollbar { display:none; }
+  /* ===== SHORTS FEED PAGE ===== */
+  #page-shorts { background:#000; }
+  .shorts-feed-header { position:fixed; top:0; left:0; right:0; max-width:430px; margin:0 auto; z-index:20; background:linear-gradient(180deg,rgba(0,0,0,0.7) 0%,transparent 100%); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; }
+  .shorts-feed-title { color:#fff; font-weight:800; font-size:18px; display:flex; align-items:center; gap:6px; }
+  .shorts-feed-icon { color:#ff0000; font-size:22px; }
 
-  .modal-close {
-    position:fixed; top:14px; right:16px; z-index:510;
-    width:36px; height:36px; border-radius:50%;
-    background:rgba(0,0,0,0.6); backdrop-filter:blur(10px);
-    border:none; color:#fff; font-size:22px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .modal-iframe-wrap {
-    width:100%; aspect-ratio:16/9; background:#111; flex-shrink:0; position:relative;
-  }
-  .modal-iframe-wrap iframe {
-    width:100%; height:100%; border:none; display:block;
-  }
-  .modal-info {
-    padding:14px 16px 10px;
-    flex:1;
-  }
-  .modal-title { font-size:15px; font-weight:700; color:#fff; line-height:1.4; margin-bottom:6px; }
-  .modal-channel { font-size:13px; color:#aaa; margin-bottom:12px; }
-  .modal-stats { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-  .modal-stat { background:rgba(255,255,255,0.1); border-radius:20px; padding:5px 12px; font-size:12px; color:#ccc; }
+  .shorts-feed-container { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; }
+  .shorts-feed-container::-webkit-scrollbar { display:none; }
+  .short-feed-item { height:100vh; width:100%; position:relative; scroll-snap-align:start; overflow:hidden; background:#000; }
+  .short-feed-item.unavail { display:none; }
 
-  .modal-actions { display:flex; gap:12px; margin-bottom:16px; }
-  .modal-action-btn {
-    flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer;
-    font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;
-    transition:.2s;
-  }
-  .modal-like-btn { background:rgba(254,44,85,0.15); color:#fe2c55; border:1.5px solid rgba(254,44,85,0.3); }
-  .modal-like-btn.liked { background:#fe2c55; color:#fff; border-color:#fe2c55; }
-  .modal-save-btn { background:rgba(255,193,7,0.1); color:#ffc107; border:1.5px solid rgba(255,193,7,0.25); }
-  .modal-save-btn.saved { background:#ffc107; color:#000; border-color:#ffc107; }
+  .short-iframe-wrap { width:100%; height:100%; position:absolute; inset:0; }
+  .short-iframe-wrap iframe { width:100%; height:100%; border:none; display:block; }
+  .short-iframe-cover { position:absolute; inset:0; background:#000; display:flex; align-items:center; justify-content:center; z-index:2; cursor:pointer; }
+  .short-iframe-thumb { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+  .short-play-overlay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.6); border-radius:50%; width:64px; height:64px; display:flex; align-items:center; justify-content:center; z-index:3; transition:opacity .2s; }
+  .short-playing .short-play-overlay { opacity:0; }
+  .short-playing .short-iframe-cover { pointer-events:none; }
 
-  .modal-comments-title { font-size:15px; font-weight:700; color:#fff; padding:12px 16px 8px; border-top:1px solid rgba(255,255,255,0.1); }
-  .modal-comment-item { display:flex; gap:10px; padding:10px 16px; border-bottom:0.5px solid rgba(255,255,255,0.06); }
-  .modal-comment-av { width:34px; height:34px; border-radius:50%; overflow:hidden; flex-shrink:0; }
-  .modal-comment-av img { width:100%; height:100%; object-fit:cover; }
-  .modal-comment-body { flex:1; }
-  .modal-comment-name { font-size:12px; font-weight:700; color:#ccc; margin-bottom:2px; }
-  .modal-comment-text { font-size:13px; color:#fff; line-height:1.4; }
-  .modal-comment-likes { font-size:11px; color:#888; margin-top:3px; }
-  .modal-comments-loading { padding:20px; text-align:center; color:#888; font-size:13px; }
-  .modal-comments-off { padding:20px 16px; color:#888; font-size:13px; font-style:italic; }
+  /* Shorts right actions */
+  .short-actions { position:absolute; right:10px; bottom:120px; display:flex; flex-direction:column; align-items:center; gap:20px; z-index:15; }
+  .short-action-btn { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; }
+  .short-action-icon { width:44px; height:44px; border-radius:50%; background:rgba(20,20,20,0.6); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+  .short-action-icon:active { transform:scale(.88); }
+  .short-action-count { font-size:11px; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+  .short-author-avatar { width:44px; height:44px; border-radius:50%; border:2px solid #fff; overflow:hidden; }
+  .short-author-avatar img { width:100%; height:100%; object-fit:cover; }
+
+  /* Shorts overlay info */
+  .short-overlay { position:absolute; bottom:0; left:0; right:60px; padding:14px 14px 85px; z-index:10; }
+  .short-author-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+  .short-caption { font-size:13px; color:#fff; line-height:1.4; text-shadow:0 1px 3px rgba(0,0,0,.4); margin-bottom:6px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .short-sound { font-size:12px; color:rgba(255,255,255,.85); display:flex; align-items:center; gap:6px; }
+  .sound-ticker { display:inline-block; white-space:nowrap; animation:ticker 10s linear infinite; max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+  @keyframes ticker { 0%{transform:translateX(0)} 50%{transform:translateX(-30%)} 100%{transform:translateX(0)} }
+
+  /* Shorts loading more */
+  .shorts-load-more { height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; scroll-snap-align:start; }
+  .shorts-load-more p { color:#888; font-size:14px; }
+
+  /* ===== LONG VIDEO PLAYER PAGE ===== */
+  #page-longplayer { background:#0f0f0f; }
+  .lp-header { display:flex; align-items:center; gap:10px; padding:14px 16px; position:sticky; top:0; background:#0f0f0f; z-index:10; }
+  .lp-back { cursor:pointer; }
+  .lp-header-title { font-size:14px; font-weight:700; color:#fff; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lp-iframe-wrap { width:100%; aspect-ratio:16/9; background:#000; position:relative; }
+  .lp-iframe-wrap iframe { width:100%; height:100%; border:none; display:block; }
+  .lp-info { padding:14px 16px 10px; }
+  .lp-title { font-size:15px; font-weight:700; color:#fff; line-height:1.4; margin-bottom:8px; }
+  .lp-channel-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .lp-ch-avatar { width:38px; height:38px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+  .lp-ch-avatar img { width:100%; height:100%; object-fit:cover; }
+  .lp-ch-name { font-size:14px; font-weight:600; color:#fff; flex:1; }
+  .lp-subscribe-btn { background:#ff0000; color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; }
+  .lp-subscribe-btn.subbed { background:#333; color:#ccc; }
+  .lp-stats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .lp-stat { background:rgba(255,255,255,0.1); border-radius:20px; padding:5px 12px; font-size:12px; color:#ccc; }
+  .lp-actions { display:flex; gap:10px; margin-bottom:16px; }
+  .lp-action-btn { flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px; transition:.2s; }
+  .lp-like-btn { background:rgba(254,44,85,0.15); color:#fe2c55; border:1.5px solid rgba(254,44,85,0.3); }
+  .lp-like-btn.liked { background:#fe2c55; color:#fff; border-color:#fe2c55; }
+  .lp-save-btn { background:rgba(255,193,7,0.1); color:#ffc107; border:1.5px solid rgba(255,193,7,0.25); }
+  .lp-save-btn.saved { background:#ffc107; color:#000; border-color:#ffc107; }
+  .lp-divider { height:.5px; background:rgba(255,255,255,0.1); margin:0 0 14px; }
+
+  /* Related videos */
+  .lp-related-title { color:#fff; font-size:14px; font-weight:700; padding:0 16px 10px; }
+  .lp-related-card { display:flex; gap:10px; padding:8px 16px; cursor:pointer; transition:background .15s; }
+  .lp-related-card:active { background:rgba(255,255,255,0.05); }
+  .lp-rel-thumb { width:120px; min-width:120px; height:68px; border-radius:6px; overflow:hidden; background:#1a1a1a; position:relative; }
+  .lp-rel-thumb img { width:100%; height:100%; object-fit:cover; }
+  .lp-rel-dur { position:absolute; bottom:3px; right:3px; background:rgba(0,0,0,0.85); color:#fff; font-size:9px; font-weight:700; padding:1px 4px; border-radius:2px; }
+  .lp-rel-info { flex:1; overflow:hidden; }
+  .lp-rel-title { font-size:12px; font-weight:600; color:#fff; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.3; margin-bottom:4px; }
+  .lp-rel-channel { font-size:11px; color:#aaa; }
+  .lp-rel-meta { font-size:11px; color:#888; }
+
+  /* Comments in LP */
+  .lp-comments-title { color:#fff; font-size:14px; font-weight:700; padding:0 16px 10px; margin-top:6px; }
+  .lp-comment-item { display:flex; gap:10px; padding:10px 16px; border-bottom:.5px solid rgba(255,255,255,0.06); }
+  .lp-comment-av { width:32px; height:32px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+  .lp-comment-av img { width:100%; height:100%; object-fit:cover; }
+  .lp-comment-name { font-size:12px; font-weight:700; color:#ccc; margin-bottom:2px; }
+  .lp-comment-text { font-size:13px; color:#fff; line-height:1.4; }
+  .lp-comment-likes { font-size:11px; color:#888; margin-top:3px; }
+  .lp-comments-loading { padding:20px; text-align:center; color:#888; font-size:13px; }
+  .lp-comments-off { padding:20px 16px; color:#888; font-size:13px; font-style:italic; }
+  .lp-pb80 { padding-bottom:80px; }
 
   /* ======= PROFILE ======= */
   #page-profile { background:#fff; }
-  .profile-header {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 16px; background:#fff;
-    border-bottom:.5px solid #f0f0f0;
-    position:sticky; top:0; z-index:10;
-  }
+  .profile-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#fff; border-bottom:.5px solid #f0f0f0; position:sticky; top:0; z-index:10; }
   .profile-username { font-size:16px; font-weight:700; }
   .profile-body { padding:20px 16px 100px; }
   .profile-avatar-section { display:flex; flex-direction:column; align-items:center; margin-bottom:16px; }
-  .profile-avatar {
-    width:88px; height:88px; border-radius:50%;
-    background:linear-gradient(135deg,#c8a485,#a07850);
-    display:flex; align-items:center; justify-content:center;
-    font-size:34px; font-weight:700; color:#fff;
-    overflow:hidden;
-  }
+  .profile-avatar { width:88px; height:88px; border-radius:50%; background:linear-gradient(135deg,#c8a485,#a07850); display:flex; align-items:center; justify-content:center; font-size:34px; font-weight:700; color:#fff; overflow:hidden; }
   .profile-avatar img { width:100%; height:100%; object-fit:cover; }
   .profile-name { font-size:19px; font-weight:700; margin-top:8px; }
   .profile-handle { font-size:13px; color:#666; margin-top:2px; }
-  .edit-profile-btn {
-    background:#fff; border:1px solid #ddd; border-radius:6px;
-    padding:8px 28px; font-size:14px; font-weight:600; margin-top:12px; cursor:pointer;
-  }
+  .edit-profile-btn { background:#fff; border:1px solid #ddd; border-radius:6px; padding:8px 28px; font-size:14px; font-weight:600; margin-top:12px; cursor:pointer; }
   .profile-stats { display:flex; justify-content:center; gap:36px; margin:20px 0; text-align:center; }
   .stat-num { font-size:20px; font-weight:700; display:block; }
   .stat-label { font-size:12px; color:#666; }
   .add-bio { width:100%; border:1px dashed #ccc; border-radius:20px; padding:10px; text-align:center; font-size:13px; color:#666; cursor:pointer; margin-bottom:20px; }
-  .profile-tabs { display:flex; border-top:.5px solid #eee; padding-top:0; }
+  .profile-tabs { display:flex; border-top:.5px solid #eee; }
   .profile-tab { flex:1; text-align:center; padding:10px 8px; cursor:pointer; color:#999; font-weight:600; font-size:13px; border-bottom:2px solid transparent; }
   .profile-tab.active { color:#000; border-bottom:2px solid #000; }
   .grid-posts { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:2px; }
@@ -380,13 +248,8 @@
   .search-trending { padding:14px 16px; }
   .search-trending-title { font-size:16px; font-weight:700; margin-bottom:12px; }
   .trending-tag { display:inline-block; background:#f5f5f5; border-radius:20px; padding:6px 14px; font-size:13px; margin:0 6px 8px 0; cursor:pointer; }
-
   .search-results { padding:8px 0; }
-  .search-result-item {
-    display:flex; align-items:center; gap:12px;
-    padding:10px 16px; cursor:pointer; border-bottom:0.5px solid #f5f5f5;
-    transition:background .15s;
-  }
+  .search-result-item { display:flex; align-items:center; gap:12px; padding:10px 16px; cursor:pointer; border-bottom:0.5px solid #f5f5f5; transition:background .15s; }
   .search-result-item:active { background:#f9f9f9; }
   .search-result-thumb { width:80px; height:56px; border-radius:6px; overflow:hidden; flex-shrink:0; background:#ddd; }
   .search-result-thumb img { width:100%; height:100%; object-fit:cover; }
@@ -433,7 +296,7 @@
   .comment-post-btn { color:#fe2c55; font-weight:700; border:none; background:none; font-size:14px; cursor:pointer; }
 
   /* Toast */
-  #toast { position:absolute; bottom:85px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; padding:8px 18px; border-radius:22px; font-size:13px; z-index:600; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+  #toast { position:absolute; bottom:85px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.85); color:#fff; padding:8px 18px; border-radius:22px; font-size:13px; z-index:600; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
   #toast.show { opacity:1; }
 </style>
 </head>
@@ -452,13 +315,52 @@
         <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2.2"/><line x1="16.5" y1="16.5" x2="22" y2="22" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
       </div>
     </div>
+    <div class="home-grid-area" id="homeGridArea">
+      <div class="feed-loading"><div class="spinner"></div><p>Loading...</p></div>
+    </div>
+  </div>
 
-    <div class="feed-container" id="feedContainer">
-      <div class="feed-loading">
-        <div class="spinner"></div>
-        <p>Loading videos...</p>
+  <!-- SHORTS FEED PAGE -->
+  <div id="page-shorts" class="page">
+    <div class="shorts-feed-header">
+      <div class="shorts-feed-title">
+        <span class="shorts-feed-icon">▶</span> Shorts
+      </div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" onclick="showPage('home')" style="cursor:pointer"><path d="M19 12H5M12 5l-7 7 7 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="shorts-feed-container" id="shortsFeedContainer">
+      <div class="shorts-load-more"><div class="spinner"></div><p>Loading Shorts...</p></div>
+    </div>
+  </div>
+
+  <!-- LONG VIDEO PLAYER PAGE -->
+  <div id="page-longplayer" class="page">
+    <div class="lp-header">
+      <div class="lp-back" onclick="closeLongPlayer()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 5l-7 7 7 7" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="lp-header-title" id="lpHeaderTitle">Video</div>
+    </div>
+    <div class="lp-iframe-wrap" id="lpIframeWrap"></div>
+    <div class="lp-info">
+      <div class="lp-title" id="lpTitle"></div>
+      <div class="lp-channel-row">
+        <div class="lp-ch-avatar" id="lpChAvatar"><img src="" alt="" id="lpChImg"></div>
+        <div class="lp-ch-name" id="lpChName"></div>
+        <button class="lp-subscribe-btn" id="lpSubBtn" onclick="toggleLpSubscribe()">Subscribe</button>
+      </div>
+      <div class="lp-stats" id="lpStats"></div>
+      <div class="lp-actions">
+        <button class="lp-action-btn lp-like-btn" id="lpLikeBtn" onclick="lpToggleLike()">❤️ Like</button>
+        <button class="lp-action-btn lp-save-btn" id="lpSaveBtn" onclick="lpToggleSave()">🔖 Save</button>
       </div>
     </div>
+    <div class="lp-divider"></div>
+    <div class="lp-related-title">Up Next</div>
+    <div id="lpRelated"></div>
+    <div class="lp-divider" style="margin-top:10px"></div>
+    <div class="lp-comments-title">Comments</div>
+    <div id="lpComments" class="lp-pb80"></div>
   </div>
 
   <!-- FRIENDS PAGE -->
@@ -472,26 +374,10 @@
     </div>
     <div style="padding:10px 16px;font-size:12px;color:#999;font-weight:600">SUGGESTED FOR YOU</div>
     <div id="friendsList">
-      <div class="friend-item" data-name="poonam3537">
-        <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-        <div class="friend-info"><div class="friend-name">poonam3537</div><div class="friend-mutual">Recent search · 2.1M followers</div></div>
-        <button class="follow-btn" onclick="toggleFollow(this,'poonam3537')">Follow</button>
-      </div>
-      <div class="friend-item" data-name="sakufects">
-        <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-        <div class="friend-info"><div class="friend-name">sakufects</div><div class="friend-mutual">New posts · 890K followers</div></div>
-        <button class="follow-btn" onclick="toggleFollow(this,'sakufects')">Follow</button>
-      </div>
-      <div class="friend-item" data-name="kenDoll">
-        <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div>
-        <div class="friend-info"><div class="friend-name">kenDoll ✓</div><div class="friend-mutual">Verified · 14.6M followers</div></div>
-        <button class="follow-btn" onclick="toggleFollow(this,'kenDoll')">Follow</button>
-      </div>
-      <div class="friend-item" data-name="sarahlooks">
-        <div class="friend-avatar"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&q=80" alt=""></div>
-        <div class="friend-info"><div class="friend-name">sarahlooks</div><div class="friend-mutual">Suggested · 4.2M followers</div></div>
-        <button class="follow-btn" onclick="toggleFollow(this,'sarahlooks')">Follow</button>
-      </div>
+      <div class="friend-item" data-name="poonam3537"><div class="friend-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div><div class="friend-info"><div class="friend-name">poonam3537</div><div class="friend-mutual">Recent search · 2.1M followers</div></div><button class="follow-btn" onclick="toggleFollow(this,'poonam3537')">Follow</button></div>
+      <div class="friend-item" data-name="sakufects"><div class="friend-avatar"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div><div class="friend-info"><div class="friend-name">sakufects</div><div class="friend-mutual">New posts · 890K followers</div></div><button class="follow-btn" onclick="toggleFollow(this,'sakufects')">Follow</button></div>
+      <div class="friend-item" data-name="kenDoll"><div class="friend-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div><div class="friend-info"><div class="friend-name">kenDoll ✓</div><div class="friend-mutual">Verified · 14.6M followers</div></div><button class="follow-btn" onclick="toggleFollow(this,'kenDoll')">Follow</button></div>
+      <div class="friend-item" data-name="sarahlooks"><div class="friend-avatar"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&q=80" alt=""></div><div class="friend-info"><div class="friend-name">sarahlooks</div><div class="friend-mutual">Suggested · 4.2M followers</div></div><button class="follow-btn" onclick="toggleFollow(this,'sarahlooks')">Follow</button></div>
     </div>
   </div>
 
@@ -502,56 +388,28 @@
       <div style="background:rgba(255,255,255,.18);padding:6px 18px;border-radius:20px;font-size:13px;color:#fff;cursor:pointer" onclick="showToast('Add sound')">🎵 Add sound</div>
       <div style="font-size:13px;color:#fff;cursor:pointer" onclick="showToast('Settings')">⚙️</div>
     </div>
-    <div class="create-viewfinder">
-      <div class="camera-circle">📷</div>
-      <div style="color:rgba(255,255,255,.45);font-size:14px">Tap to enable camera</div>
-    </div>
+    <div class="create-viewfinder"><div class="camera-circle">📷</div><div style="color:rgba(255,255,255,.45);font-size:14px">Tap to enable camera</div></div>
     <div class="create-tools">
       <div class="create-tool" onclick="showToast('Flip camera')"><div class="create-tool-icon">🔄</div><span>Flip</span></div>
       <div class="create-tool" onclick="showToast('Speed')"><div class="create-tool-icon">⚡</div><span>Speed</span></div>
       <div class="create-tool" onclick="showToast('Beauty mode')"><div class="create-tool-icon">✨</div><span>Beauty</span></div>
       <div class="create-tool" onclick="showToast('Filters')"><div class="create-tool-icon">🎨</div><span>Filters</span></div>
-      <div class="create-tool" onclick="showToast('Timer')"><div class="create-tool-icon">⏱️</div><span>Timer</span></div>
     </div>
     <div class="mode-selector">
-      <button class="mode-btn">10m</button>
-      <button class="mode-btn">60s</button>
-      <button class="mode-btn">15s</button>
-      <button class="mode-btn active">PHOTO</button>
-      <button class="mode-btn">TEXT</button>
+      <button class="mode-btn">60s</button><button class="mode-btn">15s</button><button class="mode-btn active">PHOTO</button><button class="mode-btn">TEXT</button>
     </div>
     <div class="capture-wrap">
-      <div class="gallery-btn" onclick="showToast('Gallery opened')">
-        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt="">
-      </div>
-      <div class="capture-btn-outer" onclick="showToast('📸 Photo captured!')">
-        <div class="capture-btn-inner"></div>
-      </div>
+      <div class="gallery-btn" onclick="showToast('Gallery opened')"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt=""></div>
+      <div class="capture-btn-outer" onclick="showToast('📸 Photo captured!')"><div class="capture-btn-inner"></div></div>
       <div class="flip-btn" onclick="showToast('Camera flipped')">🔄</div>
     </div>
   </div>
 
   <!-- INBOX PAGE -->
   <div id="page-inbox" class="page" style="background:#fff">
-    <div class="inbox-header">
-      <div class="inbox-title">Inbox</div>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="cursor:pointer" onclick="showToast('Settings')"><circle cx="12" cy="12" r="3" stroke="#000" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="#000" stroke-width="2"/></svg>
-    </div>
-    <div class="notif-item" onclick="showToast('kenDoll liked your post')">
-      <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div>
-      <div class="notif-content"><div class="notif-text"><strong>kenDoll</strong> liked your post ❤️</div><div class="notif-time">2h ago</div></div>
-      <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt=""></div>
-    </div>
-    <div class="notif-item" onclick="showToast('poonam3537 followed you')">
-      <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-      <div class="notif-content"><div class="notif-text"><strong>poonam3537</strong> started following you</div><div class="notif-time">5h ago</div></div>
-      <button style="background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer" onclick="event.stopPropagation();showToast('Following poonam3537')">Follow</button>
-    </div>
-    <div class="notif-item" onclick="openComments()">
-      <div class="notif-avatar"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-      <div class="notif-content"><div class="notif-text"><strong>aliofficial</strong> commented: "🔥🔥🔥"</div><div class="notif-time">1d ago</div></div>
-      <div class="notif-thumb"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&q=80" alt=""></div>
-    </div>
+    <div class="inbox-header"><div class="inbox-title">Inbox</div></div>
+    <div class="notif-item"><div class="notif-avatar"><img src="https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=100&q=80" alt=""></div><div class="notif-content"><div class="notif-text"><strong>kenDoll</strong> liked your post ❤️</div><div class="notif-time">2h ago</div></div><div class="notif-thumb"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=100&q=80" alt=""></div></div>
+    <div class="notif-item"><div class="notif-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div><div class="notif-content"><div class="notif-text"><strong>poonam3537</strong> started following you</div><div class="notif-time">5h ago</div></div><button style="background:#fe2c55;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer" onclick="showToast('Following!')">Follow</button></div>
   </div>
 
   <!-- PROFILE PAGE -->
@@ -573,41 +431,15 @@
         <div><span class="stat-num" id="followersCount">0</span><span class="stat-label">Followers</span></div>
         <div><span class="stat-num">0</span><span class="stat-label">Likes</span></div>
       </div>
-      <div class="add-bio" id="bioBox" onclick="addBio()">+ Add bio · My hobbies are...</div>
+      <div class="add-bio" id="bioBox" onclick="addBio()">+ Add bio</div>
       <div class="profile-tabs">
         <div class="profile-tab active" onclick="switchProfileTab(this,'posts')">Posts</div>
-        <div class="profile-tab" onclick="switchProfileTab(this,'private')">Private</div>
         <div class="profile-tab" onclick="switchProfileTab(this,'saved')">Saved</div>
         <div class="profile-tab" onclick="switchProfileTab(this,'liked')">Liked</div>
       </div>
-      <!-- Posts grid -->
-      <div id="profileTabPosts">
-        <div class="grid-posts">
-          <div class="grid-post"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt=""><div class="grid-post-views">▶ 89K</div></div>
-          <div class="grid-post"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&q=80" alt=""><div class="grid-post-views">▶ 421K</div></div>
-          <div class="grid-post"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80" alt=""><div class="grid-post-views">▶ 166K</div></div>
-        </div>
-      </div>
-      <!-- Private grid -->
-      <div id="profileTabPrivate" style="display:none">
-        <div class="grid-posts">
-          <div class="grid-post" style="background:#111;display:flex;align-items:center;justify-content:center">
-            <span style="font-size:28px">🔒</span>
-          </div>
-        </div>
-      </div>
-      <!-- Saved YT videos -->
-      <div id="profileTabSaved" style="display:none">
-        <div class="profile-yt-grid" id="savedYTGrid">
-          <div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div>
-        </div>
-      </div>
-      <!-- Liked YT videos -->
-      <div id="profileTabLiked" style="display:none">
-        <div class="profile-yt-grid" id="likedYTGrid">
-          <div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div>
-        </div>
-      </div>
+      <div id="profileTabPosts"><div class="grid-posts"><div class="grid-post"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt=""><div class="grid-post-views">▶ 89K</div></div><div class="grid-post"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&q=80" alt=""><div class="grid-post-views">▶ 421K</div></div><div class="grid-post"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&q=80" alt=""><div class="grid-post-views">▶ 166K</div></div></div></div>
+      <div id="profileTabSaved" style="display:none"><div class="profile-yt-grid" id="savedYTGrid"><div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div></div></div>
+      <div id="profileTabLiked" style="display:none"><div class="profile-yt-grid" id="likedYTGrid"><div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div></div></div>
     </div>
   </div>
 
@@ -623,17 +455,12 @@
     <div id="searchTrending">
       <div class="search-trending">
         <div class="search-trending-title">Trending</div>
-        <span class="trending-tag" onclick="doSearch('#ken')">#ken</span>
-        <span class="trending-tag" onclick="doSearch('#grwm')">#grwm</span>
-        <span class="trending-tag" onclick="doSearch('#viral')">#viral</span>
-        <span class="trending-tag" onclick="doSearch('#pakistan')">#pakistan</span>
-        <span class="trending-tag" onclick="doSearch('#music')">#music</span>
-        <span class="trending-tag" onclick="doSearch('#aesthetic')">#aesthetic</span>
-        <span class="trending-tag" onclick="doSearch('#fyp')">#fyp</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:0 16px">
-        <div style="border-radius:8px;overflow:hidden;aspect-ratio:.8;cursor:pointer" onclick="doSearch('trending music')"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" style="width:100%;height:100%;object-fit:cover" alt=""></div>
-        <div style="border-radius:8px;overflow:hidden;aspect-ratio:.8;cursor:pointer" onclick="doSearch('viral videos')"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&q=80" style="width:100%;height:100%;object-fit:cover" alt=""></div>
+        <span class="trending-tag" onclick="doSearch('pakistan')">#pakistan</span>
+        <span class="trending-tag" onclick="doSearch('viral')">#viral</span>
+        <span class="trending-tag" onclick="doSearch('music')">#music</span>
+        <span class="trending-tag" onclick="doSearch('funny')">#funny</span>
+        <span class="trending-tag" onclick="doSearch('news')">#news</span>
+        <span class="trending-tag" onclick="doSearch('nature')">#nature</span>
       </div>
     </div>
     <div id="searchResults" style="display:none"></div>
@@ -675,44 +502,19 @@
       <div><div class="menu-name">Saqib Saqib</div><div class="menu-handle">@saqib.saqib693</div></div>
     </div>
     <div class="menu-section">
-      <div class="menu-section-title">Creator Tools</div>
+      <div class="menu-section-title">Tools</div>
       <div class="menu-item" onclick="menuAction('Creator dashboard')"><div class="menu-item-left">📊 Creator dashboard</div><span class="menu-arrow">›</span></div>
-      <div class="menu-item" onclick="menuAction('LIVE Studio')"><div class="menu-item-left">🎙️ LIVE Studio</div><span class="menu-arrow">›</span></div>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Assets</div>
-      <div class="menu-item" onclick="menuAction('Balance')"><div class="menu-item-left">💰 Balance</div><span class="menu-arrow">›</span></div>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Personal tools</div>
       <div class="menu-item" onclick="menuAction('Watch history')"><div class="menu-item-left">⏱️ Watch history</div><span class="menu-arrow">›</span></div>
-      <div class="menu-item" onclick="menuAction('Offline videos')"><div class="menu-item-left">💾 Offline videos</div><span class="menu-arrow">›</span></div>
-      <div class="menu-item" onclick="menuAction('Your QR code')"><div class="menu-item-left">📱 Your QR code</div><span class="menu-arrow">›</span></div>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Creation & business</div>
-      <div class="menu-item" onclick="menuAction('TikTok Studio')"><div class="menu-item-left">🎬 TikTok Studio</div><span class="menu-arrow">›</span></div>
-      <div class="menu-item" onclick="menuAction('Settings and privacy')"><div class="menu-item-left">⚙️ Settings and privacy</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="menuAction('Settings')"><div class="menu-item-left">⚙️ Settings</div><span class="menu-arrow">›</span></div>
     </div>
   </div>
 
-  <!-- COMMENT SHEET (local posts) -->
+  <!-- COMMENT SHEET -->
   <div id="sheet-overlay" onclick="closeSheets()"></div>
   <div id="comment-sheet">
-    <div class="comment-header">
-      <div></div>
-      <div class="comment-header-title">Comments</div>
-      <span onclick="closeSheets()" style="cursor:pointer;font-size:20px;color:#999">✕</span>
-    </div>
+    <div class="comment-header"><div></div><div class="comment-header-title">Comments</div><span onclick="closeSheets()" style="cursor:pointer;font-size:20px;color:#999">✕</span></div>
     <div class="comment-list" id="commentList">
-      <div class="comment-item">
-        <div class="comment-av"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div>
-        <div class="comment-body"><div class="comment-name">poonam3537</div><div class="comment-text">Omg this is so cute 😍😍</div><div class="comment-time">2h · Reply</div></div>
-      </div>
-      <div class="comment-item">
-        <div class="comment-av"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&q=80" alt=""></div>
-        <div class="comment-body"><div class="comment-name">aliofficial</div><div class="comment-text">🔥🔥🔥 fire content bro</div><div class="comment-time">5h · Reply</div></div>
-      </div>
+      <div class="comment-item"><div class="comment-av"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt=""></div><div class="comment-body"><div class="comment-name">poonam3537</div><div class="comment-text">Omg this is so cute 😍😍</div><div class="comment-time">2h · Reply</div></div></div>
     </div>
     <div class="comment-input-row">
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0">S</div>
@@ -721,594 +523,747 @@
     </div>
   </div>
 
-  <!-- VIDEO MODAL -->
-  <div id="video-modal">
-    <button class="modal-close" onclick="closeVideoModal()">✕</button>
-    <div class="modal-iframe-wrap" id="modalIframe"></div>
-    <div class="modal-info">
-      <div class="modal-title" id="modalTitle"></div>
-      <div class="modal-channel" id="modalChannel"></div>
-      <div class="modal-stats" id="modalStats"></div>
-      <div class="modal-actions">
-        <button class="modal-action-btn modal-like-btn" id="modalLikeBtn" onclick="modalToggleLike()">❤️ Like</button>
-        <button class="modal-action-btn modal-save-btn" id="modalSaveBtn" onclick="modalToggleSave()">🔖 Save</button>
-      </div>
-    </div>
-    <div class="modal-comments-title">Comments</div>
-    <div id="modalComments"></div>
-  </div>
-
   <div id="toast"></div>
 </div>
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────
   const API_KEY = 'AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
-  const CACHE_KEY = 'yt_trending_cache';
-  const CACHE_TIME_KEY = 'yt_trending_time';
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  // Piped instances to proxy YouTube embeds
+  const PIPED_INSTANCES = [
+    'https://piped.video',
+    'https://piped.kavin.rocks',
+    'https://piped.privacydev.net'
+  ];
+  let pipedIdx = 0;
+
+  const FALLBACK_IDS = [
+    "dQw4w9WgXcQ","M7lc1UVf-VE","kJQP7kiw5Fk","9bZkp7q19f0","hT_nvWreIhg","jNQXAC9IVRw","fRh_vgS2dFE","hTWKbfoikeg","LsoLEjrDogU","2Vv-BfVoq4g",
+    "CevxZvSJLk8","sON68ibZxs0","LXb3EKWsInQ","C0DPdy98e4c","YQHsXMglC9A","OPf0YbXqDm0","JGwWNGJdvx8","FzCsowPyaaA","LPn0KFlbqX8","RgKAFK5djSk",
+    "9jK-NcRmVcw","BT9o5tD-0sg","hfaF0sAFQX4","eVliP1Gwl_A","QFSiMtca2RI","EoKM5wKjf9A","5NV6CJXaWDA","pRpeEdMmmQ0","Bey4zZvH6K4","3tmd-ClpJxA",
+    "YykjpeuMNEk","FzTwD3OQNww","G7KNmW9a75Y","CD-EURlQZfQ","Y8nKD8PLIcE","y60dheeffcg","SRc55yzH70w","Fz0Jc9t1S4c","JgWJPCDT9VU","aKOcFjpUuhY",
+    "L_jWHffIx5E","Q0oIoR9mTM4","kJ9uRFg1e7A","n4RjJKxsamQ","KQ6Vbk2H5pI","VYOjWnS4cMM","IcrbM1l-B7I","EjM9uZvw0QQ","nfs8NYg7yQM","WPni755-Krg",
+    "RsE1lsd0kIk","WUvgPIqGWGo","OaNoE39VzGo","6ZfuNTqbHE8","Vw4KVoF6zFY","WrbyJREBhhY","eGRfLpQBBdU","JF8BRbhktc4","5qm8ww6A7Hg","PMivT7MJ41M",
+    "UPR55V4EvCA","2zNSgSzhBfM","jYa1BOzREhQ","P9B4pj-yuPs","v3MQqwllNig","NUNNtYVbxbs","RcXgdq2Tu7o","_0NIGhTnYWE","bOCMycIbmGw","QJo3n3fIVsA",
+    "CuIaQ9TtgY4","ZRtdQbR2fsw","ekzHI_2GyYw","6vBRb2KTR4Q","OPsNrVnqVX8","AONjxKU7FSg","p0oBCKJcmHg","5UmEtDJLAe0","Z9bSTJ-zVuQ","BhzH-1VN5sc",
+    "T0VJKtNBmK8","YUfGzQ-8s_Y","oRQ5YD9xhNs","PpU2-B_Alfc","m2bS0wRiTEA","qB2Un6QU1HM","ICa0jmlQV7c","CHekNnySAfM","0h-MlZ0Kxlk","rHIGLVOEjDU",
+    "U_JEM7bF2aU","Gmq3EFN4sP4","8Fz4lh9SByk","TG4YnAdLLrU","xmGDZl2mKzE","APDHpoFn5zU","qV3jKSguXg8","Y4DvrxxHiok","3L4YoZv8bPM","3qVtEoHSVoQ",
+    "BB2Xa4DDNzI","F5ZkrzGCZrw","k4rXRMtNVDc","HR6cojgTGho","pmb0QpY6oWw","hBjuUpaKkLE","qtqAsyJdlM4","U5SIA3dHPi4","bHtaALHEG0w","LHWxKJBH_-U",
+    "7FDdrUhYtU0","Y6gdgB8N3pA","R8X6KRSIphY","PbEFTXLGwVA","aAAwjNlW2Xc","1tY0SDgfO2Y","dCufrQyDt2Y","MnEqa1ddHHY","G9V0IoKcfdY","jX1HBz9bSI8",
+    "j9WzveZ0q9Y","fR0JBt8zzvU","yHFLkCOfesQ","q0QKqdYjAOo","Nxh2-QCEjF8","h4vFZw_FrDc","jNVkkzDZUws","fY9U-vJhHaw","UYK3lZdgLQc","9AZtbXWSk4Q",
+    "uELSlxA1HMA","h2EDCb8pLpc","G5ez6fBbINk","eMhFAtI66f0","9HkTDt2JlWY","bVrPzF4D4Rw","EvBP4sIyqnQ","rZFiIesG_qM","8FGynT-G4GA","ULGKshMnDWU",
+    "Q3LQfayUhYM","8I0VuwE45Ww","nJnuwFiUp3I","zlX6DwjEYBA","shgJUC6VYY0","y3vgku0frys","mUJN_iq-yw8","pG8_Alxj_4A","j6njwDPAsQ0","RF3s4xEhq4U",
+    "LRLI2whuAJg","xhYDptcNLV8","S1SgGftwZjw","hOtCYC0yx9E","j6GqVe3-LqI","nOSO8HutRTw","UHXLYOm7wFs","VoKBfQ2JJig","vVcqyId1lRo","V5rxzvFASiE",
+    "g5RYAQ6n8Hs","y5YI0U0WZCU","cL_kIL8UDyM","Z4aZomHZApY","kbD7mNbNyRs","m5WDQuAPMj8","KqT6hCG7pAw","z6XY1yOSoG4","qtXGmX9AgXs","UkmF2Hlu8Cg",
+    "kKKrGPm7Qfw","SZUUEab2nO8","CNy8GFlgyqc","LTlQopNgSLI","nExmVE6Pmt8","j_vGCIAhEdg","KaDqIjX4ABk","rFEZiGCIGso","wEwDPpERl1w","L8Q1HcxB6Sc",
+    "O43cO6Ky0Oo","nIaKFxIQ7II","gAVnUZdaJlI","T9Z7jV5gVXU","4fQgtHCFXto","JvDSYl6BLks","UYaYgcNfvAk","SqjVZQaJLlA","xXeKuXmkRds","b-dX1mAwAmU",
+    "xF6owzfD2Hk","JEO_7MTlmtM","Kgf8A6pCDNA","WDrUDNMGaG0","lp-LLW5MDbE","kffacxfA7Q4","UNQhuFL6CWg","wyx6JBAgFa0","YoB8t0B4jx4","oBt4URXQ5kA"
+  ];
 
   // ─── STATE ────────────────────────────────────────────────────
   let followingList = [];
-  let currentVideoId = null;
-  let currentVideoData = null;
   let searchDebounceTimer = null;
 
-  // localStorage helpers
-  function getLiked() { try { return JSON.parse(localStorage.getItem('likedYouTube') || '[]'); } catch(e){return[];} }
-  function getSaved() { try { return JSON.parse(localStorage.getItem('savedYouTube') || '[]'); } catch(e){return[];} }
-  function getLikedData() { try { return JSON.parse(localStorage.getItem('likedYouTubeData') || '[]'); } catch(e){return[];} }
-  function getSavedData() { try { return JSON.parse(localStorage.getItem('savedYouTubeData') || '[]'); } catch(e){return[];} }
+  // Current long player state
+  let lpCurrentId = null;
+  let lpCurrentData = null;
 
-  function saveLiked(arr) { localStorage.setItem('likedYouTube', JSON.stringify(arr)); }
-  function saveSaved(arr) { localStorage.setItem('savedYouTube', JSON.stringify(arr)); }
-  function saveLikedData(arr) { localStorage.setItem('likedYouTubeData', JSON.stringify(arr)); }
-  function saveSavedData(arr) { localStorage.setItem('savedYouTubeData', JSON.stringify(arr)); }
+  // Shorts feed state
+  let shortsFeedIds = [];       // IDs confirmed embeddable
+  let shortsFeedData = {};      // id -> metadata
+  let shortsPage = 0;           // how many batches loaded
+  let shortsLoading = false;
+  let shortsFallbackIdx = 0;    // for fallback IDs
 
-  // ─── NUMBER FORMAT ────────────────────────────────────────────
-  function fmt(n) {
-    const num = parseInt(n) || 0;
-    if (num >= 1000000) return (num/1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num/1000).toFixed(1) + 'K';
-    return num.toString();
-  }
+  // Embeddability cache: id -> true/false
+  const embedCache = {};
+
+  // ─── HELPERS ──────────────────────────────────────────────────
+  function fmt(n) { const num=parseInt(n)||0; if(num>=1000000) return (num/1e6).toFixed(1)+'M'; if(num>=1000) return (num/1000).toFixed(1)+'K'; return num.toString(); }
+  function escapeAttr(s) { return (s||'').replace(/'/g,"&#39;").replace(/"/g,"&quot;"); }
+  function decodeHtml(str) { const t=document.createElement('textarea'); t.innerHTML=str||''; return t.value; }
+  function shuffle(arr) { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+  function getLiked() { try{return JSON.parse(localStorage.getItem('likedYT')||'[]')}catch(e){return[]} }
+  function getSaved() { try{return JSON.parse(localStorage.getItem('savedYT')||'[]')}catch(e){return[]} }
+  function getLikedData() { try{return JSON.parse(localStorage.getItem('likedYTData')||'[]')}catch(e){return[]} }
+  function getSavedData() { try{return JSON.parse(localStorage.getItem('savedYTData')||'[]')}catch(e){return[]} }
+  function saveLiked(a) { localStorage.setItem('likedYT',JSON.stringify(a)); }
+  function saveSaved(a) { localStorage.setItem('savedYT',JSON.stringify(a)); }
+  function saveLikedData(a) { localStorage.setItem('likedYTData',JSON.stringify(a)); }
+  function saveSavedData(a) { localStorage.setItem('savedYTData',JSON.stringify(a)); }
 
   // ─── TOAST ────────────────────────────────────────────────────
   let toastTimer;
   function showToast(msg) {
     clearTimeout(toastTimer);
-    const t = document.getElementById('toast');
-    t.innerText = msg;
-    t.classList.add('show');
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    const t=document.getElementById('toast'); t.innerText=msg; t.classList.add('show');
+    toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
   }
 
   // ─── PAGE NAVIGATION ──────────────────────────────────────────
   function showPage(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const ni = document.getElementById('nav-' + page);
-    if (ni) ni.classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const pg = document.getElementById('page-'+page);
+    if(pg) pg.classList.add('active');
+    const ni = document.getElementById('nav-'+page);
+    if(ni) ni.classList.add('active');
     closeSheets(); closeMenu();
-    if (page === 'profile') renderProfileYT();
+    if(page==='profile') renderProfileYT();
+    if(page==='shorts') { pauseAllShorts(); initShortsFeed(); }
+    if(page==='home') pauseAllShorts();
   }
 
   function switchTab(el) {
-    document.querySelectorAll('.home-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.home-tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
   }
 
-  function switchProfileTab(el, tab) {
-    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+  function switchProfileTab(el,tab) {
+    document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
-    document.getElementById('profileTabPosts').style.display = tab === 'posts' ? '' : 'none';
-    document.getElementById('profileTabPrivate').style.display = tab === 'private' ? '' : 'none';
-    document.getElementById('profileTabSaved').style.display = tab === 'saved' ? '' : 'none';
-    document.getElementById('profileTabLiked').style.display = tab === 'liked' ? '' : 'none';
-    if (tab === 'saved' || tab === 'liked') renderProfileYT();
+    document.getElementById('profileTabPosts').style.display=tab==='posts'?'':'none';
+    document.getElementById('profileTabSaved').style.display=tab==='saved'?'':'none';
+    document.getElementById('profileTabLiked').style.display=tab==='liked'?'':'none';
+    if(tab==='saved'||tab==='liked') renderProfileYT();
   }
 
-  // ─── PROFILE YT GRIDS ─────────────────────────────────────────
   function renderProfileYT() {
-    const likedData = getLikedData();
-    const savedData = getSavedData();
-
-    const likedGrid = document.getElementById('likedYTGrid');
-    const savedGrid = document.getElementById('savedYTGrid');
-
-    if (likedData.length === 0) {
-      likedGrid.innerHTML = '<div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div>';
-    } else {
-      likedGrid.innerHTML = likedData.map(v => `
-        <div class="profile-yt-post" onclick="openVideoModal('${v.id}','${escapeAttr(v.title)}','${escapeAttr(v.channel)}',null,null,null,'${v.thumb}')">
-          <img src="${v.thumb}" alt="" loading="lazy">
-          <div class="grid-post-views">▶ YT</div>
-        </div>
-      `).join('');
-    }
-
-    if (savedData.length === 0) {
-      savedGrid.innerHTML = '<div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div>';
-    } else {
-      savedGrid.innerHTML = savedData.map(v => `
-        <div class="profile-yt-post" onclick="openVideoModal('${v.id}','${escapeAttr(v.title)}','${escapeAttr(v.channel)}',null,null,null,'${v.thumb}')">
-          <img src="${v.thumb}" alt="" loading="lazy">
-          <div class="grid-post-views">▶ YT</div>
-        </div>
-      `).join('');
-    }
+    const likedData=getLikedData(); const savedData=getSavedData();
+    const lGrid=document.getElementById('likedYTGrid'); const sGrid=document.getElementById('savedYTGrid');
+    if(!likedData.length) { lGrid.innerHTML='<div class="profile-yt-empty">No liked videos yet.<br>Tap ❤️ on any video to like.</div>'; }
+    else { lGrid.innerHTML=likedData.map(v=>`<div class="profile-yt-post" onclick="openLongPlayer('${v.id}','${escapeAttr(v.title)}','${escapeAttr(v.channel)}',null,null,null,'${v.thumb}')"><img src="${v.thumb}" alt="" loading="lazy"><div class="grid-post-views">▶ YT</div></div>`).join(''); }
+    if(!savedData.length) { sGrid.innerHTML='<div class="profile-yt-empty">No saved videos yet.<br>Tap 🔖 on any video to save.</div>'; }
+    else { sGrid.innerHTML=savedData.map(v=>`<div class="profile-yt-post" onclick="openLongPlayer('${v.id}','${escapeAttr(v.title)}','${escapeAttr(v.channel)}',null,null,null,'${v.thumb}')"><img src="${v.thumb}" alt="" loading="lazy"><div class="grid-post-views">▶ YT</div></div>`).join(''); }
   }
 
-  function escapeAttr(s) {
-    return (s || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  // ─── EMBEDDABILITY CHECK ──────────────────────────────────────
+  // Check if a YouTube video can be embedded by testing oEmbed
+  async function checkEmbeddable(videoId) {
+    if(embedCache[videoId] !== undefined) return embedCache[videoId];
+    try {
+      const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      const ok = r.ok;
+      embedCache[videoId] = ok;
+      return ok;
+    } catch(e) {
+      embedCache[videoId] = false;
+      return false;
+    }
   }
 
   // ─── YOUTUBE API ──────────────────────────────────────────────
   async function fetchTrending() {
-    // Check cache
-    const cached = localStorage.getItem(CACHE_KEY);
-    const cachedTime = parseInt(localStorage.getItem(CACHE_TIME_KEY) || '0');
-    if (cached && (Date.now() - cachedTime < CACHE_DURATION)) {
-      try {
-        return JSON.parse(cached);
-      } catch(e) {}
-    }
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&chart=mostPopular&regionCode=PK&maxResults=20&key=${API_KEY}`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('API '+r.status);
+    const d = await r.json();
+    return d.items || [];
+  }
 
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode=US&maxResults=20&key=${API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error ' + res.status);
-    const data = await res.json();
-
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data.items));
-    localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-    return data.items;
+  async function fetchVideosByIds(ids) {
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${ids.join(',')}&key=${API_KEY}`;
+    const r = await fetch(url);
+    if(!r.ok) return [];
+    const d = await r.json();
+    return d.items || [];
   }
 
   async function fetchSearchResults(query) {
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=20&key=${API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error ' + res.status);
-    const data = await res.json();
-    return data.items;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('API '+r.status);
+    const d = await r.json();
+    return d.items || [];
   }
 
   async function fetchComments(videoId) {
     const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=20&key=${API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Comments error ' + res.status);
-    const data = await res.json();
-    return data.items;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('Comments '+r.status);
+    const d = await r.json();
+    return d.items || [];
   }
 
-  // ─── BUILD FEED ───────────────────────────────────────────────
-  function buildFeedPost(video, index) {
-    const id = video.id;
-    const snippet = video.snippet;
-    const stats = video.statistics || {};
-
-    const thumb = (snippet.thumbnails.maxres || snippet.thumbnails.high || snippet.thumbnails.medium || snippet.thumbnails.default).url;
-    const title = snippet.title;
-    const channel = snippet.channelTitle;
-    const views = fmt(stats.viewCount || 0);
-    const likes = fmt(stats.likeCount || 0);
-    const comments = fmt(stats.commentCount || 0);
-    const channelThumb = `https://ui-avatars.com/api/?name=${encodeURIComponent(channel)}&background=random&size=100`;
-
-    const postId = 'yt_' + index;
-
-    return `
-      <div class="feed-post" id="post_${postId}" ondblclick="feedDoubleTap('${postId}','${id}','${escapeAttr(title)}','${escapeAttr(channel)}','${views}','${likes}','${comments}','${escapeAttr(thumb)}')">
-        <div class="post-bg" style="background-image:url('${thumb}')" onclick="openVideoModal('${id}','${escapeAttr(title)}','${escapeAttr(channel)}','${views}','${likes}','${comments}','${escapeAttr(thumb)}')">
-          <div class="play-indicator">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
-        </div>
-        <div class="like-animation" id="likeAnim_${postId}">❤️</div>
-        <div class="post-actions">
-          <div class="author-wrap">
-            <div class="author-avatar">
-              <img src="${channelThumb}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'">
-            </div>
-            <div class="follow-dot" id="fd_${postId}" onclick="toggleFollowDot('fd_${postId}')">+</div>
-          </div>
-          <div class="action-btn" onclick="feedToggleLike('${postId}','${id}','${escapeAttr(title)}','${escapeAttr(channel)}','${escapeAttr(thumb)}')">
-            <div class="action-icon" id="likeIcon_${postId}">
-              <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" id="likePath_${postId}" fill="white"/></svg>
-            </div>
-            <span class="action-count" id="likeCount_${postId}">${likes}</span>
-          </div>
-          <div class="action-btn" onclick="openVideoModalFromFeed('${id}','${escapeAttr(title)}','${escapeAttr(channel)}','${views}','${likes}','${comments}','${escapeAttr(thumb)}',true)">
-            <div class="action-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/></svg>
-            </div>
-            <span class="action-count">${comments}</span>
-          </div>
-          <div class="action-btn" onclick="feedToggleSave('${postId}','${id}','${escapeAttr(title)}','${escapeAttr(channel)}','${escapeAttr(thumb)}')">
-            <div class="action-icon" id="saveIcon_${postId}">
-              <svg width="24" height="24" viewBox="0 0 24 24"><path id="savePath_${postId}" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="white" stroke-width="1.8" fill="none"/></svg>
-            </div>
-            <span class="action-count" id="saveCount_${postId}">${views}</span>
-          </div>
-          <div class="action-btn" onclick="showToast('Link copied! 📋')">
-            <div class="action-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-            <span class="action-count">Share</span>
-          </div>
-          <div class="music-disk" onclick="showToast('🎵 ' + '${escapeAttr(channel)}')">
-            <div class="music-disk-inner"></div>
-          </div>
-        </div>
-        <div class="post-overlay">
-          <div class="post-author-row">
-            <div class="post-mini-avatar"><img src="${channelThumb}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=YT&background=fe2c55&color=fff&size=100'"></div>
-            <div class="post-username">
-              ${channel.substring(0,20)}
-              <button class="follow-btn-feed" onclick="toggleFollowFeedBtn(this)">Follow</button>
-            </div>
-          </div>
-          <div class="post-caption">${title.substring(0,80)}${title.length > 80 ? '...' : ''}</div>
-          <div class="post-sound">🎵 <span class="sound-ticker">${channel} · ${views} views</span></div>
-        </div>
-        <div class="post-progress"><div class="post-progress-fill" style="width:${Math.floor(Math.random()*60)+10}%"></div></div>
-      </div>
-    `;
+  // Parse ISO duration to human-readable
+  function parseDuration(iso) {
+    if(!iso) return '';
+    const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if(!m) return '';
+    const h=parseInt(m[1]||0), mi=parseInt(m[2]||0), s=parseInt(m[3]||0);
+    if(h>0) return `${h}:${String(mi).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return `${mi}:${String(s).padStart(2,'0')}`;
   }
 
-  async function loadFeed() {
-    const container = document.getElementById('feedContainer');
+  // Is a video a Short? (duration ≤ 60s)
+  function isShort(item) {
+    const iso = item.contentDetails && item.contentDetails.duration;
+    if(!iso) return false;
+    const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if(!m) return false;
+    const h=parseInt(m[1]||0), mi=parseInt(m[2]||0), s=parseInt(m[3]||0);
+    return (h===0 && mi===0 && s<=60) || (h===0 && mi===1 && s===0);
+  }
+
+  // Get real YouTube thumbnail
+  function getThumb(snippet, size='high') {
+    const t = snippet.thumbnails;
+    return (t.maxres||t.high||t.medium||t.default).url;
+  }
+
+  // Get real channel avatar from YouTube API
+  async function fetchChannelAvatar(channelId) {
     try {
-      const videos = await fetchTrending();
-      if (!videos || videos.length === 0) throw new Error('No videos');
-      container.innerHTML = videos.map((v, i) => buildFeedPost(v, i)).join('');
-      // Restore like/save states
-      const likedIds = getLiked();
-      const savedIds = getSaved();
-      videos.forEach((v, i) => {
-        const postId = 'yt_' + i;
-        if (likedIds.includes(v.id)) {
-          const path = document.getElementById('likePath_' + postId);
-          if (path) path.setAttribute('fill', '#fe2c55');
+      const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${API_KEY}`;
+      const r = await fetch(url);
+      if(!r.ok) return null;
+      const d = await r.json();
+      if(d.items && d.items[0]) return d.items[0].snippet.thumbnails.default.url;
+    } catch(e){}
+    return null;
+  }
+
+  // ─── HOME GRID ────────────────────────────────────────────────
+  async function loadHomeGrid() {
+    const area = document.getElementById('homeGridArea');
+    area.innerHTML = '<div class="feed-loading"><div class="spinner"></div><p>Loading videos...</p></div>';
+    try {
+      let videos = await fetchTrending();
+      if(!videos.length) throw new Error('No videos');
+
+      // Check embeddability for all and only use embeddable
+      const checks = await Promise.all(videos.map(v => checkEmbeddable(v.id)));
+      const playable = videos.filter((_,i)=>checks[i]);
+      // Separate shorts and longs
+      const longs = playable.filter(v=>!isShort(v));
+      const shorts = playable.filter(v=>isShort(v));
+
+      let html = '';
+
+      // Shorts row
+      if(shorts.length > 0) {
+        html += `
+          <div class="shorts-header-row">
+            <div class="shorts-logo">
+              <svg viewBox="0 0 90 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="60"><rect width="90" height="20" rx="4" fill="#ff0000"/><text x="8" y="14" font-size="12" fill="white" font-weight="700" font-family="Arial">▶ Shorts</text></svg>
+            </div>
+            <div class="shorts-see-all" onclick="showPage('shorts')">See all ›</div>
+          </div>
+          <div class="shorts-scroll-wrap">
+        `;
+        for(const v of shorts) {
+          const thumb = getThumb(v.snippet);
+          const title = v.snippet.title;
+          html += `
+            <div class="short-grid-card" onclick="openShortFromHome('${v.id}','${escapeAttr(v.snippet.title)}','${escapeAttr(v.snippet.channelTitle)}','${escapeAttr(thumb)}')">
+              <div class="short-grid-thumb">
+                <img src="${thumb}" alt="" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'">
+                <div class="short-grid-play"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>
+              </div>
+              <div class="short-grid-title">${decodeHtml(title)}</div>
+            </div>
+          `;
         }
-        if (savedIds.includes(v.id)) {
-          const path = document.getElementById('savePath_' + postId);
-          if (path) { path.setAttribute('fill', '#ffc107'); path.setAttribute('stroke', '#ffc107'); }
+        html += `</div>`;
+      }
+
+      // Long videos
+      if(longs.length > 0) {
+        html += `<div class="home-section-label">Videos</div>`;
+        for(const v of longs) {
+          const thumb = getThumb(v.snippet);
+          const title = decodeHtml(v.snippet.title);
+          const channel = decodeHtml(v.snippet.channelTitle);
+          const views = fmt(v.statistics.viewCount);
+          const likes = fmt(v.statistics.likeCount);
+          const dur = parseDuration(v.contentDetails && v.contentDetails.duration);
+          const chAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(channel)}&background=random&size=60`;
+          html += `
+            <div class="long-card" onclick="openLongPlayer('${v.id}','${escapeAttr(title)}','${escapeAttr(channel)}','${views}','${likes}','0','${escapeAttr(thumb)}','${escapeAttr(chAvatar)}','${v.snippet.channelId||''}')">
+              <div class="long-thumb-wrap">
+                <img src="${thumb}" alt="" loading="lazy">
+                ${dur?`<div class="long-duration">${dur}</div>`:''}
+              </div>
+              <div class="long-info">
+                <div class="long-title">${title}</div>
+                <div class="long-channel-row">
+                  <div class="long-ch-avatar"><img src="${chAvatar}" alt="" onerror="this.style.display='none'"></div>
+                  <div class="long-channel">${channel}</div>
+                </div>
+                <div class="long-meta">${views} views</div>
+              </div>
+            </div>
+          `;
         }
-      });
+      }
+
+      if(!html) {
+        html = '<div class="feed-loading"><p>No playable videos found.<br>Try refreshing.</p></div>';
+      }
+
+      area.innerHTML = html;
     } catch(e) {
       console.error(e);
-      showToast('Unable to load videos. Try again later.');
-      container.innerHTML = `
-        <div class="feed-loading">
-          <div style="font-size:40px">📡</div>
-          <p>Could not load videos.</p>
-          <p style="margin-top:8px;font-size:12px;color:#555">Check your connection or API quota.</p>
-          <button onclick="loadFeed()" style="margin-top:16px;background:#fe2c55;color:#fff;border:none;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer">Retry</button>
-        </div>
-      `;
+      area.innerHTML = `<div class="feed-loading"><div style="font-size:40px">📡</div><p>Could not load videos.</p><button onclick="loadHomeGrid()" style="margin-top:16px;background:#fe2c55;color:#fff;border:none;padding:10px 24px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer">Retry</button></div>`;
     }
   }
 
-  // ─── FEED LIKE / SAVE ─────────────────────────────────────────
-  function feedToggleLike(postId, videoId, title, channel, thumb) {
-    const liked = getLiked();
-    const likedData = getLikedData();
-    const path = document.getElementById('likePath_' + postId);
-    if (liked.includes(videoId)) {
-      const idx = liked.indexOf(videoId);
-      liked.splice(idx, 1);
-      const didx = likedData.findIndex(v => v.id === videoId);
-      if (didx > -1) likedData.splice(didx, 1);
-      if (path) path.setAttribute('fill', 'white');
-      showToast('Removed from liked');
-    } else {
-      liked.push(videoId);
-      likedData.push({ id: videoId, title, channel, thumb });
-      if (path) path.setAttribute('fill', '#fe2c55');
-      showToast('❤️ Liked!');
-    }
-    saveLiked(liked);
-    saveLikedData(likedData);
+  // ─── OPEN SHORT FROM HOME (goes to shorts feed) ───────────────
+  function openShortFromHome(id, title, channel, thumb) {
+    // Pre-seed the shorts feed with this short first, then go to shorts page
+    shortsFeedIds = [];
+    shortsFeedData = {};
+    shortsFallbackIdx = 0;
+    shortsFeedIds.push(id);
+    shortsFeedData[id] = { id, title: decodeHtml(title), channel: decodeHtml(channel), thumb };
+    showPage('shorts');
   }
 
-  function feedToggleSave(postId, videoId, title, channel, thumb) {
-    const saved = getSaved();
-    const savedData = getSavedData();
-    const path = document.getElementById('savePath_' + postId);
-    if (saved.includes(videoId)) {
-      const idx = saved.indexOf(videoId);
-      saved.splice(idx, 1);
-      const didx = savedData.findIndex(v => v.id === videoId);
-      if (didx > -1) savedData.splice(didx, 1);
-      if (path) { path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'white'); }
-      showToast('Removed from saved');
-    } else {
-      saved.push(videoId);
-      savedData.push({ id: videoId, title, channel, thumb });
-      if (path) { path.setAttribute('fill', '#ffc107'); path.setAttribute('stroke', '#ffc107'); }
-      showToast('🔖 Saved!');
-    }
-    saveSaved(saved);
-    saveSavedData(savedData);
-  }
+  // ─── LONG PLAYER ──────────────────────────────────────────────
+  async function openLongPlayer(id, title, channel, views, likes, comments, thumb, chAvatar, channelId) {
+    lpCurrentId = id;
+    lpCurrentData = { id, title: decodeHtml(title), channel: decodeHtml(channel), thumb };
+    document.getElementById('page-longplayer').classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>{ if(p.id!=='page-longplayer') p.classList.remove('active'); });
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.getElementById('page-longplayer').scrollTop = 0;
 
-  function feedDoubleTap(postId, videoId, title, channel, views, likes, comments, thumb) {
-    feedToggleLike(postId, videoId, title, channel, thumb);
-    const a = document.getElementById('likeAnim_' + postId);
-    if (a) {
-      a.classList.remove('show');
-      void a.offsetWidth;
-      a.classList.add('show');
-      setTimeout(() => a.classList.remove('show'), 700);
-    }
-  }
+    document.getElementById('lpHeaderTitle').textContent = decodeHtml(title);
+    document.getElementById('lpTitle').textContent = decodeHtml(title);
+    document.getElementById('lpChName').textContent = decodeHtml(channel);
 
-  // ─── VIDEO MODAL ──────────────────────────────────────────────
-  function openVideoModal(videoId, title, channel, views, likes, comments, thumb) {
-    currentVideoId = videoId;
-    currentVideoData = { id: videoId, title, channel, thumb };
+    const img = document.getElementById('lpChImg');
+    if(chAvatar) { img.src = chAvatar; img.onerror = ()=>{ img.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(decodeHtml(channel))}&background=random&size=60`; }; }
+    else { img.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(decodeHtml(channel))}&background=random&size=60`; }
 
-    // Show loading spinner first, then iframe
-    const wrap = document.getElementById('modalIframe');
+    // Embed
+    const wrap = document.getElementById('lpIframeWrap');
     wrap.innerHTML = `
-      <div id="iframeLoader" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;position:absolute;inset:0;z-index:2">
-        <div class="spinner" style="width:40px;height:40px;border-width:3px"></div>
+      <div id="lpLoader" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;position:absolute;inset:0;z-index:2">
+        <div class="spinner" style="width:36px;height:36px;border-width:3px"></div>
       </div>
-      <iframe
-        id="ytIframe"
-        src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&rel=0&playsinline=1&enablejsapi=1"
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen
-        style="width:100%;height:100%;border:none;display:block;position:relative;z-index:1"
-        onload="document.getElementById('iframeLoader').style.display='none'"
-      ></iframe>
+      <iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;display:block;position:relative;z-index:1" onload="document.getElementById('lpLoader').style.display='none'"></iframe>
     `;
-    document.getElementById('modalTitle').textContent = decodeHtmlEntities(title);
-    document.getElementById('modalChannel').textContent = '📺 ' + decodeHtmlEntities(channel);
 
+    // Stats
     const statsHtml = [
-      views ? `<span class="modal-stat">👁️ ${views} views</span>` : '',
-      likes ? `<span class="modal-stat">👍 ${likes} likes</span>` : '',
-      comments ? `<span class="modal-stat">💬 ${comments} comments</span>` : ''
+      views ? `<span class="lp-stat">👁️ ${views} views</span>` : '',
+      likes ? `<span class="lp-stat">👍 ${likes} likes</span>` : ''
     ].filter(Boolean).join('');
-    document.getElementById('modalStats').innerHTML = statsHtml || '<span class="modal-stat">YouTube Video</span>';
+    document.getElementById('lpStats').innerHTML = statsHtml || '<span class="lp-stat">YouTube Video</span>';
 
     // Like/save state
-    const likedIds = getLiked();
-    const savedIds = getSaved();
-    const likeBtn = document.getElementById('modalLikeBtn');
-    const saveBtn = document.getElementById('modalSaveBtn');
-    if (likedIds.includes(videoId)) { likeBtn.classList.add('liked'); likeBtn.textContent = '❤️ Liked'; }
-    else { likeBtn.classList.remove('liked'); likeBtn.textContent = '❤️ Like'; }
-    if (savedIds.includes(videoId)) { saveBtn.classList.add('saved'); saveBtn.textContent = '🔖 Saved'; }
-    else { saveBtn.classList.remove('saved'); saveBtn.textContent = '🔖 Save'; }
+    const likedIds=getLiked(); const savedIds=getSaved();
+    const lb=document.getElementById('lpLikeBtn'); const sb=document.getElementById('lpSaveBtn');
+    if(likedIds.includes(id)){lb.classList.add('liked');lb.textContent='❤️ Liked';}else{lb.classList.remove('liked');lb.textContent='❤️ Like';}
+    if(savedIds.includes(id)){sb.classList.add('saved');sb.textContent='🔖 Saved';}else{sb.classList.remove('saved');sb.textContent='🔖 Save';}
 
-    document.getElementById('video-modal').classList.add('open');
-    document.getElementById('video-modal').scrollTop = 0;
+    // Subscribe state
+    const subBtn = document.getElementById('lpSubBtn');
+    subBtn.classList.remove('subbed'); subBtn.textContent='Subscribe';
 
-    // Load comments
-    loadModalComments(videoId);
-  }
+    // Load related and comments
+    document.getElementById('lpRelated').innerHTML = '<div class="lp-comments-loading"><div class="spinner" style="width:24px;height:24px;border-width:2px;margin:0 auto 8px"></div>Loading...</div>';
+    document.getElementById('lpComments').innerHTML = '<div class="lp-comments-loading"><div class="spinner" style="width:24px;height:24px;border-width:2px;margin:0 auto 8px"></div>Loading comments...</div>';
 
-  function openVideoModalFromFeed(videoId, title, channel, views, likes, comments, thumb, scrollToComments) {
-    openVideoModal(videoId, title, channel, views, likes, comments, thumb);
-    if (scrollToComments) {
-      setTimeout(() => {
-        const modal = document.getElementById('video-modal');
-        const commentsEl = document.getElementById('modalComments');
-        if (commentsEl) modal.scrollTo({ top: commentsEl.offsetTop - 60, behavior: 'smooth' });
-      }, 400);
+    loadLpRelated(id, channel);
+    loadLpComments(id);
+
+    // Fetch real channel avatar in background
+    if(channelId) {
+      fetchChannelAvatar(channelId).then(url=>{
+        if(url) { img.src=url; }
+      });
     }
   }
 
-  function closeVideoModal() {
-    // Stop video first (prevents audio continuing after close)
-    const iframe = document.getElementById('ytIframe');
-    if (iframe) iframe.src = '';
-    document.getElementById('video-modal').classList.remove('open');
-    setTimeout(() => { document.getElementById('modalIframe').innerHTML = ''; }, 200);
-    currentVideoId = null;
+  function closeLongPlayer() {
+    const iframe = document.getElementById('lpIframeWrap').querySelector('iframe');
+    if(iframe) iframe.src='';
+    setTimeout(()=>{ document.getElementById('lpIframeWrap').innerHTML=''; },200);
+    lpCurrentId=null;
+    showPage('home');
   }
 
-  function modalToggleLike() {
-    if (!currentVideoId || !currentVideoData) return;
-    const liked = getLiked();
-    const likedData = getLikedData();
-    const btn = document.getElementById('modalLikeBtn');
-    if (liked.includes(currentVideoId)) {
-      const idx = liked.indexOf(currentVideoId);
-      liked.splice(idx, 1);
-      const didx = likedData.findIndex(v => v.id === currentVideoId);
-      if (didx > -1) likedData.splice(didx, 1);
-      btn.classList.remove('liked');
-      btn.textContent = '❤️ Like';
-      showToast('Removed from liked');
+  function toggleLpSubscribe() {
+    const btn=document.getElementById('lpSubBtn');
+    if(btn.classList.contains('subbed')){ btn.classList.remove('subbed'); btn.textContent='Subscribe'; showToast('Unsubscribed'); }
+    else { btn.classList.add('subbed'); btn.textContent='Subscribed ✓'; showToast('Subscribed!'); }
+  }
+
+  function lpToggleLike() {
+    if(!lpCurrentId||!lpCurrentData) return;
+    const liked=getLiked(); const likedData=getLikedData(); const btn=document.getElementById('lpLikeBtn');
+    if(liked.includes(lpCurrentId)) {
+      liked.splice(liked.indexOf(lpCurrentId),1);
+      const idx=likedData.findIndex(v=>v.id===lpCurrentId); if(idx>-1) likedData.splice(idx,1);
+      btn.classList.remove('liked'); btn.textContent='❤️ Like'; showToast('Removed from liked');
     } else {
-      liked.push(currentVideoId);
-      likedData.push(currentVideoData);
-      btn.classList.add('liked');
-      btn.textContent = '❤️ Liked';
-      showToast('❤️ Liked!');
+      liked.push(lpCurrentId); likedData.push(lpCurrentData);
+      btn.classList.add('liked'); btn.textContent='❤️ Liked'; showToast('❤️ Liked!');
     }
-    saveLiked(liked);
-    saveLikedData(likedData);
+    saveLiked(liked); saveLikedData(likedData);
   }
 
-  function modalToggleSave() {
-    if (!currentVideoId || !currentVideoData) return;
-    const saved = getSaved();
-    const savedData = getSavedData();
-    const btn = document.getElementById('modalSaveBtn');
-    if (saved.includes(currentVideoId)) {
-      const idx = saved.indexOf(currentVideoId);
-      saved.splice(idx, 1);
-      const didx = savedData.findIndex(v => v.id === currentVideoId);
-      if (didx > -1) savedData.splice(didx, 1);
-      btn.classList.remove('saved');
-      btn.textContent = '🔖 Save';
-      showToast('Removed from saved');
+  function lpToggleSave() {
+    if(!lpCurrentId||!lpCurrentData) return;
+    const saved=getSaved(); const savedData=getSavedData(); const btn=document.getElementById('lpSaveBtn');
+    if(saved.includes(lpCurrentId)) {
+      saved.splice(saved.indexOf(lpCurrentId),1);
+      const idx=savedData.findIndex(v=>v.id===lpCurrentId); if(idx>-1) savedData.splice(idx,1);
+      btn.classList.remove('saved'); btn.textContent='🔖 Save'; showToast('Removed from saved');
     } else {
-      saved.push(currentVideoId);
-      savedData.push(currentVideoData);
-      btn.classList.add('saved');
-      btn.textContent = '🔖 Saved';
-      showToast('🔖 Saved!');
+      saved.push(lpCurrentId); savedData.push(lpCurrentData);
+      btn.classList.add('saved'); btn.textContent='🔖 Saved'; showToast('🔖 Saved!');
     }
-    saveSaved(saved);
-    saveSavedData(savedData);
+    saveSaved(saved); saveSavedData(savedData);
   }
 
-  async function loadModalComments(videoId) {
-    const container = document.getElementById('modalComments');
-    container.innerHTML = '<div class="modal-comments-loading"><div class="spinner" style="width:28px;height:28px;border-width:3px;margin:0 auto 8px"></div>Loading comments...</div>';
+  async function loadLpRelated(videoId, channel) {
     try {
-      const items = await fetchComments(videoId);
-      if (!items || items.length === 0) {
-        container.innerHTML = '<div class="modal-comments-off">No comments found for this video.</div>';
-        return;
-      }
-      container.innerHTML = items.map(item => {
-        const c = item.snippet.topLevelComment.snippet;
+      // Search for related videos by channel
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(channel)}&type=video&maxResults=15&key=${API_KEY}`;
+      const r = await fetch(url);
+      const d = await r.json();
+      const items = (d.items||[]).filter(i=>i.id.videoId && i.id.videoId!==videoId);
+      if(!items.length) { document.getElementById('lpRelated').innerHTML=''; return; }
+      // Check embeddability
+      const checks = await Promise.all(items.map(i=>checkEmbeddable(i.id.videoId)));
+      const playable = items.filter((_,idx)=>checks[idx]);
+      document.getElementById('lpRelated').innerHTML = playable.slice(0,8).map(item=>{
+        const vid=item.id.videoId; const s=item.snippet;
+        const thumb=(s.thumbnails.high||s.thumbnails.medium||s.thumbnails.default).url;
         return `
-          <div class="modal-comment-item">
-            <div class="modal-comment-av"><img src="${c.authorProfileImageUrl}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.authorDisplayName)}&size=60&background=random'"></div>
-            <div class="modal-comment-body">
-              <div class="modal-comment-name">${c.authorDisplayName}</div>
-              <div class="modal-comment-text">${c.textDisplay.replace(/<[^>]*>/g,'').substring(0,200)}</div>
-              <div class="modal-comment-likes">❤️ ${fmt(c.likeCount)}</div>
+          <div class="lp-related-card" onclick="openLongPlayer('${vid}','${escapeAttr(s.title)}','${escapeAttr(s.channelTitle)}',null,null,null,'${escapeAttr(thumb)}')">
+            <div class="lp-rel-thumb"><img src="${thumb}" alt="" loading="lazy"></div>
+            <div class="lp-rel-info">
+              <div class="lp-rel-title">${decodeHtml(s.title)}</div>
+              <div class="lp-rel-channel">${decodeHtml(s.channelTitle)}</div>
             </div>
           </div>
         `;
       }).join('');
     } catch(e) {
-      console.error('Comments error:', e);
-      container.innerHTML = '<div class="modal-comments-off">Comments are turned off or unavailable for this video.</div>';
+      document.getElementById('lpRelated').innerHTML='';
     }
+  }
+
+  async function loadLpComments(videoId) {
+    const container = document.getElementById('lpComments');
+    try {
+      const items = await fetchComments(videoId);
+      if(!items.length) { container.innerHTML='<div class="lp-comments-off">No comments available.</div>'; return; }
+      container.innerHTML = items.map(item=>{
+        const c=item.snippet.topLevelComment.snippet;
+        const name=c.authorDisplayName||'User';
+        const realAvatar=c.authorProfileImageUrl;
+        return `
+          <div class="lp-comment-item">
+            <div class="lp-comment-av"><img src="${realAvatar}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=60&background=random'"></div>
+            <div>
+              <div class="lp-comment-name">${name}</div>
+              <div class="lp-comment-text">${(c.textDisplay||'').replace(/<[^>]*>/g,'').substring(0,200)}</div>
+              <div class="lp-comment-likes">❤️ ${fmt(c.likeCount)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch(e) {
+      container.innerHTML='<div class="lp-comments-off">Comments unavailable for this video.</div>';
+    }
+  }
+
+  // ─── SHORTS FEED ──────────────────────────────────────────────
+  async function initShortsFeed() {
+    const container = document.getElementById('shortsFeedContainer');
+    if(shortsFeedIds.length === 0) {
+      // Fresh load — show spinner and load
+      container.innerHTML = '<div class="shorts-load-more"><div class="spinner"></div><p>Loading Shorts...</p></div>';
+      await loadMoreShorts();
+    } else {
+      // Already have pre-seeded or loaded shorts — render
+      renderShortsFeed(container);
+    }
+  }
+
+  async function loadMoreShorts() {
+    if(shortsLoading) return;
+    shortsLoading = true;
+    const container = document.getElementById('shortsFeedContainer');
+
+    try {
+      // Fetch a batch of trending videos + filter to only shorts
+      let newIds = [];
+      // Try API first
+      try {
+        const pageToken = shortsPage > 0 ? `&pageToken=` : '';
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&chart=mostPopular&regionCode=PK&maxResults=50&key=${API_KEY}`;
+        const r = await fetch(url);
+        const d = await r.json();
+        const items = d.items || [];
+        // Filter to short-duration and embeddable
+        const candidates = items.filter(v=>isShort(v) && !shortsFeedIds.includes(v.id));
+        const checks = await Promise.all(candidates.map(v=>checkEmbeddable(v.id)));
+        const okCandidates = candidates.filter((_,i)=>checks[i]);
+        for(const v of okCandidates) {
+          shortsFeedData[v.id] = {
+            id: v.id,
+            title: decodeHtml(v.snippet.title),
+            channel: decodeHtml(v.snippet.channelTitle),
+            thumb: getThumb(v.snippet),
+            views: fmt(v.statistics.viewCount||0),
+            likes: fmt(v.statistics.likeCount||0),
+            channelId: v.snippet.channelId
+          };
+          newIds.push(v.id);
+        }
+        shortsPage++;
+      } catch(e) { console.warn('API failed for shorts, using fallback'); }
+
+      // Fill remaining from fallback IDs
+      const needed = Math.max(0, 10 - newIds.length);
+      if(needed > 0) {
+        const fallbackSlice = [];
+        let attempts = 0;
+        while(fallbackSlice.length < needed && shortsFallbackIdx < FALLBACK_IDS.length && attempts < 40) {
+          const fid = FALLBACK_IDS[shortsFallbackIdx++];
+          if(!shortsFeedIds.includes(fid) && !newIds.includes(fid)) {
+            const ok = await checkEmbeddable(fid);
+            if(ok) {
+              fallbackSlice.push(fid);
+              if(!shortsFeedData[fid]) shortsFeedData[fid] = { id:fid, title:'Trending Video', channel:'YouTube', thumb:`https://i.ytimg.com/vi/${fid}/hqdefault.jpg`, views:'—', likes:'—' };
+            }
+          }
+          attempts++;
+        }
+        newIds = [...newIds, ...fallbackSlice];
+      }
+
+      // Fetch metadata for fallback IDs that don't have proper data
+      const needsMeta = newIds.filter(id => shortsFeedData[id] && shortsFeedData[id].title === 'Trending Video');
+      if(needsMeta.length > 0) {
+        try {
+          const metaItems = await fetchVideosByIds(needsMeta.slice(0,10));
+          for(const v of metaItems) {
+            shortsFeedData[v.id] = {
+              id: v.id, title: decodeHtml(v.snippet.title), channel: decodeHtml(v.snippet.channelTitle),
+              thumb: getThumb(v.snippet), views: fmt(v.statistics.viewCount||0), likes: fmt(v.statistics.likeCount||0),
+              channelId: v.snippet.channelId
+            };
+          }
+        } catch(e){}
+      }
+
+      shortsFeedIds = [...shortsFeedIds, ...newIds];
+      renderShortsFeed(container);
+    } finally {
+      shortsLoading = false;
+    }
+  }
+
+  function renderShortsFeed(container) {
+    container.innerHTML = '';
+    for(const id of shortsFeedIds) {
+      const data = shortsFeedData[id] || { id, title:'Trending', channel:'YouTube', thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`, views:'—', likes:'—' };
+      container.appendChild(buildShortItem(data));
+    }
+    // Sentinel for infinite scroll
+    const sentinel = document.createElement('div');
+    sentinel.className = 'shorts-load-more';
+    sentinel.id = 'shortsSentinel';
+    sentinel.innerHTML = '<div class="spinner"></div><p>Loading more...</p>';
+    container.appendChild(sentinel);
+
+    // Observe sentinel for infinite scroll
+    if(window._shortsObserver) window._shortsObserver.disconnect();
+    window._shortsObserver = new IntersectionObserver(entries=>{
+      if(entries[0].isIntersecting) loadMoreShorts();
+    }, { threshold:0.1 });
+    window._shortsObserver.observe(sentinel);
+
+    // Auto-play first short
+    setTimeout(()=>playShortAtIndex(0), 200);
+
+    // Scroll event for auto-play
+    container.onscroll = null;
+    container.addEventListener('scroll', onShortsFeedScroll, { passive:true });
+  }
+
+  function buildShortItem(data) {
+    const div = document.createElement('div');
+    div.className = 'short-feed-item';
+    div.id = 'short_'+data.id;
+    div.dataset.vid = data.id;
+
+    const likedIds = getLiked();
+    const liked = likedIds.includes(data.id);
+    const channelAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.channel)}&background=random&size=80`;
+
+    div.innerHTML = `
+      <div class="short-iframe-cover" id="cover_${data.id}" onclick="playShort('${data.id}')">
+        <img class="short-iframe-thumb" src="${data.thumb}" alt="" onerror="this.style.opacity='0'">
+        <div class="short-play-overlay">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+      </div>
+      <div class="short-iframe-wrap" id="iframeWrap_${data.id}"></div>
+      <div class="short-actions">
+        <div class="short-action-btn" style="margin-bottom:8px">
+          <div class="short-author-avatar"><img src="${channelAvatar}" alt="" id="shortAvatar_${data.id}" onerror="this.src='${channelAvatar}'"></div>
+        </div>
+        <div class="short-action-btn" onclick="shortToggleLike('${data.id}','${escapeAttr(data.title)}','${escapeAttr(data.channel)}','${escapeAttr(data.thumb)}')">
+          <div class="short-action-icon"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" id="sLikePath_${data.id}" fill="${liked?'#fe2c55':'white'}"/></svg></div>
+          <span class="short-action-count">${data.likes||'0'}</span>
+        </div>
+        <div class="short-action-btn" onclick="showToast('Comments coming soon')">
+          <div class="short-action-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <span class="short-action-count">Comment</span>
+        </div>
+        <div class="short-action-btn" onclick="showToast('Link copied! 📋')">
+          <div class="short-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <span class="short-action-count">Share</span>
+        </div>
+      </div>
+      <div class="short-overlay">
+        <div class="short-author-name">@${data.channel}</div>
+        <div class="short-caption">${data.title}</div>
+        <div class="short-sound">🎵 <span class="sound-ticker">${data.channel}</span></div>
+      </div>
+    `;
+
+    // Fetch real channel avatar in background
+    if(data.channelId) {
+      fetchChannelAvatar(data.channelId).then(url=>{
+        if(url) { const img=document.getElementById('shortAvatar_'+data.id); if(img) img.src=url; }
+      });
+    }
+
+    return div;
+  }
+
+  function playShort(videoId) {
+    const cover = document.getElementById('cover_'+videoId);
+    const wrap = document.getElementById('iframeWrap_'+videoId);
+    const item = document.getElementById('short_'+videoId);
+    if(!cover || !wrap) return;
+
+    // If already playing, toggle pause via postMessage (not easily possible cross-origin), just ignore
+    if(item.classList.contains('short-playing')) return;
+
+    cover.style.display='none';
+    item.classList.add('short-playing');
+
+    wrap.innerHTML = `<iframe
+      src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1&controls=1&fs=0"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      style="width:100%;height:100%;border:none;display:block;"
+    ></iframe>`;
+  }
+
+  function pauseShort(videoId) {
+    const cover = document.getElementById('cover_'+videoId);
+    const wrap = document.getElementById('iframeWrap_'+videoId);
+    const item = document.getElementById('short_'+videoId);
+    if(!item) return;
+    item.classList.remove('short-playing');
+    if(wrap) wrap.innerHTML='';
+    if(cover) cover.style.display='';
+  }
+
+  function pauseAllShorts() {
+    shortsFeedIds.forEach(id=>pauseShort(id));
+  }
+
+  function playShortAtIndex(index) {
+    if(index<0 || index>=shortsFeedIds.length) return;
+    // Pause others
+    shortsFeedIds.forEach((id,i)=>{ if(i!==index) pauseShort(id); });
+    playShort(shortsFeedIds[index]);
+  }
+
+  let shortsScrollTimer;
+  function onShortsFeedScroll() {
+    clearTimeout(shortsScrollTimer);
+    shortsScrollTimer = setTimeout(()=>{
+      const container = document.getElementById('shortsFeedContainer');
+      if(!container) return;
+      const viewH = container.clientHeight;
+      const scrollTop = container.scrollTop;
+      const idx = Math.round(scrollTop / viewH);
+      playShortAtIndex(idx);
+    }, 150);
+  }
+
+  function shortToggleLike(id, title, channel, thumb) {
+    const liked=getLiked(); const likedData=getLikedData();
+    const path=document.getElementById('sLikePath_'+id);
+    if(liked.includes(id)) {
+      liked.splice(liked.indexOf(id),1);
+      const idx=likedData.findIndex(v=>v.id===id); if(idx>-1) likedData.splice(idx,1);
+      if(path) path.setAttribute('fill','white');
+      showToast('Removed from liked');
+    } else {
+      liked.push(id); likedData.push({id,title:decodeHtml(title),channel:decodeHtml(channel),thumb});
+      if(path) path.setAttribute('fill','#fe2c55');
+      showToast('❤️ Liked!');
+    }
+    saveLiked(liked); saveLikedData(likedData);
   }
 
   // ─── SEARCH ───────────────────────────────────────────────────
   function onSearchInput(val) {
     clearTimeout(searchDebounceTimer);
-    if (!val.trim()) {
-      document.getElementById('searchTrending').style.display = '';
-      document.getElementById('searchResults').style.display = 'none';
-      return;
-    }
-    searchDebounceTimer = setTimeout(() => doSearch(val), 600);
+    if(!val.trim()) { document.getElementById('searchTrending').style.display=''; document.getElementById('searchResults').style.display='none'; return; }
+    searchDebounceTimer = setTimeout(()=>doSearch(val), 600);
   }
 
   async function doSearch(query) {
-    document.getElementById('searchInput').value = query;
-    document.getElementById('searchTrending').style.display = 'none';
-    const resultsDiv = document.getElementById('searchResults');
-    resultsDiv.style.display = '';
-    resultsDiv.innerHTML = '<div class="search-loading"><div class="spinner" style="width:30px;height:30px;border-width:3px;margin:0 auto 10px;border-top-color:#fe2c55"></div>Searching YouTube...</div>';
-
+    document.getElementById('searchInput').value=query;
+    document.getElementById('searchTrending').style.display='none';
+    const resultsDiv=document.getElementById('searchResults');
+    resultsDiv.style.display='';
+    resultsDiv.innerHTML='<div class="search-loading"><div class="spinner" style="width:28px;height:28px;border-width:3px;margin:0 auto 10px;border-top-color:#fe2c55"></div>Searching...</div>';
     try {
       const items = await fetchSearchResults(query);
-      if (!items || items.length === 0) {
-        resultsDiv.innerHTML = '<div class="search-empty"><p>No results found for "<strong>' + query + '</strong>"</p><p style="font-size:12px">Try a different keyword</p></div>';
-        return;
-      }
-      resultsDiv.innerHTML = '<div class="search-results">' + items.map(item => {
-        const vid = item.id.videoId;
-        const snippet = item.snippet;
-        const thumb = (snippet.thumbnails.high || snippet.thumbnails.medium || snippet.thumbnails.default).url;
-        const title = snippet.title;
-        const channel = snippet.channelTitle;
+      if(!items.length) { resultsDiv.innerHTML='<div class="search-empty"><p>No results found.</p></div>'; return; }
+      // Check embeddability
+      const checks = await Promise.all(items.map(i=>checkEmbeddable(i.id.videoId)));
+      const playable = items.filter((_,i)=>checks[i]);
+      if(!playable.length) { resultsDiv.innerHTML='<div class="search-empty"><p>No playable videos found for this search.</p></div>'; return; }
+      resultsDiv.innerHTML='<div class="search-results">'+playable.map(item=>{
+        const vid=item.id.videoId; const s=item.snippet;
+        const thumb=(s.thumbnails.high||s.thumbnails.medium||s.thumbnails.default).url;
         return `
-          <div class="search-result-item" onclick="openVideoModal('${vid}','${escapeAttr(title)}','${escapeAttr(channel)}',null,null,null,'${escapeAttr(thumb)}')">
+          <div class="search-result-item" onclick="openLongPlayer('${vid}','${escapeAttr(s.title)}','${escapeAttr(s.channelTitle)}',null,null,null,'${escapeAttr(thumb)}')">
             <div class="search-result-thumb"><img src="${thumb}" alt="" loading="lazy"></div>
             <div class="search-result-info">
-              <div class="search-result-title">${title}</div>
-              <div class="search-result-channel">📺 ${channel}</div>
+              <div class="search-result-title">${decodeHtml(s.title)}</div>
+              <div class="search-result-channel">📺 ${decodeHtml(s.channelTitle)}</div>
             </div>
           </div>
         `;
-      }).join('') + '</div>';
+      }).join('')+'</div>';
     } catch(e) {
-      console.error(e);
-      resultsDiv.innerHTML = '<div class="search-empty"><p>Unable to search right now.</p><p style="font-size:12px">Check API quota or connection.</p></div>';
-      showToast('Search failed. Try again later.');
+      resultsDiv.innerHTML='<div class="search-empty"><p>Search failed. Try again.</p></div>';
     }
   }
 
-  // ─── HELPER ───────────────────────────────────────────────────
-  function decodeHtmlEntities(str) {
-    const txt = document.createElement('textarea');
-    txt.innerHTML = str || '';
-    return txt.value;
-  }
-
-  // ─── FOLLOW / FRIENDS ─────────────────────────────────────────
-  function toggleFollowDot(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const done = el.classList.contains('done');
-    if (!done) { el.classList.add('done'); el.innerHTML = '✓'; followingList.push(id); showToast('Following!'); }
-    else { el.classList.remove('done'); el.innerHTML = '+'; followingList = followingList.filter(f => f !== id); showToast('Unfollowed'); }
-    updateCounts();
-  }
-
-  function toggleFollowFeedBtn(btn) {
-    const f = btn.classList.contains('following');
-    btn.classList.toggle('following');
-    btn.innerText = f ? 'Follow' : 'Following';
-    f ? followingList.pop() : followingList.push('u');
-    updateCounts(); showToast(f ? 'Unfollowed' : 'Following!');
-  }
-
-  function toggleFollow(btn, name) {
-    const f = btn.classList.contains('following');
-    btn.classList.toggle('following');
-    btn.innerText = f ? 'Follow' : 'Following';
-    f ? followingList = followingList.filter(x => x !== name) : followingList.push(name);
-    updateCounts(); showToast(f ? 'Unfollowed' : `Following ${name}`);
-  }
-
-  function filterFriends() {
-    const q = document.getElementById('friendSearch').value.toLowerCase();
-    document.querySelectorAll('.friend-item').forEach(i => {
-      i.style.display = i.dataset.name.includes(q) ? 'flex' : 'none';
-    });
-  }
-
-  function updateCounts() {
-    document.getElementById('followingCount').innerText = followingList.length;
-  }
-
   // ─── PROFILE ──────────────────────────────────────────────────
-  function editProfile() {
-    const n = prompt('Enter new name:', 'Saqib Saqib');
-    if (n) { document.getElementById('profileName').innerText = n; showToast('Profile updated!'); }
-  }
+  function editProfile() { const n=prompt('Enter new name:','Saqib Saqib'); if(n){ document.getElementById('profileName').innerText=n; showToast('Profile updated!'); } }
+  function addBio() { const b=prompt('Add your bio:','My hobbies are...'); if(b){ document.getElementById('bioBox').innerHTML=b; showToast('Bio updated!'); } }
 
-  function addBio() {
-    const b = prompt('Add your bio:', 'My hobbies are...');
-    if (b) { document.getElementById('bioBox').innerHTML = b; showToast('Bio updated!'); }
-  }
-
-  // ─── COMMENTS (local) ─────────────────────────────────────────
-  function openComments() {
-    document.getElementById('comment-sheet').classList.add('open');
-    document.getElementById('sheet-overlay').classList.add('open');
-  }
-
+  // ─── COMMENTS ─────────────────────────────────────────────────
+  function openComments() { document.getElementById('comment-sheet').classList.add('open'); document.getElementById('sheet-overlay').classList.add('open'); }
   function postComment() {
-    const inp = document.getElementById('commentInput');
-    const txt = inp.value.trim();
-    if (!txt) return;
-    const li = document.getElementById('commentList');
-    const d = document.createElement('div');
-    d.className = 'comment-item';
-    d.innerHTML = `<div class="comment-av"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">S</div></div><div class="comment-body"><div class="comment-name">saqib.saqib693</div><div class="comment-text">${txt}</div><div class="comment-time">Just now · Reply</div></div>`;
-    li.appendChild(d);
-    inp.value = '';
-    showToast('Comment posted!');
+    const inp=document.getElementById('commentInput'); const txt=inp.value.trim(); if(!txt) return;
+    const li=document.getElementById('commentList');
+    const d=document.createElement('div'); d.className='comment-item';
+    d.innerHTML=`<div class="comment-av"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c8a485,#a07850);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">S</div></div><div class="comment-body"><div class="comment-name">saqib.saqib693</div><div class="comment-text">${txt}</div><div class="comment-time">Just now</div></div>`;
+    li.appendChild(d); inp.value=''; showToast('Comment posted!');
   }
 
   // ─── MENUS ────────────────────────────────────────────────────
@@ -1316,16 +1271,15 @@
   function closeMenu() { document.getElementById('side-menu').classList.remove('open'); document.getElementById('menu-overlay').classList.remove('open'); }
   function closeSheets() { document.getElementById('comment-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('open'); }
   function menuAction(item) { closeMenu(); showToast(`${item} — coming soon`); }
+  function toggleFollow(btn,name) { const f=btn.classList.contains('following'); btn.classList.toggle('following'); btn.innerText=f?'Follow':'Following'; f?followingList=followingList.filter(x=>x!==name):followingList.push(name); updateCounts(); showToast(f?'Unfollowed':`Following ${name}`); }
+  function filterFriends() { const q=document.getElementById('friendSearch').value.toLowerCase(); document.querySelectorAll('.friend-item').forEach(i=>{ i.style.display=i.dataset.name.includes(q)?'flex':'none'; }); }
+  function updateCounts() { document.getElementById('followingCount').innerText=followingList.length; }
 
-  // Mode buttons
-  document.querySelectorAll('.mode-btn').forEach(b => b.onclick = function() {
-    document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
-    this.classList.add('active');
-  });
+  document.querySelectorAll('.mode-btn').forEach(b=>b.onclick=function(){ document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); });
 
   // ─── INIT ─────────────────────────────────────────────────────
   updateCounts();
-  loadFeed();
+  loadHomeGrid();
 </script>
 </body>
-</html>
+  </html>
