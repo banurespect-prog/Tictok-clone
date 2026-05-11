@@ -531,14 +531,30 @@ async function ytApiDetails(ids){
     if(!r.ok) return null;
     const data=await r.json();
     if(!data.items||!data.items.length) return null;
+    // Collect unique channelIds to batch-fetch channel avatars
+    const channelIds=[...new Set(data.items.map(i=>i.snippet?.channelId).filter(Boolean))];
+    let channelAvatars={};
+    try{
+      const chUrl=`https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelIds.join(',')}&key=${YT_API_KEY}`;
+      const chR=await fetch(chUrl,{signal:AbortSignal.timeout(6000)});
+      if(chR.ok){
+        const chData=await chR.json();
+        (chData.items||[]).forEach(ch=>{
+          channelAvatars[ch.id]=ch.snippet?.thumbnails?.default?.url||ch.snippet?.thumbnails?.medium?.url||'';
+        });
+      }
+    }catch(e){}
     return data.items.map(item=>{
       const sn=item.snippet||{};
       const st=item.statistics||{};
       const id=item.id;
+      const chId=sn.channelId||'';
       return{
         id,
         title:sn.title||'YouTube Short',
         channel:sn.channelTitle||'Channel',
+        channelId:chId,
+        channelAvatar:channelAvatars[chId]||'',
         channelUrl:'',
         views:fmt(parseInt(st.viewCount)||0),viewsRaw:parseInt(st.viewCount)||0,
         likes:st.likeCount>0?fmt(parseInt(st.likeCount)):rndFmt(500,500000),
@@ -555,8 +571,11 @@ function parsePipedItem(item){
   const raw=item.url||item.videoId||'';
   const id=raw.match(/[?&]v=([A-Za-z0-9_-]{11})/)?.[1]||raw.match(/\/shorts\/([A-Za-z0-9_-]{11})/)?.[1]||(raw.length===11?raw:'');
   if(!id) return null;
+  // Piped provides uploaderAvatar for real channel photo
+  const chAvatar=item.uploaderAvatar||item.avatar||'';
   return{
-    id,title:item.title||'Trending Short',channel:item.uploaderName||item.uploader||'Channel',channelUrl:'',
+    id,title:item.title||'Trending Short',channel:item.uploaderName||item.uploader||'Channel',
+    channelId:'',channelAvatar:chAvatar,channelUrl:'',
     views:fmt(item.views||0),viewsRaw:parseInt(item.views)||0,
     likes:item.likes>0?fmt(item.likes):rndFmt(500,500000),comments:rndFmt(50,50000),
     thumb:item.thumbnail||thumb(id),duration:item.duration||30,publishedAt:item.uploadedDate||''
@@ -638,7 +657,7 @@ function makeBasicVideo(id){
   const titles=['Amazing viral short 🔥','You won\'t believe this 😲','POV: This is 100% you 😂','Satisfying moment ✨','Best clip ever 🎉','Watch till the end 👀','Trending now 📈','Made my day 🌟','Absolutely incredible 😮','Crazy talent 🎸'];
   const chs=['ViralWorld','TrendHub','DailyFun','ShortClips','WowMoments','JoyVibes','QuickFlix','HitShorts','CoolTube','TopViral'];
   const i=Math.floor(Math.random()*10);
-  return{id,title:titles[i],channel:chs[i],channelUrl:'',views:rndFmt(50000,50000000),viewsRaw:0,likes:rndFmt(1000,5000000),comments:rndFmt(100,200000),thumb:thumb(id),duration:30,publishedAt:''};
+  return{id,title:titles[i],channel:chs[i],channelId:'',channelAvatar:'',channelUrl:'',views:rndFmt(50000,50000000),viewsRaw:0,likes:rndFmt(1000,5000000),comments:rndFmt(100,200000),thumb:thumb(id),duration:30,publishedAt:''};
 }
 
 // ── Fake comments pool ────────────────────────────────────────────
@@ -693,23 +712,23 @@ async function playVideo(pid, id){
   playerEl.classList.add('active');
   postEl.classList.remove('show-play');
 
-  // Use YouTube embed — most reliable, works 100%
-  // Shorts can be embedded directly
-  const embedUrl=`https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=1&loop=1&playlist=${id}`;
+  // youtube-nocookie.com fixes "Service unavailable" error on GitHub Pages
+  // This is YouTube's privacy-enhanced embed that allows third-party embedding
+  const origin=encodeURIComponent(location.origin||'https://spect-prog.github.io');
+  const embedUrl=`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=1&loop=1&playlist=${id}&enablejsapi=1&origin=${origin}&iv_load_policy=3&cc_load_policy=0`;
 
   playerEl.innerHTML=`
     <iframe
       src="${embedUrl}"
-      allow="autoplay; fullscreen; encrypted-media"
+      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
       allowfullscreen
       loading="lazy"
       title="YouTube Short"
+      style="width:100%;height:100%;border:none;display:block;"
     ></iframe>
     <div class="player-close" onclick="closePlayer('${pid}')">✕</div>
-    <div class="piped-badge">▶ Playing</div>
+    <div class="piped-badge" style="display:block">▶ Playing</div>
   `;
-
-  document.querySelector(`#player_${pid} .piped-badge`).style.display='block';
 }
 
 function closePlayer(pid){
@@ -741,7 +760,9 @@ function handlePostTap(pid,id,title,ch,views,likes,comments,th){
 // ── Build Post Card ───────────────────────────────────────────────
 function buildPost(v,i){
   const pid='p'+i;
-  const av=avURL(v.channel);
+  // Real avatar: from YouTube API if available, else ui-avatars fallback
+  const av=v.channelAvatar||avURL(v.channel);
+  const avFallback=avURL(v.channel);
   const title=decode(v.title||'').substring(0,90);
   const bg=v.thumb||thumb(v.id);
   const prog=Math.floor(Math.random()*60)+5;
@@ -763,7 +784,7 @@ function buildPost(v,i){
   </div>
   <div class="post-actions" style="z-index:12" onclick="event.stopPropagation()">
     <div class="author-wrap">
-      <div class="author-avatar"><img src="${av}" alt="" loading="lazy" onerror="this.src='${avURL(v.channel).replace(/'/g,"&#39;")}'"></div>
+      <div class="author-avatar"><img src="${av}" alt="" loading="lazy" onerror="this.src='${avFallback}'"></div>
       <div class="follow-dot" id="fd_${pid}" onclick="toggleFollowDot('fd_${pid}')">+</div>
     </div>
     <div class="action-btn" onclick="feedLike('${pid}','${v.id}','${esc(title)}','${esc(v.channel)}','${esc(bg)}')">
