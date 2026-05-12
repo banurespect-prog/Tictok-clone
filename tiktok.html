@@ -1677,3 +1677,343 @@ function buildShortsContainer(shorts) {
           <span>Save</span>
         </button>
       </div>`;
+    scroller.appendChild(slide);
+  });
+
+  ST.shortsBuilt = true;
+  setupShortsObserver();
+  // Load more when near end
+  setupShortsInfinite(shorts);
+}
+
+function setupShortsObserver() {
+  if(ST.shortsObserver) ST.shortsObserver.disconnect();
+  const scroller = document.getElementById('shorts-scroller');
+  ST.shortsObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting || entry.intersectionRatio < 0.6) return;
+      const idx = parseInt(entry.target.id.replace('ss-',''));
+      if(isNaN(idx)) return;
+      ST.activeShortIdx = idx;
+      autoPlayShort(idx);
+      // Stop others
+      document.querySelectorAll('.s-iframe').forEach((f,i) => {
+        if(i !== idx) { f.src = ''; }
+      });
+    });
+  }, { threshold: 0.6, root: scroller });
+  document.querySelectorAll('.s-slide').forEach(s => ST.shortsObserver.observe(s));
+}
+
+// Load more shorts when near end of list
+function setupShortsInfinite(currentShorts) {
+  const slides = document.querySelectorAll('.s-slide');
+  if(!slides.length) return;
+  const lastSlide = slides[slides.length - 1];
+  const endObs = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting) {
+      endObs.disconnect();
+      loadMoreShorts(currentShorts.length);
+    }
+  }, { threshold: 0.5, root: document.getElementById('shorts-scroller') });
+  endObs.observe(lastSlide);
+}
+
+async function loadMoreShorts(offset) {
+  // Fetch new shorts batch with different query
+  const queries = SHORT_CAT_QUERIES[ST.activeCat] || SHORT_CAT_QUERIES['All'];
+  const q = queries[Math.floor(Math.random()*queries.length)];
+  const { shorts: newShorts } = await fetchShorts(ST.activeCat, ST.shortsNextPage||'');
+  if(!newShorts.length) return;
+  // Avoid duplicates
+  const existingIds = new Set(ST.shortsData.map(s=>s.id));
+  const fresh = newShorts.filter(s=>!existingIds.has(s.id));
+  if(!fresh.length) return;
+  ST.shortsData = [...ST.shortsData, ...fresh];
+  // Append to scroller
+  const scroller = document.getElementById('shorts-scroller');
+  const startIdx = offset;
+  fresh.forEach((s, i) => {
+    const idx = startIdx + i;
+    const liked = ST.likedShorts.includes(s.id);
+    const lc = ST.shortLikes[s.id]||0;
+    const subbed = ST.subs.some(sub=>sub.id===s.channelId||sub.name===s.channel);
+    const avBg = chColor(s.channel);
+    const slide = document.createElement('div');
+    slide.className = 's-slide';
+    slide.id = 'ss-'+idx;
+    slide.innerHTML = `
+      <img class="s-bg-img" src="${esc(s.thumb)}" alt="">
+      <div class="s-video-wrap">
+        <iframe class="s-iframe" id="si-${idx}" frameborder="0" allowfullscreen
+          allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share">
+        </iframe>
+      </div>
+      <div class="s-gradient"></div>
+
+      <div class="s-info">
+        <div class="s-ch-row">
+          <div class="s-avatar" style="background:${avBg}">${(s.channel||'?').charAt(0).toUpperCase()}</div>
+          <span class="s-ch-name">${esc(s.channel)}</span>
+          <button class="s-sub-btn ${subbed?'subbed':''}" id="ssub-${idx}"
+            onclick="toggleShortSub('${esc(s.channelId||'')}','${esc(s.channel)}',${idx})">
+            ${subbed?'Subscribed':'Subscribe'}
+          </button>
+        </div>
+        <div class="s-title">${esc(s.title)}</div>
+      </div>
+      <div class="s-actions">
+        <button class="s-act-btn ${liked?'liked':''}" id="slike-${idx}" onclick="toggleShortLike(${idx})">
+          <div class="s-act-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24"
+              fill="${liked?'#ff4444':'none'}"
+              stroke="${liked?'#ff4444':'white'}" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <span id="slc-${idx}">${lc > 0 ? lc : ''}</span>
+        </button>
+        <button class="s-act-btn" onclick="showShortComments(${idx})">
+          <div class="s-act-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <span>Comment</span>
+        </button>
+        <button class="s-act-btn" onclick="shareShort(${idx})">
+          <div class="s-act-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <span>Share</span>
+        </button>
+        <button class="s-act-btn" onclick="toast('🔖 Saved!')">
+          <div class="s-act-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <span>Save</span>
+        </button>
+      </div>`;
+    scroller.appendChild(slide);
+    if(ST.shortsObserver) ST.shortsObserver.observe(slide);
+  });
+  setupShortsInfinite(ST.shortsData);
+}
+
+function autoPlayShort(idx) {
+  const s = ST.shortsData[idx];
+  if(!s) return;
+  const iframe = document.getElementById('si-'+idx);
+  if(!iframe) return;
+  if(!iframe.src || iframe.src === location.href) {
+    iframe.src = ytEmbed(s.id, '&mute=0');
+  }
+}
+
+// Short actions
+function toggleShortLike(idx) {
+  const s = ST.shortsData[idx];
+  if(!s) return;
+  const btn = document.getElementById('slike-'+idx);
+  const countEl = document.getElementById('slc-'+idx);
+  const svg = btn?.querySelector('svg');
+  const li = ST.likedShorts.indexOf(s.id);
+  if(li === -1) {
+    ST.likedShorts.push(s.id);
+    ST.shortLikes[s.id] = (ST.shortLikes[s.id]||0)+1;
+    if(btn) btn.classList.add('liked');
+    if(svg){svg.setAttribute('fill','#ff4444');svg.setAttribute('stroke','#ff4444');}
+    toast('❤️ Liked!');
+  } else {
+    ST.likedShorts.splice(li,1);
+    ST.shortLikes[s.id] = Math.max(0,(ST.shortLikes[s.id]||1)-1);
+    if(btn) btn.classList.remove('liked');
+    if(svg){svg.setAttribute('fill','none');svg.setAttribute('stroke','white');}
+  }
+  if(countEl) countEl.textContent = ST.shortLikes[s.id] > 0 ? (ST.shortLikes[s.id]||0) : '';
+  save('likedShorts', ST.likedShorts);
+  save('shortLikes', ST.shortLikes);
+}
+
+function toggleShortSub(channelId, channelName, idx) {
+  toggleSub(channelId, channelName, null);
+  const btn = document.getElementById('ssub-'+idx);
+  if(btn) {
+    const subbed = ST.subs.some(s=>s.id===channelId||s.name===channelName);
+    btn.textContent = subbed ? 'Subscribed' : 'Subscribe';
+    btn.className = 's-sub-btn ' + (subbed ? 'subbed' : '');
+  }
+}
+
+function shareShort(idx) {
+  const s = ST.shortsData[idx];
+  if(!s) return;
+  const url = `https://www.youtube.com/shorts/${s.id}`;
+  if(navigator.share) navigator.share({title:s.title,url}).catch(()=>{});
+  else { try{navigator.clipboard.writeText(url);}catch(e){} toast('🔗 Link copied!'); }
+}
+
+async function showShortComments(idx) {
+  const s = ST.shortsData[idx];
+  if(!s) return;
+  document.getElementById('s-panel-overlay').style.display = 'block';
+  document.getElementById('s-cmt-panel').style.display = 'block';
+  document.getElementById('panel-cmt-count').textContent = 'Comments';
+  document.getElementById('s-cmt-list').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  const comments = await fetchComments(s.id);
+  document.getElementById('panel-cmt-count').textContent = (comments.length||0) + ' Comments';
+  if(comments.length) {
+    document.getElementById('s-cmt-list').innerHTML = comments.map(c=>`
+      <div class="cmt-item">
+        <div class="cmt-av" style="${c.avatar?'overflow:hidden;padding:0;':''}">
+          ${c.avatar?`<img src="${c.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(c.author||'?').charAt(0)}
+        </div>
+        <div class="cmt-body">
+          <span class="cmt-author">${esc(c.author)}</span>
+          <span class="cmt-time">${c.time}</span>
+          <div class="cmt-text">${esc(c.text)}</div>
+          <button class="cmt-likes" onclick="this.classList.toggle('liked')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+            ${c.likes||0}
+          </button>
+        </div>
+      </div>`).join('');
+  } else {
+    document.getElementById('s-cmt-list').innerHTML = '<div style="color:var(--text2);font-size:13px;padding:10px 0;text-align:center;">No comments yet</div>';
+  }
+}
+
+function closeSPanel() {
+  document.getElementById('s-panel-overlay').style.display = 'none';
+  document.getElementById('s-cmt-panel').style.display = 'none';
+}
+
+// ============================================================
+// SEARCH — real YouTube API search
+// ============================================================
+const TRENDING_QUERIES = [
+  'saku facts','zemtv','funny moments','pakistan drama','news today',
+  'humnava drama','music video 2024','gaming highlights','viral shorts',
+  'bridal makeup','cartoon kids','tech review'
+];
+
+function showSearchPage() {
+  if(ST.page === 'search') return;
+  ST.pageHistory.push(ST.page);
+  ST.page = 'search';
+  ['home-page','player-page','subs-page','profile-page'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('search-page').style.display = 'block';
+  document.getElementById('search-suggestions').style.display = 'block';
+  document.getElementById('search-results-wrap').style.display = 'none';
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  renderTrending();
+  setTimeout(()=>{
+    document.getElementById('search-big-input').focus();
+  }, 100);
+}
+
+function renderTrending() {
+  const list = document.getElementById('trend-list');
+  list.innerHTML = TRENDING_QUERIES.map(q=>`
+    <div class="trend-item" onclick="doSearchQuery('${esc(q)}')">
+      <span class="trend-icon">🔍</span>
+      <span class="trend-text">${esc(q)}</span>
+    </div>`).join('');
+}
+
+function doSearchQuery(q) {
+  document.getElementById('search-big-input').value = q;
+  document.getElementById('search-input').value = q;
+  doSearch();
+}
+
+async function doSearch() {
+  const q = (document.getElementById('search-big-input').value ||
+             document.getElementById('search-input').value).trim();
+  if(!q) return;
+  // Ensure search page visible
+  if(ST.page !== 'search') showSearchPage();
+  document.getElementById('search-big-input').value = q;
+  document.getElementById('search-input').value = q;
+  document.getElementById('search-suggestions').style.display = 'none';
+  document.getElementById('search-results-wrap').style.display = 'block';
+  document.getElementById('search-shorts-wrap').style.display = 'none';
+  document.getElementById('search-vids-hdr').style.display = 'none';
+  document.getElementById('search-long-feed').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  document.getElementById('search-shorts-grid').innerHTML = '';
+
+  try {
+    // Search videos
+    const searchData = await apiGet('search', {
+      part: 'snippet',
+      type: 'video',
+      q: q,
+      maxResults: 20,
+      videoEmbeddable: 'true',
+      safeSearch: 'moderate',
+    });
+    const allIds = (searchData.items||[]).map(i=>i.id.videoId).filter(Boolean);
+    const details = await getVideoDetails(allIds);
+    const detMap = {};
+    details.forEach(d=>detMap[d.id]=d);
+
+    const shorts = [], longs = [];
+    for(const item of (searchData.items||[])) {
+      const vid = item.id.videoId;
+      if(!vid) continue;
+      const det = detMap[vid];
+      if(!det) continue; // skip non-embeddable
+      const sn = item.snippet;
+      const dur = parseDuration(det.contentDetails?.duration||'');
+      const durSecs = parseDurSecs(det.contentDetails?.duration||'');
+      const obj = {
+        id: vid,
+        title: sn.title,
+        channel: sn.channelTitle,
+        channelId: sn.channelId,
+        thumb: sn.thumbnails?.high?.url || ytThumb(vid),
+        views: fmt(det.statistics?.viewCount||0),
+        likes: fmt(det.statistics?.likeCount||0),
+        time: timeAgo(sn.publishedAt),
+        dur: dur,
+      };
+      if(durSecs <= 60) shorts.push(obj);
+      else longs.push(obj);
+    }
+
+    // Show shorts
+    if(shorts.length) {
+      document.getElementById('search-shorts-wrap').style.display = 'block';
+      renderShortsGrid('search-shorts-grid', shorts);
+    }
+
+    // Show long videos
+    const lf = document.getElementById('search-long-feed');
+    if(longs.length) {
+      document.getElementById('search-vids-hdr').style.display = 'flex';
+      lf.innerHTML = '';
+      longs.forEach(v => lf.appendChild(makeLongCard(v)));
+    } else if(!shorts.length) {
+      lf.innerHTML = `<div class="empty-msg"><span class="icon">🔍</span>No results for "<strong>${esc(q)}</strong>"<br><small style="color:var(--text3)">Try different keywords</small></div>`;
+    } else {
+      lf.innerHTML = '';
+    }
+  } catch(e) {
+    document.getElementById('search-long-feed').innerHTML = `<div class="empty-msg"><span class="icon">⚠️</span>Search error. Check internet & try again.</div>`;
+  }
+}
+
+function parseDurSecs(iso) {
+  if(!iso) return 999;
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if(!m) return 999;
+  return (parseInt(m[1]||0)*3600) + (parseInt(m[2]||0)*60) + parseInt(m[3]||0);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+ST.shortsCat = 'All';
+renderCats();
+loadHome();
+</script>
+</body>
+</html>
