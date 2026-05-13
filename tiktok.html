@@ -931,4 +931,1122 @@ function toast(msg) {
   toastTimeout = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// =====================================
+// ============================================================
+// SPLASH + INIT
+// ============================================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add('hide');
+    setTimeout(() => { splash.style.display = 'none'; }, 500);
+    if (!navigator.onLine) {
+      showNoInternet();
+    } else {
+      initApp();
+    }
+  }, 2500);
+});
+
+function showNoInternet() {
+  document.getElementById('no-internet').style.display = 'flex';
+}
+function hideNoInternet() {
+  document.getElementById('no-internet').style.display = 'none';
+}
+function retryLoad() {
+  if (navigator.onLine) {
+    hideNoInternet();
+    initApp();
+  } else {
+    toast('📡 Still no internet connection');
+  }
+}
+
+function initApp() {
+  buildCatStrip();
+  buildShortsCatChips();
+  loadHomeFeed();
+  buildTrendList();
+  renderSubsPage();
+  renderProfileContent();
+}
+
+// ============================================================
+// CATEGORY STRIPS
+// ============================================================
+function buildCatStrip() {
+  const strip = document.getElementById('cat-strip');
+  strip.innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-chip${c===currentCat?' active':''}" onclick="selectCat('${c}')">${c}</div>`
+  ).join('');
+}
+
+function buildShortsCatChips() {
+  const chips = document.getElementById('shorts-cat-chips');
+  chips.innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-chip${c===currentCat?' active':''}" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.2);" onclick="selectShortsCat('${c}')">${c}</div>`
+  ).join('');
+}
+
+function selectCat(cat) {
+  currentCat = cat;
+  buildCatStrip();
+  homeNextToken = '';
+  loadHomeFeed(true);
+}
+
+function selectShortsCat(cat) {
+  currentCat = cat;
+  buildShortsCatChips();
+  loadShortsForPage();
+}
+
+// ============================================================
+// API FETCH HELPERS
+// ============================================================
+async function ytSearch(query, maxResults = 10, pageToken = '', videoDuration = '') {
+  let url = `${API_BASE}/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=${maxResults}&key=${API_KEY}&safeSearch=none`;
+  if (pageToken) url += `&pageToken=${pageToken}`;
+  if (videoDuration) url += `&videoDuration=${videoDuration}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('API error ' + res.status);
+  return res.json();
+}
+
+async function ytVideoDetails(ids) {
+  const url = `${API_BASE}/videos?part=snippet,statistics,contentDetails&id=${ids.join(',')}&key=${API_KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('API error');
+  return res.json();
+}
+
+async function ytComments(videoId, maxResults = 20) {
+  const url = `${API_BASE}/commentThreads?part=snippet&videoId=${videoId}&maxResults=${maxResults}&key=${API_KEY}&order=relevance`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('API comments error');
+  return res.json();
+}
+
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function avatarColor(str) {
+  const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63'];
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % colors.length;
+  return colors[h];
+}
+
+function fmtNum(n) {
+  n = parseInt(n) || 0;
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function fmtDur(iso) {
+  if (!iso) return '';
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return '';
+  const h = parseInt(m[1]||0), min = parseInt(m[2]||0), s = parseInt(m[3]||0);
+  if (h > 0) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${min}:${String(s).padStart(2,'0')}`;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const s = diff/1000, m = s/60, hr = m/60, d = hr/24, w = d/7, mo = d/30;
+  if (mo >= 1) return Math.floor(mo) + ' mo ago';
+  if (w >= 1) return Math.floor(w) + 'w ago';
+  if (d >= 1) return Math.floor(d) + 'd ago';
+  if (hr >= 1) return Math.floor(hr) + 'h ago';
+  return Math.floor(m) + 'm ago';
+}
+
+function thumbUrl(videoId, quality = 'mqdefault') {
+  return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+}
+
+// ============================================================
+// HOME FEED
+// ============================================================
+async function loadHomeFeed(reset = false) {
+  if (reset) {
+    homeNextToken = '';
+    document.getElementById('home-shorts-grid').innerHTML = '<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
+    document.getElementById('home-long-feed').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  }
+
+  // Load shorts
+  try {
+    const q = randomFrom(SHORT_CAT_QUERIES[currentCat] || SHORT_CAT_QUERIES.All);
+    const data = await ytSearch(q, 8, '', 'short');
+    if (data.items && data.items.length > 0) {
+      shortsData = data.items;
+      renderHomeShorts(data.items);
+    } else {
+      renderFallbackShorts();
+    }
+  } catch(e) {
+    renderFallbackShorts();
+  }
+
+  // Load long videos
+  try {
+    const q = randomFrom(CAT_QUERIES[currentCat] || CAT_QUERIES.All);
+    const data = await ytSearch(q, 10, homeNextToken, 'medium');
+    homeNextToken = data.nextPageToken || '';
+    if (data.items && data.items.length > 0) {
+      const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      renderHomeLong(details.items || [], reset);
+    } else {
+      renderFallbackLong(reset);
+    }
+  } catch(e) {
+    renderFallbackLong(reset);
+  }
+}
+
+function renderHomeShorts(items) {
+  const grid = document.getElementById('home-shorts-grid');
+  grid.innerHTML = items.map(item => {
+    const vid = item.id.videoId;
+    const title = item.snippet.title;
+    return `<div class="short-card" onclick="openShortsPage(0,'${vid}')">
+      <img src="${thumbUrl(vid,'hqdefault')}" alt="" loading="lazy" onerror="this.src='${thumbUrl(vid)}'">
+      <div class="short-card-info">
+        <div class="short-card-title">${escHtml(title)}</div>
+        <div class="short-card-views">${escHtml(item.snippet.channelTitle)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  // Store for shorts page
+  shortsData = items;
+}
+
+function renderFallbackShorts() {
+  const grid = document.getElementById('home-shorts-grid');
+  grid.innerHTML = FALLBACK_SHORTS.map(s =>
+    `<div class="short-card" onclick="openShortsPage(0,'${s.id}')">
+      <img src="${thumbUrl(s.id,'hqdefault')}" alt="" loading="lazy">
+      <div class="short-card-info">
+        <div class="short-card-title">${s.title}</div>
+        <div class="short-card-views">${s.views} views</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function renderHomeLong(items, reset = false) {
+  const feed = document.getElementById('home-long-feed');
+  const html = items.map(v => videoCardHtml(v)).join('');
+  if (reset) feed.innerHTML = html;
+  else feed.innerHTML += html;
+}
+
+function renderFallbackLong(reset = false) {
+  const feed = document.getElementById('home-long-feed');
+  const html = FALLBACK_VIDEOS.map(v =>
+    `<div class="video-card" onclick="openPlayer('${v.id}','${escHtml(v.title)}','${thumbUrl(v.id,'maxresdefault')}')">
+      <div class="thumb-wrap"><img src="${thumbUrl(v.id,'mqdefault')}" alt="" loading="lazy"><div class="thumb-dur">${v.dur}</div></div>
+      <div class="video-row">
+        <div class="ch-av" style="background:${v.color}">${v.avatar}</div>
+        <div class="vid-meta">
+          <div class="vid-title">${escHtml(v.title)}</div>
+          <div class="vid-sub"><span>${escHtml(v.channel)}</span><span>${v.views}</span></div>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+  if (reset) feed.innerHTML = html;
+  else feed.innerHTML += html;
+}
+
+function videoCardHtml(v) {
+  const vid = v.id;
+  const sn = v.snippet || {};
+  const st = v.statistics || {};
+  const cd = v.contentDetails || {};
+  const dur = fmtDur(cd.duration);
+  const views = fmtNum(st.viewCount) + ' views';
+  const ch = sn.channelTitle || '';
+  const title = sn.title || '';
+  const color = avatarColor(ch);
+  const letter = ch.charAt(0).toUpperCase() || 'C';
+  const thumb = sn.thumbnails?.high?.url || thumbUrl(vid,'mqdefault');
+  return `<div class="video-card" onclick="openPlayer('${vid}','${escAttr(title)}','${escAttr(thumb)}')">
+    <div class="thumb-wrap">
+      <img src="${thumb}" alt="" loading="lazy" onerror="this.src='${thumbUrl(vid)}'">
+      ${dur ? `<div class="thumb-dur">${dur}</div>` : ''}
+    </div>
+    <div class="video-row">
+      <div class="ch-av" style="background:${color}">${letter}</div>
+      <div class="vid-meta">
+        <div class="vid-title">${escHtml(title)}</div>
+        <div class="vid-sub"><span>${escHtml(ch)}</span><span>${views}</span><span>${timeAgo(sn.publishedAt)}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Infinite scroll
+const sentinel = document.getElementById('load-sentinel');
+const obs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !isLoadingMore && homeNextToken && currentPage === 'home') {
+    isLoadingMore = true;
+    loadMoreLong().finally(() => { isLoadingMore = false; });
+  }
+}, { threshold: 0.1 });
+obs.observe(sentinel);
+
+async function loadMoreLong() {
+  if (!homeNextToken) return;
+  const q = randomFrom(CAT_QUERIES[currentCat] || CAT_QUERIES.All);
+  try {
+    const data = await ytSearch(q, 10, homeNextToken, 'medium');
+    homeNextToken = data.nextPageToken || '';
+    if (data.items && data.items.length > 0) {
+      const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      renderHomeLong(details.items || [], false);
+    }
+  } catch(e) { /* silent */ }
+}
+
+// ============================================================
+// VIDEO PLAYER
+// ============================================================
+function openPlayer(videoId, title, thumb) {
+  currentVideoId = videoId;
+  document.getElementById('player-title').textContent = title || 'Video';
+  document.getElementById('player-thumb').src = thumb || thumbUrl(videoId, 'maxresdefault');
+  document.getElementById('fake-play').style.display = 'flex';
+  const iframe = document.getElementById('yt-iframe');
+  iframe.style.display = 'none';
+  iframe.src = '';
+  // Reset loop/headphone state
+  loopEnabled = false;
+  headphoneMode = false;
+  document.getElementById('loop-btn').classList.remove('ctrl-active');
+  document.getElementById('hdph-btn').classList.remove('ctrl-active');
+
+  showPage('player');
+  loadVideoDetails(videoId);
+  loadComments(videoId);
+  loadMoreVideos();
+}
+
+function playVideo() {
+  const iframe = document.getElementById('yt-iframe');
+  document.getElementById('fake-play').style.display = 'none';
+  iframe.style.display = 'block';
+  const loopParam = loopEnabled ? '&loop=1&playlist=' + currentVideoId : '';
+  iframe.src = `${EMBED_BASE}${currentVideoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin || location.href)}${loopParam}`;
+}
+
+function toggleLoop() {
+  loopEnabled = !loopEnabled;
+  const btn = document.getElementById('loop-btn');
+  btn.classList.toggle('ctrl-active', loopEnabled);
+  toast(loopEnabled ? '🔁 Loop ON' : '🔁 Loop OFF');
+  // If video is playing, reload with loop param
+  const iframe = document.getElementById('yt-iframe');
+  if (iframe.style.display !== 'none' && iframe.src) {
+    let src = iframe.src.replace(/&loop=\d+&playlist=[^&]*/g, '');
+    if (loopEnabled) src += `&loop=1&playlist=${currentVideoId}`;
+    iframe.src = src;
+  }
+}
+
+function toggleHeadphone() {
+  headphoneMode = !headphoneMode;
+  const btn = document.getElementById('hdph-btn');
+  btn.classList.toggle('ctrl-active', headphoneMode);
+  if (headphoneMode) {
+    toast('🎧 Headphone mode ON – audio continues in background tab');
+    // Keep page awake hint via NoSleep simulation
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.001; // nearly silent
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      window._headphoneCtx = ctx;
+      window._headphoneOsc = osc;
+    } catch(e) {}
+  } else {
+    toast('🎧 Headphone mode OFF');
+    try {
+      if (window._headphoneOsc) window._headphoneOsc.stop();
+      if (window._headphoneCtx) window._headphoneCtx.close();
+    } catch(e) {}
+  }
+}
+
+async function loadVideoDetails(videoId) {
+  const container = document.getElementById('vid-details');
+  container.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  try {
+    const data = await ytVideoDetails([videoId]);
+    const v = data.items?.[0];
+    if (!v) { container.innerHTML = ''; return; }
+    const sn = v.snippet || {};
+    const st = v.statistics || {};
+    const ch = sn.channelTitle || '';
+    const color = avatarColor(ch);
+    const letter = ch.charAt(0).toUpperCase();
+    const liked = getLiked();
+    const saved = getSaved();
+    const subs = getSubs();
+    const isLiked = !!liked[videoId];
+    const isSaved = !!saved[videoId];
+    const isSubbed = !!subs[ch];
+
+    container.innerHTML = `
+      <div class="vd-title">${escHtml(sn.title||'')}</div>
+      <div class="vd-ch-row">
+        <div class="vd-ch-left">
+          <div class="vd-av" style="background:${color}">${letter}</div>
+          <div>
+            <div class="vd-ch-name">${escHtml(ch)}</div>
+            <div class="vd-subs">${fmtNum(st.viewCount)} views</div>
+          </div>
+        </div>
+        <button class="sub-btn ${isSubbed?'subscribed':''}" id="sub-btn-main" onclick="toggleSub('${escAttr(ch)}')">
+          ${isSubbed ? 'Subscribed ✓' : 'Subscribe'}
+        </button>
+      </div>
+      <div class="vd-stats">
+        <div class="stat-chip">👁 ${fmtNum(st.viewCount)} views</div>
+        <div class="stat-chip">👍 ${fmtNum(st.likeCount)}</div>
+        <div class="stat-chip">🕒 ${timeAgo(sn.publishedAt)}</div>
+      </div>
+      <div class="vd-actions">
+        <button class="vd-act like-act ${isLiked?'liked':''}" id="like-btn-main" onclick="toggleLikeVideo('${videoId}','${escAttr(sn.title||'')}','${escAttr(sn.thumbnails?.medium?.url||thumbUrl(videoId))}')">
+          ${isLiked?'❤️':'🤍'} Like
+        </button>
+        <button class="vd-act save-act ${isSaved?'saved-active':''}" id="save-btn-main" onclick="toggleSaveVideo('${videoId}','${escAttr(sn.title||'')}')">
+          ${isSaved?'🔖':'🏷️'} ${isSaved?'Saved':'Save'}
+        </button>
+        <button class="vd-act share-act" onclick="shareVideo('${videoId}')">↗ Share</button>
+      </div>`;
+  } catch(e) {
+    container.innerHTML = '';
+  }
+}
+
+function toggleLikeVideo(videoId, title, thumb) {
+  const liked = getLiked();
+  if (liked[videoId]) {
+    delete liked[videoId];
+    toast('💔 Removed from liked');
+  } else {
+    liked[videoId] = { title, thumb, ts: Date.now() };
+    toast('❤️ Added to liked!');
+  }
+  saveLiked(liked);
+  // Update UI
+  const btn = document.getElementById('like-btn-main');
+  if (btn) {
+    const isNowLiked = !!liked[videoId];
+    btn.classList.toggle('liked', isNowLiked);
+    btn.textContent = (isNowLiked ? '❤️' : '🤍') + ' Like';
+  }
+  updateProfileLikes();
+}
+
+function toggleSaveVideo(videoId, title) {
+  const saved = getSaved();
+  if (saved[videoId]) {
+    delete saved[videoId];
+    toast('🗑️ Removed from saved');
+  } else {
+    saved[videoId] = { title, thumb: thumbUrl(videoId), ts: Date.now() };
+    toast('🔖 Saved!');
+  }
+  saveSaved(saved);
+  const btn = document.getElementById('save-btn-main');
+  if (btn) {
+    const isNowSaved = !!saved[videoId];
+    btn.classList.toggle('saved-active', isNowSaved);
+    btn.textContent = (isNowSaved ? '🔖' : '🏷️') + (isNowSaved ? ' Saved' : ' Save');
+  }
+}
+
+function toggleSub(channelName) {
+  const subs = getSubs();
+  if (subs[channelName]) {
+    delete subs[channelName];
+    toast('🔕 Unsubscribed from ' + channelName);
+  } else {
+    subs[channelName] = { name: channelName, ts: Date.now() };
+    toast('🔔 Subscribed to ' + channelName + '!');
+  }
+  saveSubs(subs);
+  const btn = document.getElementById('sub-btn-main');
+  if (btn) {
+    const isNowSubbed = !!subs[channelName];
+    btn.classList.toggle('subscribed', isNowSubbed);
+    btn.textContent = isNowSubbed ? 'Subscribed ✓' : 'Subscribe';
+  }
+  renderSubsPage();
+  updateProfileFollowing();
+}
+
+function shareVideo(videoId) {
+  const url = `https://youtu.be/${videoId}`;
+  if (navigator.share) {
+    navigator.share({ url }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(url).then(() => toast('🔗 Link copied!'));
+  }
+}
+
+async function loadMoreVideos() {
+  const section = document.getElementById('more-videos-section');
+  const list = document.getElementById('more-videos-list');
+  section.style.display = 'none';
+  try {
+    const q = randomFrom(CAT_QUERIES[currentCat] || CAT_QUERIES.All);
+    const data = await ytSearch(q, 6, '', 'medium');
+    if (data.items?.length) {
+      const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      list.innerHTML = (details.items || []).map(v => videoCardHtml(v)).join('');
+      section.style.display = 'block';
+    }
+  } catch(e) {
+    list.innerHTML = FALLBACK_VIDEOS.slice(0, 4).map(v =>
+      `<div class="video-card" onclick="openPlayer('${v.id}','${escHtml(v.title)}','${thumbUrl(v.id,'maxresdefault')}')">
+        <div class="thumb-wrap"><img src="${thumbUrl(v.id,'mqdefault')}" alt="" loading="lazy"><div class="thumb-dur">${v.dur}</div></div>
+        <div class="video-row">
+          <div class="ch-av" style="background:${v.color}">${v.avatar}</div>
+          <div class="vid-meta">
+            <div class="vid-title">${escHtml(v.title)}</div>
+            <div class="vid-sub"><span>${escHtml(v.channel)}</span><span>${v.views}</span></div>
+          </div>
+        </div>
+      </div>`
+    ).join('');
+    section.style.display = 'block';
+  }
+}
+
+// ============================================================
+// COMMENTS
+// ============================================================
+async function loadComments(videoId) {
+  const section = document.getElementById('cmt-section');
+  section.innerHTML = `
+    <div class="cmt-toggle-row" onclick="toggleComments(this)">
+      <span style="font-size:14px;font-weight:700;">💬 Comments <span id="cmt-count-label">Loading...</span></span>
+      <span class="cmt-toggle-icon">▼</span>
+    </div>
+    <div class="cmt-body" id="cmt-body">
+      <div class="cmt-input-row">
+        <div class="my-av">W</div>
+        <div class="cmt-field">
+          <textarea class="cmt-textarea" id="cmt-textarea" placeholder="Add a comment..." rows="1"
+            onfocus="showCmtBtns()" oninput="checkCmtReady(this)"></textarea>
+          <div class="cmt-btns" id="cmt-btns">
+            <button class="cmt-cancel" onclick="cancelCmt()">Cancel</button>
+            <button class="cmt-submit" id="cmt-submit-btn" onclick="submitCmt('${videoId}')">Comment</button>
+          </div>
+        </div>
+      </div>
+      <div id="cmt-list"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+    </div>`;
+
+  // Fetch comments
+  try {
+    const data = await ytComments(videoId);
+    const items = data.items || [];
+    const localCmts = getLocalCmts(videoId);
+    document.getElementById('cmt-count-label').textContent = `(${items.length + localCmts.length})`;
+    renderComments(videoId, items, localCmts);
+  } catch(e) {
+    document.getElementById('cmt-count-label').textContent = '';
+    const localCmts = getLocalCmts(videoId);
+    renderComments(videoId, [], localCmts);
+  }
+}
+
+function renderComments(videoId, apiCmts, localCmts) {
+  const list = document.getElementById('cmt-list');
+  if (!list) return;
+  let html = '';
+  // Local comments first
+  localCmts.reverse().forEach(c => {
+    html += `<div class="cmt-item">
+      <div class="cmt-av" style="background:var(--red);color:#fff;">W</div>
+      <div class="cmt-body-inner">
+        <span class="cmt-author">waseem7227</span><span class="cmt-time">just now</span>
+        <div class="cmt-text">${escHtml(c.text)}</div>
+      </div>
+    </div>`;
+  });
+  // API comments
+  apiCmts.forEach(item => {
+    const sn = item.snippet?.topLevelComment?.snippet || {};
+    const author = sn.authorDisplayName || 'User';
+    const text = sn.textDisplay || '';
+    const likes = fmtNum(sn.likeCount);
+    const time = timeAgo(sn.publishedAt);
+    const pic = sn.authorProfileImageUrl || '';
+    html += `<div class="cmt-item">
+      <div class="cmt-av">${pic ? `<img src="${pic}" alt="">` : author.charAt(0)}</div>
+      <div class="cmt-body-inner">
+        <span class="cmt-author">${escHtml(author)}</span><span class="cmt-time">${time}</span>
+        <div class="cmt-text">${escHtml(text)}</div>
+        <button class="cmt-likes-btn">👍 ${likes}</button>
+      </div>
+    </div>`;
+  });
+  if (!html) html = '<div class="empty-msg">No comments yet. Be first!</div>';
+  list.innerHTML = html;
+}
+
+function toggleComments(row) {
+  const body = document.getElementById('cmt-body');
+  const icon = row.querySelector('.cmt-toggle-icon');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  icon.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+function showCmtBtns() {
+  document.getElementById('cmt-btns').style.display = 'flex';
+}
+function cancelCmt() {
+  document.getElementById('cmt-textarea').value = '';
+  document.getElementById('cmt-btns').style.display = 'none';
+  document.getElementById('cmt-submit-btn').classList.remove('ready');
+}
+function checkCmtReady(el) {
+  const btn = document.getElementById('cmt-submit-btn');
+  if (btn) btn.classList.toggle('ready', el.value.trim().length > 0);
+}
+function submitCmt(videoId) {
+  const ta = document.getElementById('cmt-textarea');
+  const text = ta.value.trim();
+  if (!text) return;
+  const cmts = getLocalCmts(videoId);
+  cmts.push({ text, ts: Date.now() });
+  saveLocalCmts(videoId, cmts);
+  ta.value = '';
+  cancelCmt();
+  toast('💬 Comment posted!');
+  // Prepend comment to list
+  const list = document.getElementById('cmt-list');
+  if (list) {
+    const div = document.createElement('div');
+    div.className = 'cmt-item';
+    div.innerHTML = `<div class="cmt-av" style="background:var(--red);color:#fff;">W</div>
+      <div class="cmt-body-inner">
+        <span class="cmt-author">waseem7227</span><span class="cmt-time">just now</span>
+        <div class="cmt-text">${escHtml(text)}</div>
+      </div>`;
+    list.prepend(div);
+  }
+}
+
+// ============================================================
+// SHORTS FULLSCREEN
+// ============================================================
+let shortsPageData = [];
+let shortsObserver = null;
+
+async function openShortsPage(startIndex = 0, specificId = null) {
+  document.getElementById('shorts-page').style.display = 'block';
+  document.getElementById('shorts-botnav').style.display = 'flex';
+  document.getElementById('topnav').style.display = 'none';
+  document.getElementById('botnav').style.display = 'none';
+  document.getElementById('main').style.display = 'none';
+
+  await loadShortsForPage(specificId);
+}
+
+async function loadShortsForPage(specificId = null) {
+  const scroller = document.getElementById('shorts-scroller');
+  scroller.innerHTML = '<div class="loading-dots" style="color:#fff;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><span></span><span></span><span></span></div>';
+
+  try {
+    const q = randomFrom(SHORT_CAT_QUERIES[currentCat] || SHORT_CAT_QUERIES.All);
+    const data = await ytSearch(q, 15, '', 'short');
+    let items = data.items || [];
+    if (!items.length) throw new Error('no items');
+    // If specific ID, put it first
+    if (specificId) {
+      const idx = items.findIndex(i => i.id.videoId === specificId);
+      if (idx > 0) { const [item] = items.splice(idx, 1); items.unshift(item); }
+      else if (idx === -1) {
+        // create fake item for it
+        items.unshift({ id: { videoId: specificId }, snippet: { title: 'Short Video', channelTitle: 'Channel' } });
+      }
+    }
+    shortsPageData = items;
+    renderShortsSlides(items);
+  } catch(e) {
+    // Fallback
+    shortsPageData = FALLBACK_SHORTS.map(s => ({
+      id: { videoId: s.id },
+      snippet: { title: s.title, channelTitle: s.channel }
+    }));
+    renderShortsSlides(shortsPageData);
+  }
+}
+
+function renderShortsSlides(items) {
+  const scroller = document.getElementById('shorts-scroller');
+  scroller.innerHTML = '';
+
+  items.forEach((item, idx) => {
+    const vid = item.id?.videoId || item.id;
+    const title = item.snippet?.title || 'Short Video';
+    const channel = item.snippet?.channelTitle || 'Channel';
+    const color = avatarColor(channel);
+    const letter = channel.charAt(0).toUpperCase();
+    const liked = getLiked();
+    const subs = getSubs();
+    const isLiked = !!liked[vid];
+    const isSubbed = !!subs[channel];
+
+    const slide = document.createElement('div');
+    slide.className = 's-slide';
+    slide.dataset.vid = vid;
+    slide.dataset.idx = idx;
+    slide.innerHTML = `
+      <img class="s-bg-img" src="${thumbUrl(vid,'maxresdefault')}" alt="" loading="lazy">
+      <div class="s-video-wrap" id="swrap-${idx}">
+        <img src="${thumbUrl(vid,'hqdefault')}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" id="sthumb-${idx}" loading="lazy">
+      </div>
+      <div class="s-tap-overlay" id="stap-${idx}" onclick="playShort(${idx},'${vid}')">
+        <div class="s-play-circle">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      <div class="s-gradient"></div>
+      <div class="s-info">
+        <div class="s-ch-row">
+          <div class="s-avatar" style="background:${color}">${letter}</div>
+          <div class="s-ch-name">${escHtml(channel)}</div>
+          <button class="s-sub-btn ${isSubbed?'subbed':''}" id="ssub-${idx}" onclick="toggleShortSub(event,'${escAttr(channel)}',${idx})">${isSubbed?'Subscribed':'Subscribe'}</button>
+        </div>
+        <div class="s-title">${escHtml(title)}</div>
+      </div>
+      <div class="s-actions">
+        <button class="s-act-btn ${isLiked?'liked':''}" id="slike-${idx}" onclick="toggleShortLike(event,${idx},'${vid}','${escAttr(title)}')">
+          <div class="s-act-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="${isLiked?'#ff4444':'none'}" stroke="${isLiked?'#ff4444':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <span id="slikes-${idx}">Like</span>
+        </button>
+        <button class="s-act-btn" onclick="openSPanel('${vid}')">
+          <div class="s-act-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          Comment
+        </button>
+        <button class="s-act-btn" onclick="event.stopPropagation();shareVideo('${vid}')">
+          <div class="s-act-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          Share
+        </button>
+        <button class="s-act-btn" onclick="event.stopPropagation();openPlayer('${vid}','${escAttr(title)}','${thumbUrl(vid,'maxresdefault')}');leaveShorts();">
+          <div class="s-act-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          Full
+        </button>
+      </div>`;
+    scroller.appendChild(slide);
+  });
+
+  // Scroll snap observer to pause/clear inactive iframes
+  if (shortsObserver) shortsObserver.disconnect();
+  shortsObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const slide = entry.target;
+      const idx = parseInt(slide.dataset.idx);
+      if (!entry.isIntersecting) {
+        // Clear iframe when not visible
+        const wrap = document.getElementById('swrap-' + idx);
+        const iframe = wrap?.querySelector('iframe');
+        if (iframe) {
+          iframe.src = '';
+          // Show tap overlay again
+          const tap = document.getElementById('stap-' + idx);
+          if (tap) tap.style.display = 'flex';
+        }
+      }
+    });
+  }, { threshold: 0.5, root: document.getElementById('shorts-scroller') });
+
+  document.querySelectorAll('.s-slide').forEach(s => shortsObserver.observe(s));
+}
+
+function playShort(idx, vid) {
+  const wrap = document.getElementById('swrap-' + idx);
+  const tap = document.getElementById('stap-' + idx);
+  if (!wrap) return;
+  // Clear other iframes
+  document.querySelectorAll('.s-slide').forEach(slide => {
+    const i = parseInt(slide.dataset.idx);
+    if (i !== idx) {
+      const w = document.getElementById('swrap-' + i);
+      const iframe = w?.querySelector('iframe');
+      if (iframe) iframe.src = '';
+    }
+  });
+  tap.style.display = 'none';
+  wrap.innerHTML = `<iframe class="s-iframe" src="${EMBED_BASE}${vid}?autoplay=1&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+}
+
+function toggleShortLike(event, idx, vid, title) {
+  event.stopPropagation();
+  const liked = getLiked();
+  const btn = document.getElementById('slike-' + idx);
+  const circle = btn?.querySelector('.s-act-circle');
+  const heart = circle?.querySelector('svg');
+  if (liked[vid]) {
+    delete liked[vid];
+    btn?.classList.remove('liked');
+    if (heart) { heart.setAttribute('fill','none'); heart.setAttribute('stroke','white'); }
+    toast('💔 Unliked');
+  } else {
+    liked[vid] = { title, thumb: thumbUrl(vid), ts: Date.now() };
+    btn?.classList.add('liked');
+    if (heart) { heart.setAttribute('fill','#ff4444'); heart.setAttribute('stroke','#ff4444'); }
+    toast('❤️ Liked!');
+  }
+  saveLiked(liked);
+  updateProfileLikes();
+}
+
+function toggleShortSub(event, channel, idx) {
+  event.stopPropagation();
+  const subs = getSubs();
+  const btn = document.getElementById('ssub-' + idx);
+  if (subs[channel]) {
+    delete subs[channel];
+    btn.textContent = 'Subscribe';
+    btn.classList.remove('subbed');
+    toast('🔕 Unsubscribed');
+  } else {
+    subs[channel] = { name: channel, ts: Date.now() };
+    btn.textContent = 'Subscribed';
+    btn.classList.add('subbed');
+    toast('🔔 Subscribed!');
+  }
+  saveSubs(subs);
+  renderSubsPage();
+  updateProfileFollowing();
+}
+
+function leaveShorts(page = 'home') {
+  if (shortsObserver) shortsObserver.disconnect();
+  // Clear all iframes
+  document.querySelectorAll('.s-slide').forEach((slide, i) => {
+    const wrap = document.getElementById('swrap-' + i);
+    const iframe = wrap?.querySelector('iframe');
+    if (iframe) iframe.src = '';
+  });
+  document.getElementById('shorts-page').style.display = 'none';
+  document.getElementById('shorts-botnav').style.display = 'none';
+  document.getElementById('topnav').style.display = 'flex';
+  document.getElementById('botnav').style.display = 'flex';
+  document.getElementById('main').style.display = 'block';
+  if (page) showPage(page);
+}
+
+// SHORT COMMENT PANEL
+async function openSPanel(videoId) {
+  document.getElementById('s-panel-overlay').style.display = 'block';
+  document.getElementById('s-cmt-panel').style.display = 'block';
+  const list = document.getElementById('s-cmt-list');
+  list.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  try {
+    const data = await ytComments(videoId, 15);
+    const items = data.items || [];
+    document.getElementById('panel-cmt-count').textContent = `Comments (${items.length})`;
+    list.innerHTML = items.map(item => {
+      const sn = item.snippet?.topLevelComment?.snippet || {};
+      const author = sn.authorDisplayName || 'User';
+      const text = sn.textDisplay || '';
+      const pic = sn.authorProfileImageUrl || '';
+      const time = timeAgo(sn.publishedAt);
+      return `<div class="cmt-item">
+        <div class="cmt-av">${pic ? `<img src="${pic}" alt="">` : author.charAt(0)}</div>
+        <div class="cmt-body-inner">
+          <span class="cmt-author">${escHtml(author)}</span><span class="cmt-time">${time}</span>
+          <div class="cmt-text">${escHtml(text)}</div>
+        </div>
+      </div>`;
+    }).join('') || '<div class="empty-msg">No comments yet.</div>';
+  } catch(e) {
+    list.innerHTML = '<div class="empty-msg">Comments unavailable.</div>';
+  }
+}
+function closeSPanel() {
+  document.getElementById('s-panel-overlay').style.display = 'none';
+  document.getElementById('s-cmt-panel').style.display = 'none';
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+const TRENDS = ['viral dance 2024','cricket highlights India','funny cat videos','tech review iPhone','bollywood songs 2024','minecraft gameplay','motivational speech Hindi','street food challenge','football goals 2024','satisfying videos'];
+
+function buildTrendList() {
+  const list = document.getElementById('trend-list');
+  list.innerHTML = TRENDS.map(t =>
+    `<div class="trend-item" onclick="doSearchWith('${escAttr(t)}')">
+      <span class="trend-icon">🔥</span>
+      <span class="trend-text">${escHtml(t)}</span>
+    </div>`
+  ).join('');
+}
+
+function showSearchPage() {
+  showPage('search');
+  setTimeout(() => document.getElementById('search-big-input').focus(), 100);
+}
+
+function doSearch() {
+  const q = document.getElementById('search-big-input').value.trim() || document.getElementById('search-input').value.trim();
+  if (!q) return;
+  doSearchWith(q);
+}
+
+async function doSearchWith(query) {
+  document.getElementById('search-big-input').value = query;
+  document.getElementById('search-input').value = query;
+  showPage('search');
+  document.getElementById('search-suggestions').style.display = 'none';
+  document.getElementById('search-results-wrap').style.display = 'block';
+  document.getElementById('search-shorts-wrap').style.display = 'none';
+  document.getElementById('search-vids-hdr').style.display = 'none';
+  document.getElementById('search-shorts-grid').innerHTML = '';
+  document.getElementById('search-long-feed').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  try {
+    // Search shorts
+    const shortData = await ytSearch(query, 4, '', 'short');
+    if (shortData.items?.length) {
+      document.getElementById('search-shorts-wrap').style.display = 'block';
+      document.getElementById('search-shorts-grid').innerHTML = shortData.items.map(item => {
+        const vid = item.id.videoId;
+        return `<div class="short-card" onclick="openShortsPage(0,'${vid}')">
+          <img src="${thumbUrl(vid,'hqdefault')}" alt="" loading="lazy">
+          <div class="short-card-info">
+            <div class="short-card-title">${escHtml(item.snippet.title)}</div>
+            <div class="short-card-views">${escHtml(item.snippet.channelTitle)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    // Search long
+    const longData = await ytSearch(query, 10, '', 'medium');
+    document.getElementById('search-vids-hdr').style.display = 'flex';
+    if (longData.items?.length) {
+      const ids = longData.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      document.getElementById('search-long-feed').innerHTML = (details.items || []).map(v => videoCardHtml(v)).join('');
+    } else {
+      document.getElementById('search-long-feed').innerHTML = '<div class="empty-msg"><span class="icon">🔍</span>No results found.</div>';
+    }
+  } catch(e) {
+    document.getElementById('search-long-feed').innerHTML = '<div class="empty-msg"><span class="icon">⚠️</span>Search failed. Try again.</div>';
+  }
+}
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+const pages = ['home', 'search', 'player', 'subs', 'profile'];
+
+function showPage(name) {
+  currentPage = name;
+  pages.forEach(p => {
+    const el = document.getElementById(p + '-page');
+    if (el) el.style.display = p === name ? 'block' : 'none';
+  });
+  // Update nav
+  ['home','shorts','subs','profile'].forEach(b => {
+    const btn = document.getElementById('bn-' + b);
+    if (btn) btn.classList.toggle('active', b === name);
+  });
+  // Hide search suggestions when not searching
+  if (name !== 'search') {
+    document.getElementById('search-suggestions').style.display = 'block';
+    document.getElementById('search-results-wrap').style.display = 'none';
+  }
+  if (name === 'profile') { renderProfileContent(); updateProfileLikes(); updateProfileFollowing(); }
+  if (name === 'subs') renderSubsPage();
+}
+
+function goBack() {
+  if (currentPage === 'player') {
+    // Stop video
+    const iframe = document.getElementById('yt-iframe');
+    iframe.src = '';
+    iframe.style.display = 'none';
+    document.getElementById('fake-play').style.display = 'flex';
+    showPage('home');
+  } else if (currentPage === 'search') {
+    showPage('home');
+  } else {
+    showPage('home');
+  }
+}
+
+// ============================================================
+// PLATFORM DROPDOWN
+// ============================================================
+function togglePlatformDropdown() {
+  platformDropdownOpen = !platformDropdownOpen;
+  const dd = document.getElementById('platform-dropdown');
+  const arrow = document.getElementById('nav-arrow');
+  dd.style.display = platformDropdownOpen ? 'block' : 'none';
+  if (arrow) arrow.classList.toggle('open', platformDropdownOpen);
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#platform-dropdown') && !e.target.closest('.platform-arrow') && !e.target.closest('.shl-arrow') && !e.target.closest('.ig-arrow-btn') && !e.target.closest('.tt-arrow-btn')) {
+    document.getElementById('platform-dropdown').style.display = 'none';
+    platformDropdownOpen = false;
+    const arrow = document.getElementById('nav-arrow');
+    if (arrow) arrow.classList.remove('open');
+  }
+});
+
+function selectPlatform(platform) {
+  document.getElementById('platform-dropdown').style.display = 'none';
+  platformDropdownOpen = false;
+  ['pd-yt','pd-ig','pd-tt'].forEach(id => document.getElementById(id)?.classList.remove('active-platform'));
+  document.getElementById('pd-' + platform)?.classList.add('active-platform');
+
+  if (platform === 'yt') {
+    // Already in YT mode, just close
+    toast('YouTube Style');
+  } else {
+    toast('🚧 ' + (platform === 'ig' ? 'Instagram' : 'TikTok') + ' Style – Coming Soon!');
+  }
+}
+
+// ============================================================
+// SUBSCRIPTIONS PAGE
+// ============================================================
+function renderSubsPage() {
+  const list = document.getElementById('subs-list');
+  const subs = getSubs();
+  const keys = Object.keys(subs);
+  if (!keys.length) {
+    list.innerHTML = '<div class="empty-msg"><span class="icon">🔔</span>No subscriptions yet.<br>Subscribe to channels to see them here.</div>';
+    return;
+  }
+  const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c'];
+  list.innerHTML = keys.map((ch, i) =>
+    `<div class="sub-ch-item">
+      <div class="sub-ch-av" style="background:${colors[i % colors.length]}">${ch.charAt(0).toUpperCase()}</div>
+      <div class="sub-ch-info">
+        <div class="sub-ch-name">${escHtml(ch)}</div>
+        <div class="sub-ch-count">Subscribed</div>
+      </div>
+      <button class="unsub-btn" onclick="unsubFrom('${escAttr(ch)}')">Unsubscribe</button>
+    </div>`
+  ).join('');
+}
+
+function unsubFrom(ch) {
+  const subs = getSubs();
+  delete subs[ch];
+  saveSubs(subs);
+  renderSubsPage();
+  toast('🔕 Unsubscribed from ' + ch);
+  updateProfileFollowing();
+}
+
+// ============================================================
+// PROFILE PAGE
+// ============================================================
+function updateProfileLikes() {
+  const liked = getLiked();
+  const el = document.getElementById('profile-likes');
+  if (el) el.textContent = Object.keys(liked).length;
+}
+function updateProfileFollowing() {
+  const subs = getSubs();
+  const el = document.getElementById('profile-following');
+  if (el) el.textContent = Object.keys(subs).length;
+}
+
+function switchProfileTab(tab) {
+  document.getElementById('ptab-videos').classList.toggle('active', tab === 'videos');
+  document.getElementById('ptab-liked').classList.toggle('active', tab === 'liked');
+  renderProfileContent(tab);
+}
+
+function renderProfileContent(tab = 'videos') {
+  updateProfileLikes();
+  updateProfileFollowing();
+  const content = document.getElementById('profile-content');
+  if (tab === 'liked') {
+    const liked = getLiked();
+    const keys = Object.keys(liked);
+    if (!keys.length) {
+      content.innerHTML = '<div class="profile-liked-section">No liked videos yet.<br>Like videos to see them here.</div>';
+    } else {
+      content.innerHTML = `<div class="profile-videos-grid">${keys.map(vid => {
+        const v = liked[vid];
+        return `<div class="profile-vid-thumb" onclick="openPlayer('${vid}','${escAttr(v.title||'')}','${escAttr(v.thumb||thumbUrl(vid))}')">
+          <img src="${thumbUrl(vid,'mqdefault')}" alt="" loading="lazy">
+          <div class="profile-vid-views">❤️</div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+  } else {
+    // Demo videos grid
+    const demoIds = ['dQw4w9WgXcQ','9bZkp7q19f0','kJQP7kiw5Fk','RgKAFK5djSk','hT_nvWreIhg','pRpeEdMmmQ0'];
+    content.innerHTML = `<div class="profile-videos-grid">${demoIds.map(id =>
+      `<div class="profile-vid-thumb" onclick="openPlayer('${id}','Video','')">
+        <img src="${thumbUrl(id,'mqdefault')}" alt="" loading="lazy">
+        <div class="profile-vid-views">▶</div>
+      </div>`
+    ).join('')}</div>`;
+  }
+}
+
+// ============================================================
+// TikTok Upload (preserved)
+// ============================================================
+function showTTUpload() {
+  document.getElementById('tt-upload-modal').style.display = 'flex';
+}
+function hideTTUpload() {
+  document.getElementById('tt-upload-modal').style.display = 'none';
+}
+function switchTTTab(el) {
+  document.querySelectorAll('.ttum-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+  return String(str || '').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/\n/g,' ').replace(/\r/g,' ');
+}
+</script>
+</body>
+</html>
+Ab ye cod mila he or ab kia past karon is ke saath or photo phioto hain mery oass sath main atech kardnga  or yahi cod bhi or ab 1 promt do jis se kaam 100% ho jay thank  you
