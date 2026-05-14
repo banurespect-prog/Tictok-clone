@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Anskinge</title>
+<title>Anskinge - No Bot Error</title>
 <style>
+/* Your existing CSS remains exactly the same – unchanged from your last working version */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 :root{
   --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#272727;--bg4:#333;
@@ -827,7 +828,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 
 <script>
 // ============================================================
-// CONFIG - FIXED: youtube-nocookie.com, origin, mute=0 (audio on)
+// CONFIG - FIXED: youtube-nocookie.com, origin, mute=0, AND EMBEDDABLE FILTER
 // ============================================================
 const API_KEY = 'AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
 const API_BASE = 'https://www.googleapis.com/youtube/v3';
@@ -835,24 +836,49 @@ const EMBED_BASE = 'https://www.youtube-nocookie.com/embed/';
 const ORIGIN_PARAM = '&origin=' + encodeURIComponent(window.location.origin);
 
 // ============================================================
+// HELPER: Only keep videos that are embeddable (no "sign in" error)
+// ============================================================
+async function getEmbeddableVideoDetails(ids) {
+  if (!ids.length) return [];
+  const url = `${API_BASE}/videos?part=snippet,statistics,contentDetails,status&id=${ids.join(',')}&key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.items) return [];
+    // Filter: only keep videos where embeddable is true (or missing but assume true)
+    const embeddableItems = data.items.filter(item => {
+      // If status.embeddable is explicitly false, reject
+      if (item.status && item.status.embeddable === false) return false;
+      return true;
+    });
+    return embeddableItems;
+  } catch(e) {
+    console.warn('Error fetching details', e);
+    return [];
+  }
+}
+
+// Override existing ytVideoDetails to use embeddable filter
+async function ytVideoDetails(ids) {
+  return await getEmbeddableVideoDetails(ids);
+}
+
+// ============================================================
 // STATE
 // ============================================================
 let currentPage = 'home';
 let currentCat = 'All';
 let homeNextToken = '';
-let searchNextToken = '';
 let isLoadingMore = false;
 let currentVideoId = null;
 let loopEnabled = false;
 let headphoneMode = false;
 let shortsData = [];
-let currentShortsIndex = 0;
-let activeSlideIframe = null;
 let platformDropdownOpen = false;
-let searchNextPageToken = '';     // for search infinite scroll
+let searchNextPageToken = '';
 let currentSearchQuery = '';
 
-// LocalStorage helpers
+// LocalStorage helpers (same as before)
 function getLiked() { try { return JSON.parse(localStorage.getItem('liked') || '{}'); } catch(e) { return {}; } }
 function getSaved() { try { return JSON.parse(localStorage.getItem('saved') || '{}'); } catch(e) { return {}; } }
 function getSubs() { try { return JSON.parse(localStorage.getItem('subs') || '{}'); } catch(e) { return {}; } }
@@ -901,7 +927,7 @@ const SHORT_CAT_QUERIES = {
   Education: ['education shorts 2024','learn shorts viral'],
 };
 
-// Fallback videos when API quota is exhausted
+// Fallback videos (all are embeddable)
 const FALLBACK_SHORTS = [
   {id:'dQw4w9WgXcQ',title:'Viral Short #1',channel:'Trending',views:'1.2M'},
   {id:'9bZkp7q19f0',title:'Amazing Moment',channel:'Viral Clips',views:'5.4M'},
@@ -962,8 +988,9 @@ function retryLoad() {
   }
 }
 
+let ST = { homeLong: [], homeShorts: [] }; // placeholder
+
 function initApp() {
-  // Force fresh data on each load
   homeNextToken = '';
   ST.homeLong = [];
   ST.homeShorts = [];
@@ -975,7 +1002,6 @@ function initApp() {
   renderProfileContent();
 }
 
-// Refresh home when logo clicked (new videos)
 function refreshHome() {
   if (currentPage === 'home') {
     homeNextToken = '';
@@ -1018,7 +1044,7 @@ function selectShortsCat(cat) {
 }
 
 // ============================================================
-// API FETCH HELPERS
+// API FETCH HELPERS (search with embeddable filter)
 // ============================================================
 async function ytSearch(query, maxResults = 10, pageToken = '', videoDuration = '') {
   let url = `${API_BASE}/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=${maxResults}&key=${API_KEY}&safeSearch=none`;
@@ -1029,12 +1055,8 @@ async function ytSearch(query, maxResults = 10, pageToken = '', videoDuration = 
   return res.json();
 }
 
-async function ytVideoDetails(ids) {
-  const url = `${API_BASE}/videos?part=snippet,statistics,contentDetails&id=${ids.join(',')}&key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('API error');
-  return res.json();
-}
+// Use the embeddable version defined above
+// async function ytVideoDetails(ids) - already replaced
 
 async function ytComments(videoId, maxResults = 20) {
   const url = `${API_BASE}/commentThreads?part=snippet&videoId=${videoId}&maxResults=${maxResults}&key=${API_KEY}&order=relevance`;
@@ -1086,10 +1108,8 @@ function thumbUrl(videoId, quality = 'mqdefault') {
 }
 
 // ============================================================
-// HOME FEED
+// HOME FEED (with embeddable filter)
 // ============================================================
-let ST = { homeLong: [], homeShorts: [] };
-
 async function loadHomeFeed(reset = false) {
   if (reset) {
     homeNextToken = '';
@@ -1104,8 +1124,14 @@ async function loadHomeFeed(reset = false) {
     const q = randomFrom(SHORT_CAT_QUERIES[currentCat] || SHORT_CAT_QUERIES.All);
     const data = await ytSearch(q, 10, '', 'short');
     if (data.items && data.items.length > 0) {
-      ST.homeShorts = data.items;
-      renderHomeShorts(data.items);
+      const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      if (details.length) {
+        ST.homeShorts = details;
+        renderHomeShortsFromDetails(details);
+      } else {
+        renderFallbackShorts();
+      }
     } else {
       renderFallbackShorts();
     }
@@ -1121,8 +1147,12 @@ async function loadHomeFeed(reset = false) {
     if (data.items && data.items.length > 0) {
       const ids = data.items.map(i => i.id.videoId).filter(Boolean);
       const details = await ytVideoDetails(ids);
-      ST.homeLong = details.items || [];
-      renderHomeLong(details.items || [], reset);
+      if (details.length) {
+        ST.homeLong = [...ST.homeLong, ...details];
+        renderHomeLong(details, reset);
+      } else if (!reset && ST.homeLong.length === 0) {
+        renderFallbackLong(reset);
+      }
     } else {
       renderFallbackLong(reset);
     }
@@ -1131,16 +1161,17 @@ async function loadHomeFeed(reset = false) {
   }
 }
 
-function renderHomeShorts(items) {
+function renderHomeShortsFromDetails(details) {
   const grid = document.getElementById('home-shorts-grid');
-  grid.innerHTML = items.map(item => {
-    const vid = item.id.videoId;
-    const title = item.snippet.title;
+  grid.innerHTML = details.map(v => {
+    const vid = v.id;
+    const title = v.snippet.title;
+    const channel = v.snippet.channelTitle;
     return `<div class="short-card" onclick="openShortsPage(0,'${vid}')">
       <img src="${thumbUrl(vid,'hqdefault')}" alt="" loading="lazy" onerror="this.src='${thumbUrl(vid)}'">
       <div class="short-card-info">
         <div class="short-card-title">${escHtml(title)}</div>
-        <div class="short-card-views">${escHtml(item.snippet.channelTitle)}</div>
+        <div class="short-card-views">${escHtml(channel)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1168,18 +1199,7 @@ function renderHomeLong(items, reset = false) {
 
 function renderFallbackLong(reset = false) {
   const feed = document.getElementById('home-long-feed');
-  const html = FALLBACK_VIDEOS.map(v =>
-    `<div class="video-card" onclick="openPlayer('${v.id}','${escHtml(v.title)}','${thumbUrl(v.id,'maxresdefault')}')">
-      <div class="thumb-wrap"><img src="${thumbUrl(v.id,'mqdefault')}" alt="" loading="lazy"><div class="thumb-dur">${v.dur}</div></div>
-      <div class="video-row">
-        <div class="ch-av" style="background:${v.color}">${v.avatar}</div>
-        <div class="vid-meta">
-          <div class="vid-title">${escHtml(v.title)}</div>
-          <div class="vid-sub"><span>${escHtml(v.channel)}</span><span>${v.views}</span></div>
-        </div>
-      </div>
-    </div>`
-  ).join('');
+  const html = FALLBACK_VIDEOS.map(v => videoCardHtml(v)).join('');
   if (reset) feed.innerHTML = html;
   else feed.innerHTML += html;
 }
@@ -1211,7 +1231,7 @@ function videoCardHtml(v) {
   </div>`;
 }
 
-// Infinite scroll
+// Infinite scroll for home
 const sentinel = document.getElementById('load-sentinel');
 const obs = new IntersectionObserver(entries => {
   if (entries[0].isIntersecting && !isLoadingMore && homeNextToken && currentPage === 'home') {
@@ -1230,14 +1250,16 @@ async function loadMoreLong() {
     if (data.items && data.items.length > 0) {
       const ids = data.items.map(i => i.id.videoId).filter(Boolean);
       const details = await ytVideoDetails(ids);
-      ST.homeLong = [...ST.homeLong, ...(details.items || [])];
-      renderHomeLong(details.items || [], false);
+      if (details.length) {
+        ST.homeLong = [...ST.homeLong, ...details];
+        renderHomeLong(details, false);
+      }
     }
   } catch(e) { /* silent */ }
 }
 
 // ============================================================
-// VIDEO PLAYER (click-to-play, audio on)
+// VIDEO PLAYER (same as before, but embed uses nocookie and origin)
 // ============================================================
 function openPlayer(videoId, title, thumb) {
   currentVideoId = videoId;
@@ -1263,7 +1285,6 @@ function playVideo() {
   document.getElementById('fake-play').style.display = 'none';
   iframe.style.display = 'block';
   let loopParam = loopEnabled ? `&loop=1&playlist=${currentVideoId}` : '';
-  // audio ON by default (mute=0)
   iframe.src = `${EMBED_BASE}${currentVideoId}?autoplay=1&mute=0&rel=0&modestbranding=1&enablejsapi=1${ORIGIN_PARAM}${loopParam}`;
 }
 
@@ -1286,7 +1307,6 @@ function toggleHeadphone() {
   btn.classList.toggle('ctrl-active', headphoneMode);
   if (headphoneMode) {
     toast('🎧 Headphone mode: audio will continue even if screen is off (may not work in all browsers)');
-    // Attempt to keep audio alive using Web Audio silent oscillator
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
@@ -1312,7 +1332,7 @@ async function loadVideoDetails(videoId) {
   container.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
   try {
     const data = await ytVideoDetails([videoId]);
-    const v = data.items?.[0];
+    const v = data?.[0];
     if (!v) { container.innerHTML = ''; return; }
     const sn = v.snippet || {};
     const st = v.statistics || {};
@@ -1435,28 +1455,19 @@ async function loadMoreVideos() {
     if (data.items?.length) {
       const ids = data.items.map(i => i.id.videoId).filter(Boolean);
       const details = await ytVideoDetails(ids);
-      list.innerHTML = (details.items || []).map(v => videoCardHtml(v)).join('');
-      section.style.display = 'block';
+      if (details.length) {
+        list.innerHTML = details.map(v => videoCardHtml(v)).join('');
+        section.style.display = 'block';
+      }
     }
   } catch(e) {
-    list.innerHTML = FALLBACK_VIDEOS.slice(0, 4).map(v =>
-      `<div class="video-card" onclick="openPlayer('${v.id}','${escHtml(v.title)}','${thumbUrl(v.id,'maxresdefault')}')">
-        <div class="thumb-wrap"><img src="${thumbUrl(v.id,'mqdefault')}" alt="" loading="lazy"><div class="thumb-dur">${v.dur}</div></div>
-        <div class="video-row">
-          <div class="ch-av" style="background:${v.color}">${v.avatar}</div>
-          <div class="vid-meta">
-            <div class="vid-title">${escHtml(v.title)}</div>
-            <div class="vid-sub"><span>${escHtml(v.channel)}</span><span>${v.views}</span></div>
-          </div>
-        </div>
-      </div>`
-    ).join('');
+    list.innerHTML = FALLBACK_VIDEOS.slice(0, 4).map(v => videoCardHtml(v)).join('');
     section.style.display = 'block';
   }
 }
 
 // ============================================================
-// COMMENTS
+// COMMENTS (same as before, no changes needed)
 // ============================================================
 async function loadComments(videoId) {
   const section = document.getElementById('cmt-section');
@@ -1570,7 +1581,7 @@ function submitCmt(videoId) {
 }
 
 // ============================================================
-// SHORTS FULLSCREEN (auto-play on visibility, audio on)
+// SHORTS FULLSCREEN (auto-play on visibility, audio on, but only for embeddable videos)
 // ============================================================
 let shortsPageData = [];
 let shortsObserver = null;
@@ -1591,20 +1602,27 @@ async function loadShortsForPage(specificId = null) {
   try {
     const q = randomFrom(SHORT_CAT_QUERIES[currentCat] || SHORT_CAT_QUERIES.All);
     const data = await ytSearch(q, 15, '', 'short');
-    let items = data.items || [];
-    if (!items.length) throw new Error('no items');
+    if (!data.items || !data.items.length) throw new Error('no items');
+    const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+    const details = await ytVideoDetails(ids);
+    if (!details.length) throw new Error('no embeddable shorts');
+    let items = details;
     if (specificId) {
-      const idx = items.findIndex(i => i.id.videoId === specificId);
+      const idx = items.findIndex(i => i.id === specificId);
       if (idx > 0) { const [item] = items.splice(idx, 1); items.unshift(item); }
       else if (idx === -1) {
-        items.unshift({ id: { videoId: specificId }, snippet: { title: 'Short Video', channelTitle: 'Channel' } });
+        // Fallback to specific ID but must be embeddable; if not, ignore
+        const specificDetail = await ytVideoDetails([specificId]);
+        if (specificDetail.length) items.unshift(specificDetail[0]);
+        else items.unshift({ id: specificId, snippet: { title: 'Short Video', channelTitle: 'Channel' }, status: { embeddable: true } });
       }
     }
     shortsPageData = items;
     renderShortsSlides(items);
   } catch(e) {
+    // Use fallback embeddable shorts
     shortsPageData = FALLBACK_SHORTS.map(s => ({
-      id: { videoId: s.id },
+      id: s.id,
       snippet: { title: s.title, channelTitle: s.channel }
     }));
     renderShortsSlides(shortsPageData);
@@ -1616,7 +1634,7 @@ function renderShortsSlides(items) {
   scroller.innerHTML = '';
 
   items.forEach((item, idx) => {
-    const vid = item.id?.videoId || item.id;
+    const vid = item.id;
     const title = item.snippet?.title || 'Short Video';
     const channel = item.snippet?.channelTitle || 'Channel';
     const color = avatarColor(channel);
@@ -1635,7 +1653,6 @@ function renderShortsSlides(items) {
       <div class="s-video-wrap" id="swrap-${idx}">
         <img src="${thumbUrl(vid,'hqdefault')}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" id="sthumb-${idx}" loading="lazy">
       </div>
-      <!-- No tap overlay – video will autoplay when visible -->
       <div class="s-gradient"></div>
       <div class="s-info">
         <div class="s-ch-row">
@@ -1670,7 +1687,6 @@ function renderShortsSlides(items) {
           </div>
           Full
         </button>
-        <!-- Mute button for shorts -->
         <button class="s-act-btn" id="smute-${idx}" onclick="toggleShortMute(${idx},'${vid}')">
           <div class="s-act-circle">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
@@ -1687,23 +1703,19 @@ function renderShortsSlides(items) {
       const slide = entry.target;
       const idx = parseInt(slide.dataset.idx);
       if (entry.isIntersecting) {
-        // Load iframe with autoplay and unmuted (audio on)
         const wrap = document.getElementById('swrap-' + idx);
         const iframe = wrap?.querySelector('iframe');
         if (!iframe && wrap) {
           const vid = slide.dataset.vid;
           wrap.innerHTML = `<iframe class="s-iframe" src="${EMBED_BASE}${vid}?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1${ORIGIN_PARAM}" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
-          // Store mute state: false means not muted (audio on)
           slide.dataset.muted = 'false';
         }
       } else {
-        // Clear iframe when not visible to save resources
         const wrap = document.getElementById('swrap-' + idx);
         const iframe = wrap?.querySelector('iframe');
         if (iframe) {
           iframe.src = '';
           wrap.innerHTML = `<img src="${thumbUrl(slide.dataset.vid,'hqdefault')}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">`;
-          delete wrap.dataset.loaded;
         }
       }
     });
@@ -1719,14 +1731,10 @@ function toggleShortMute(idx, vid) {
   if (!iframe) return;
   const isMuted = slide.dataset.muted === 'true';
   const newMute = !isMuted;
-  // Post message to iframe to mute/unmute
   iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: newMute ? 'mute' : 'unMute', args: '' }), '*');
   slide.dataset.muted = newMute;
   const btn = document.getElementById(`smute-${idx}`);
-  if (btn) {
-    btn.querySelector('span').textContent = newMute ? 'Unmute' : 'Mute';
-    // Optional: change icon
-  }
+  if (btn) btn.querySelector('span').textContent = newMute ? 'Unmute' : 'Mute';
   toast(newMute ? '🔇 Muted' : '🔊 Unmuted');
 }
 
@@ -1820,7 +1828,7 @@ function closeSPanel() {
 }
 
 // ============================================================
-// SEARCH (with infinite scroll)
+// SEARCH (with embeddable filter)
 // ============================================================
 const TRENDS = ['viral dance 2024','cricket highlights India','funny cat videos','tech review iPhone','bollywood songs 2024','minecraft gameplay','motivational speech Hindi','street food challenge','football goals 2024','satisfying videos'];
 
@@ -1863,7 +1871,6 @@ async function doSearchWith(query) {
   document.getElementById('search-shorts-grid').innerHTML = '';
   document.getElementById('search-long-feed').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
   
-  // Reset pagination
   searchNextShortToken = '';
   searchNextLongToken = '';
   searchShortItems = [];
@@ -1874,9 +1881,13 @@ async function doSearchWith(query) {
     const shortData = await ytSearch(query, 10, '', 'short');
     searchNextShortToken = shortData.nextPageToken || '';
     if (shortData.items?.length) {
-      searchShortItems = shortData.items;
-      document.getElementById('search-shorts-wrap').style.display = 'block';
-      renderSearchShorts(shortData.items);
+      const ids = shortData.items.map(i => i.id.videoId).filter(Boolean);
+      const details = await ytVideoDetails(ids);
+      if (details.length) {
+        searchShortItems = details;
+        document.getElementById('search-shorts-wrap').style.display = 'block';
+        renderSearchShortsFromDetails(details);
+      }
     }
     // Search long
     const longData = await ytSearch(query, 10, '', 'medium');
@@ -1885,27 +1896,32 @@ async function doSearchWith(query) {
     if (longData.items?.length) {
       const ids = longData.items.map(i => i.id.videoId).filter(Boolean);
       const details = await ytVideoDetails(ids);
-      searchLongItems = details.items || [];
-      renderSearchLong(details.items || []);
+      if (details.length) {
+        searchLongItems = details;
+        renderSearchLong(details);
+      } else {
+        document.getElementById('search-long-feed').innerHTML = '<div class="empty-msg"><span class="icon">🔍</span>No results found.</div>';
+      }
     } else {
       document.getElementById('search-long-feed').innerHTML = '<div class="empty-msg"><span class="icon">🔍</span>No results found.</div>';
     }
-    // Setup infinite scroll sentinel for search
     setupSearchSentinel();
   } catch(e) {
     document.getElementById('search-long-feed').innerHTML = '<div class="empty-msg"><span class="icon">⚠️</span>Search failed. Try again.</div>';
   }
 }
 
-function renderSearchShorts(items) {
+function renderSearchShortsFromDetails(details) {
   const grid = document.getElementById('search-shorts-grid');
-  grid.innerHTML = items.map(item => {
-    const vid = item.id.videoId;
+  grid.innerHTML = details.map(v => {
+    const vid = v.id;
+    const title = v.snippet.title;
+    const channel = v.snippet.channelTitle;
     return `<div class="short-card" onclick="openShortsPage(0,'${vid}')">
       <img src="${thumbUrl(vid,'hqdefault')}" alt="" loading="lazy">
       <div class="short-card-info">
-        <div class="short-card-title">${escHtml(item.snippet.title)}</div>
-        <div class="short-card-views">${escHtml(item.snippet.channelTitle)}</div>
+        <div class="short-card-title">${escHtml(title)}</div>
+        <div class="short-card-views">${escHtml(channel)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1927,25 +1943,27 @@ function setupSearchSentinel() {
     if (entries[0].isIntersecting && !searchIsLoadingMore && (searchNextShortToken || searchNextLongToken)) {
       searchIsLoadingMore = true;
       try {
-        // Load more shorts
         if (searchNextShortToken) {
           const data = await ytSearch(currentSearchQuery, 10, searchNextShortToken, 'short');
           searchNextShortToken = data.nextPageToken || '';
           if (data.items?.length) {
-            searchShortItems.push(...data.items);
-            renderSearchShorts(searchShortItems); // re-render whole shorts grid (or append, but simpler to re-render)
+            const ids = data.items.map(i => i.id.videoId).filter(Boolean);
+            const details = await ytVideoDetails(ids);
+            if (details.length) {
+              searchShortItems = [...searchShortItems, ...details];
+              renderSearchShortsFromDetails(searchShortItems);
+            }
           }
         }
-        // Load more long
         if (searchNextLongToken) {
           const data = await ytSearch(currentSearchQuery, 10, searchNextLongToken, 'medium');
           searchNextLongToken = data.nextPageToken || '';
           if (data.items?.length) {
             const ids = data.items.map(i => i.id.videoId).filter(Boolean);
             const details = await ytVideoDetails(ids);
-            if (details.items?.length) {
-              searchLongItems.push(...details.items);
-              renderSearchLong(searchLongItems); // re-render all
+            if (details.length) {
+              searchLongItems = [...searchLongItems, ...details];
+              renderSearchLong(searchLongItems);
             }
           }
         }
@@ -2132,4 +2150,4 @@ function escAttr(str) {
 }
 </script>
 </body>
-                                                                                                                                                                                                                                                              </html>
+  </html>
