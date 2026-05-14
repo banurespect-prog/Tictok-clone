@@ -830,11 +830,12 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 
 <script>
 // ============================================================
-// CONFIG
+// CONFIG - FIXED: youtube-nocookie.com and origin parameter
 // ============================================================
 const API_KEY = 'AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
 const API_BASE = 'https://www.googleapis.com/youtube/v3';
 const EMBED_BASE = 'https://www.youtube-nocookie.com/embed/';
+const ORIGIN_PARAM = '&origin=' + encodeURIComponent(window.location.origin);
 
 // ============================================================
 // STATE
@@ -1123,7 +1124,6 @@ function renderHomeShorts(items) {
       </div>
     </div>`;
   }).join('');
-  // Store for shorts page
   shortsData = items;
 }
 
@@ -1217,7 +1217,7 @@ async function loadMoreLong() {
 }
 
 // ============================================================
-// VIDEO PLAYER
+// VIDEO PLAYER (click-to-play with youtube-nocookie + origin)
 // ============================================================
 function openPlayer(videoId, title, thumb) {
   currentVideoId = videoId;
@@ -1227,7 +1227,6 @@ function openPlayer(videoId, title, thumb) {
   const iframe = document.getElementById('yt-iframe');
   iframe.style.display = 'none';
   iframe.src = '';
-  // Reset loop/headphone state
   loopEnabled = false;
   headphoneMode = false;
   document.getElementById('loop-btn').classList.remove('ctrl-active');
@@ -1243,8 +1242,8 @@ function playVideo() {
   const iframe = document.getElementById('yt-iframe');
   document.getElementById('fake-play').style.display = 'none';
   iframe.style.display = 'block';
-  const loopParam = loopEnabled ? '&loop=1&playlist=' + currentVideoId : '';
-  iframe.src = `${EMBED_BASE}${currentVideoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin || location.href)}${loopParam}`;
+  let loopParam = loopEnabled ? `&loop=1&playlist=${currentVideoId}` : '';
+  iframe.src = `${EMBED_BASE}${currentVideoId}?autoplay=1&mute=1&rel=0&modestbranding=1&enablejsapi=1${ORIGIN_PARAM}${loopParam}`;
 }
 
 function toggleLoop() {
@@ -1252,7 +1251,6 @@ function toggleLoop() {
   const btn = document.getElementById('loop-btn');
   btn.classList.toggle('ctrl-active', loopEnabled);
   toast(loopEnabled ? '🔁 Loop ON' : '🔁 Loop OFF');
-  // If video is playing, reload with loop param
   const iframe = document.getElementById('yt-iframe');
   if (iframe.style.display !== 'none' && iframe.src) {
     let src = iframe.src.replace(/&loop=\d+&playlist=[^&]*/g, '');
@@ -1266,13 +1264,12 @@ function toggleHeadphone() {
   const btn = document.getElementById('hdph-btn');
   btn.classList.toggle('ctrl-active', headphoneMode);
   if (headphoneMode) {
-    toast('🎧 Headphone mode ON – audio continues in background tab');
-    // Keep page awake hint via NoSleep simulation
+    toast('🎧 Headphone mode ON – audio continues in background');
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      gain.gain.value = 0.001; // nearly silent
+      gain.gain.value = 0.001;
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
@@ -1350,7 +1347,6 @@ function toggleLikeVideo(videoId, title, thumb) {
     toast('❤️ Added to liked!');
   }
   saveLiked(liked);
-  // Update UI
   const btn = document.getElementById('like-btn-main');
   if (btn) {
     const isNowLiked = !!liked[videoId];
@@ -1462,7 +1458,6 @@ async function loadComments(videoId) {
       <div id="cmt-list"><div class="loading-dots"><span></span><span></span><span></span></div></div>
     </div>`;
 
-  // Fetch comments
   try {
     const data = await ytComments(videoId);
     const items = data.items || [];
@@ -1480,7 +1475,6 @@ function renderComments(videoId, apiCmts, localCmts) {
   const list = document.getElementById('cmt-list');
   if (!list) return;
   let html = '';
-  // Local comments first
   localCmts.reverse().forEach(c => {
     html += `<div class="cmt-item">
       <div class="cmt-av" style="background:var(--red);color:#fff;">W</div>
@@ -1490,7 +1484,6 @@ function renderComments(videoId, apiCmts, localCmts) {
       </div>
     </div>`;
   });
-  // API comments
   apiCmts.forEach(item => {
     const sn = item.snippet?.topLevelComment?.snippet || {};
     const author = sn.authorDisplayName || 'User';
@@ -1541,7 +1534,6 @@ function submitCmt(videoId) {
   ta.value = '';
   cancelCmt();
   toast('💬 Comment posted!');
-  // Prepend comment to list
   const list = document.getElementById('cmt-list');
   if (list) {
     const div = document.createElement('div');
@@ -1556,7 +1548,7 @@ function submitCmt(videoId) {
 }
 
 // ============================================================
-// SHORTS FULLSCREEN
+// SHORTS FULLSCREEN (tap-to-play, no autoplay, clear on scroll)
 // ============================================================
 let shortsPageData = [];
 let shortsObserver = null;
@@ -1567,7 +1559,6 @@ async function openShortsPage(startIndex = 0, specificId = null) {
   document.getElementById('topnav').style.display = 'none';
   document.getElementById('botnav').style.display = 'none';
   document.getElementById('main').style.display = 'none';
-
   await loadShortsForPage(specificId);
 }
 
@@ -1580,19 +1571,16 @@ async function loadShortsForPage(specificId = null) {
     const data = await ytSearch(q, 15, '', 'short');
     let items = data.items || [];
     if (!items.length) throw new Error('no items');
-    // If specific ID, put it first
     if (specificId) {
       const idx = items.findIndex(i => i.id.videoId === specificId);
       if (idx > 0) { const [item] = items.splice(idx, 1); items.unshift(item); }
       else if (idx === -1) {
-        // create fake item for it
         items.unshift({ id: { videoId: specificId }, snippet: { title: 'Short Video', channelTitle: 'Channel' } });
       }
     }
     shortsPageData = items;
     renderShortsSlides(items);
   } catch(e) {
-    // Fallback
     shortsPageData = FALLBACK_SHORTS.map(s => ({
       id: { videoId: s.id },
       snippet: { title: s.title, channelTitle: s.channel }
@@ -1668,19 +1656,16 @@ function renderShortsSlides(items) {
     scroller.appendChild(slide);
   });
 
-  // Scroll snap observer to pause/clear inactive iframes
   if (shortsObserver) shortsObserver.disconnect();
   shortsObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const slide = entry.target;
       const idx = parseInt(slide.dataset.idx);
       if (!entry.isIntersecting) {
-        // Clear iframe when not visible
         const wrap = document.getElementById('swrap-' + idx);
         const iframe = wrap?.querySelector('iframe');
         if (iframe) {
           iframe.src = '';
-          // Show tap overlay again
           const tap = document.getElementById('stap-' + idx);
           if (tap) tap.style.display = 'flex';
         }
@@ -1695,7 +1680,6 @@ function playShort(idx, vid) {
   const wrap = document.getElementById('swrap-' + idx);
   const tap = document.getElementById('stap-' + idx);
   if (!wrap) return;
-  // Clear other iframes
   document.querySelectorAll('.s-slide').forEach(slide => {
     const i = parseInt(slide.dataset.idx);
     if (i !== idx) {
@@ -1705,7 +1689,7 @@ function playShort(idx, vid) {
     }
   });
   tap.style.display = 'none';
-  wrap.innerHTML = `<iframe class="s-iframe" src="${EMBED_BASE}${vid}?autoplay=1&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+  wrap.innerHTML = `<iframe class="s-iframe" src="${EMBED_BASE}${vid}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1${ORIGIN_PARAM}" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
 }
 
 function toggleShortLike(event, idx, vid, title) {
@@ -1751,7 +1735,6 @@ function toggleShortSub(event, channel, idx) {
 
 function leaveShorts(page = 'home') {
   if (shortsObserver) shortsObserver.disconnect();
-  // Clear all iframes
   document.querySelectorAll('.s-slide').forEach((slide, i) => {
     const wrap = document.getElementById('swrap-' + i);
     const iframe = wrap?.querySelector('iframe');
@@ -1836,7 +1819,6 @@ async function doSearchWith(query) {
   document.getElementById('search-long-feed').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
 
   try {
-    // Search shorts
     const shortData = await ytSearch(query, 4, '', 'short');
     if (shortData.items?.length) {
       document.getElementById('search-shorts-wrap').style.display = 'block';
@@ -1851,7 +1833,6 @@ async function doSearchWith(query) {
         </div>`;
       }).join('');
     }
-    // Search long
     const longData = await ytSearch(query, 10, '', 'medium');
     document.getElementById('search-vids-hdr').style.display = 'flex';
     if (longData.items?.length) {
@@ -1877,12 +1858,10 @@ function showPage(name) {
     const el = document.getElementById(p + '-page');
     if (el) el.style.display = p === name ? 'block' : 'none';
   });
-  // Update nav
   ['home','shorts','subs','profile'].forEach(b => {
     const btn = document.getElementById('bn-' + b);
     if (btn) btn.classList.toggle('active', b === name);
   });
-  // Hide search suggestions when not searching
   if (name !== 'search') {
     document.getElementById('search-suggestions').style.display = 'block';
     document.getElementById('search-results-wrap').style.display = 'none';
@@ -1893,7 +1872,6 @@ function showPage(name) {
 
 function goBack() {
   if (currentPage === 'player') {
-    // Stop video
     const iframe = document.getElementById('yt-iframe');
     iframe.src = '';
     iframe.style.display = 'none';
@@ -1931,9 +1909,7 @@ function selectPlatform(platform) {
   platformDropdownOpen = false;
   ['pd-yt','pd-ig','pd-tt'].forEach(id => document.getElementById(id)?.classList.remove('active-platform'));
   document.getElementById('pd-' + platform)?.classList.add('active-platform');
-
   if (platform === 'yt') {
-    // Already in YT mode, just close
     toast('YouTube Style');
   } else {
     toast('🚧 ' + (platform === 'ig' ? 'Instagram' : 'TikTok') + ' Style – Coming Soon!');
@@ -2012,7 +1988,6 @@ function renderProfileContent(tab = 'videos') {
       }).join('')}</div>`;
     }
   } else {
-    // Demo videos grid
     const demoIds = ['dQw4w9WgXcQ','9bZkp7q19f0','kJQP7kiw5Fk','RgKAFK5djSk','hT_nvWreIhg','pRpeEdMmmQ0'];
     content.innerHTML = `<div class="profile-videos-grid">${demoIds.map(id =>
       `<div class="profile-vid-thumb" onclick="openPlayer('${id}','Video','')">
@@ -2048,4 +2023,4 @@ function escAttr(str) {
 }
 </script>
 </body>
-</html>
+  </html>
