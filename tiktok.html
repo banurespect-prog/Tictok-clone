@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Anskinge - No Bot Error</title>
 <style>
-/* Your existing CSS remains exactly the same – unchanged from your last working version */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 :root{
   --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#272727;--bg4:#333;
@@ -18,7 +17,7 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);}
 body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 auto;position:relative;}
 
-/* SPLASH */
+/* SPLASH - Fixed animation */
 #splash{
   position:fixed;inset:0;z-index:9999;
   background:#0f0f0f;
@@ -845,7 +844,7 @@ async function getEmbeddableVideoDetails(ids) {
     const res = await fetch(url);
     const data = await res.json();
     if (!data.items) return [];
-    // Filter: only keep videos where embeddable is true (or missing but assume true)
+    // Filter: only keep videos where embeddable is true
     const embeddableItems = data.items.filter(item => {
       // If status.embeddable is explicitly false, reject
       if (item.status && item.status.embeddable === false) return false;
@@ -961,8 +960,11 @@ function toast(msg) {
 // SPLASH + INIT
 // ============================================================
 window.addEventListener('load', () => {
+  // Ensure splash is visible
+  const splash = document.getElementById('splash');
+  splash.classList.remove('hide');
+  splash.style.display = 'flex';
   setTimeout(() => {
-    const splash = document.getElementById('splash');
     splash.classList.add('hide');
     setTimeout(() => { splash.style.display = 'none'; }, 500);
     if (!navigator.onLine) {
@@ -2150,4 +2152,4 @@ function escAttr(str) {
 }
 </script>
 </body>
-  </html>
+</html>
