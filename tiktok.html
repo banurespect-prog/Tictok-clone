@@ -17,16 +17,33 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);}
 body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 auto;position:relative;}
 
-/* SPLASH */
-#splash{position:fixed;inset:0;z-index:9999;background:#0f0f0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+/* ===== SPLASH ===== */
+#splash{position:fixed;inset:0;z-index:9999;background:#0f0f0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .4s;}
+#splash.hide{opacity:0;pointer-events:none;}
 .splash-logo-row{display:flex;align-items:center;gap:10px;}
+/* YouTube splash logo */
+#splash-yt-logo{display:flex;align-items:center;gap:10px;}
 .splash-logo-box{width:48px;height:33px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .splash-logo-box svg{width:22px;height:22px;fill:#fff;}
+/* TikTok splash logo */
+#splash-tt-logo{display:none;align-items:center;gap:10px;}
+.splash-tt-box{width:40px;height:40px;background:#000;border:1.5px solid #333;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+/* Instagram splash logo */
+#splash-ig-logo{display:none;align-items:center;gap:10px;}
+.splash-ig-box{width:40px;height:40px;border-radius:10px;background:var(--ig-grad);display:flex;align-items:center;justify-content:center;}
+
 .splash-name{font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px;}
 .splash-name em{color:var(--red);font-style:normal;}
+.splash-name-tt em{color:var(--pink);font-style:normal;}
+.splash-name-ig em{color:#e6683c;font-style:normal;}
+
+/* line color changes per platform */
 .splash-line-wrap{width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
-.splash-line-bar{height:100%;width:0%;background:var(--red);border-radius:2px;animation:splashLine 2.3s cubic-bezier(.4,0,.2,1) forwards;}
-@keyframes splashLine{0%{width:0%;}30%{width:30%;}60%{width:65%;}85%{width:90%;}100%{width:100%;}}
+.splash-line-bar{height:100%;width:0%;border-radius:2px;animation:splashLine 2.3s cubic-bezier(.4,0,.2,1) forwards;}
+.splash-line-bar.yt-line{background:var(--red);}
+.splash-line-bar.tt-line{background:var(--pink);}
+.splash-line-bar.ig-line{background:var(--ig-grad);}
+@keyframes splashLine{0%{width:0%}30%{width:30%}60%{width:65%}85%{width:90%}100%{width:100%}}
 
 /* NO INTERNET */
 #no-internet{display:none;position:fixed;inset:0;z-index:8000;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:20px;}
@@ -116,7 +133,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .trend-icon{color:var(--text3);font-size:16px;}
 .trend-text{font-size:14px;color:var(--text);flex:1;}
 
-/* SHORTS FULLSCREEN */
+/* ===== SHORTS FULLSCREEN ===== */
 #shorts-page{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:100vh;z-index:600;background:#000;overflow:hidden;}
 #shorts-scroller{width:100%;height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #shorts-scroller::-webkit-scrollbar{display:none;}
@@ -127,7 +144,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,transparent 55%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:5;}
 .s-info{position:absolute;bottom:76px;left:14px;right:76px;z-index:10;}
 .s-ch-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.s-avatar{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.85);overflow:hidden;}
+.s-avatar{width:40px;height:40px;border-radius:50%;color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.85);overflow:hidden;}
 .s-ch-name{font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);}
 .s-sub-btn{padding:5px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.9);background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;transition:all .2s;}
 .s-sub-btn.subbed{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);}
@@ -137,13 +154,13 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-act-circle{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);transition:transform .15s;}
 .s-act-circle:active{transform:scale(.88);}
 .s-act-btn.liked .s-act-circle{background:rgba(255,60,60,.4);}
-.s-act-btn.active-opt .s-act-circle{background:rgba(62,166,255,.3);}
 
-/* SHORTS HEADER */
+/* SHORTS HEADER - YT style (no YouTube logo, just Anskinge) */
 #shorts-cat-strip{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:620;background:linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);padding:10px 12px 20px;display:flex;gap:8px;overflow-x:auto;align-items:center;}
 #shorts-cat-strip::-webkit-scrollbar{display:none;}
 #shorts-cat-chips{display:flex;gap:6px;overflow-x:auto;flex:1;}
 #shorts-cat-chips::-webkit-scrollbar{display:none;}
+/* Anskinge header logo in shorts (no platform logo, just brand) */
 .shorts-header-logo{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-right:4px;cursor:pointer;}
 .shl-box{width:26px;height:18px;background:#ff0000;border-radius:4px;display:flex;align-items:center;justify-content:center;}
 .shl-box svg{width:11px;height:11px;fill:white;}
@@ -161,7 +178,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .sbn-plus{width:50px;height:34px;background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;}
 .sbn-plus-inner{width:100%;height:100%;border-radius:9px;background:linear-gradient(135deg,#00c6ff,#7b2ff7,#ff0080);display:flex;align-items:center;justify-content:center;}
 .sbn-plus-inner svg{width:18px;height:18px;stroke:#fff;stroke-width:2.5;}
-.sbn-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border-radius:50%;width:15px;height:15px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;}
 
 /* VIDEO PLAYER */
 #player-page{display:none;}
@@ -176,14 +192,11 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .fake-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);}
 .play-circle{position:relative;z-index:2;width:64px;height:64px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5);}
 .play-circle svg{width:28px;height:28px;fill:#000;margin-left:5px;}
-
-/* Player Controls */
 .player-controls-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 12px;background:rgba(0,0,0,.6);}
 .ctrl-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:6px 10px;border-radius:8px;transition:all .2s;}
 .ctrl-btn:active{background:rgba(255,255,255,.1);}
 .ctrl-btn.ctrl-active{color:var(--blue);background:rgba(62,166,255,.15);}
 .ctrl-btn svg{width:20px;height:20px;}
-
 .vid-details{padding:14px;}
 .vd-title{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:12px;}
 .vd-ch-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
@@ -201,8 +214,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .like-act.liked{background:rgba(255,0,0,.3);color:#ff4444;}
 .save-act{background:rgba(255,200,0,.1);color:#ffc107;border:1px solid rgba(255,200,0,.2);}
 .share-act{background:var(--bg2);color:var(--text2);border:1px solid var(--border);}
-
-/* Comments */
 .cmt-section{padding:0;border-top:1px solid var(--border);}
 .cmt-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;}
 .cmt-toggle-icon{color:var(--text2);font-size:18px;transition:transform .3s;}
@@ -212,13 +223,8 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .cmt-textarea{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:13px;padding:6px 0;resize:none;outline:none;font-family:'Outfit',sans-serif;min-height:34px;}
 .cmt-textarea::placeholder{color:var(--text3);}
 .cmt-textarea:focus{border-bottom-color:var(--blue);}
-.cmt-btns{display:none;justify-content:flex-end;gap:8px;margin-top:8px;}
-.cmt-cancel{background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;padding:6px 12px;border-radius:20px;font-family:'Outfit',sans-serif;}
-.cmt-submit{background:var(--bg3);border:none;color:var(--text3);cursor:pointer;font-size:13px;font-weight:700;padding:6px 16px;border-radius:20px;font-family:'Outfit',sans-serif;transition:all .2s;}
-.cmt-submit.ready{background:var(--blue);color:#000;}
 .cmt-item{display:flex;gap:10px;margin-bottom:16px;}
 .cmt-av{width:32px;height:32px;border-radius:50%;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);overflow:hidden;}
-.cmt-av img{width:100%;height:100%;object-fit:cover;}
 .cmt-body-inner{flex:1;}
 .cmt-author{font-size:12px;font-weight:700;}
 .cmt-time{font-size:11px;color:var(--text2);margin-left:6px;}
@@ -235,8 +241,9 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .panel-handle{width:36px;height:4px;background:var(--bg4);border-radius:2px;margin:12px auto 14px;}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-top:4px;}
 
-/* INSTAGRAM MODE */
+/* ===== INSTAGRAM MODE ===== */
 #ig-page{display:none;position:fixed;inset:0;background:#000;z-index:590;flex-direction:column;}
+/* IG top nav exactly like real Instagram */
 .ig-topnav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#000;border-bottom:1px solid #262626;height:52px;flex-shrink:0;}
 .ig-logo-area{display:flex;align-items:center;gap:8px;cursor:pointer;}
 .ig-logo-box{width:26px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;background:var(--ig-grad);}
@@ -246,32 +253,49 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .ig-arrow-btn svg{width:10px;height:10px;fill:white;}
 .ig-icons{display:flex;gap:16px;align-items:center;}
 .ig-icon-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;}
+
+/* IG Reels tabs at top (like real Instagram Reels page) */
+.ig-reels-tabs{display:flex;align-items:center;gap:0;background:#000;border-bottom:1px solid #262626;flex-shrink:0;}
+.ig-reels-tab{flex:1;text-align:center;padding:10px;font-size:14px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;border-bottom:2px solid transparent;}
+.ig-reels-tab.active{color:#fff;border-bottom-color:#fff;}
+
 #ig-scroller{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #ig-scroller::-webkit-scrollbar{display:none;}
-.ig-slide{width:100%;height:calc(100vh - 52px - 56px);scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
+/* Each reel takes full height minus topnav + reels-tabs + botnav */
+.ig-slide{width:100%;height:calc(100vh - 52px - 40px - 56px);scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
 .ig-slide-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(3px) scale(1.08);opacity:.35;}
 .ig-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .ig-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3) 0%,transparent 30%,transparent 50%,rgba(0,0,0,.8) 100%);pointer-events:none;z-index:5;}
-.ig-actions{position:absolute;right:12px;bottom:100px;display:flex;flex-direction:column;align-items:center;gap:22px;z-index:10;}
+
+/* IG right actions - exactly like Instagram Reels */
+.ig-actions{position:absolute;right:12px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
 .ig-act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
 .ig-act-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;transition:transform .15s;border:1px solid rgba(255,255,255,.1);}
 .ig-act-icon:active{transform:scale(.85);}
 .ig-act-count{font-size:12px;color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.7);}
 .ig-act.liked-ig .ig-act-icon{background:rgba(255,48,48,.4);}
-.ig-info{position:absolute;bottom:12px;left:12px;right:68px;z-index:10;}
-.ig-user-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+/* IG music disc on right side */
+.ig-music-disc-right{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:#222;display:flex;align-items:center;justify-content:center;animation:spin 4s linear infinite;}
+
+/* IG bottom info */
+.ig-info{position:absolute;bottom:10px;left:12px;right:64px;z-index:10;}
+.ig-user-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .ig-avatar{width:36px;height:36px;border-radius:50%;border:2px solid #fff;overflow:hidden;flex-shrink:0;background:var(--red);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;}
 .ig-username{font-size:14px;font-weight:700;color:#fff;}
-.ig-follow-btn{padding:4px 14px;border-radius:6px;border:1.5px solid #fff;background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
+.ig-follow-btn{padding:4px 12px;border-radius:6px;border:1.5px solid #fff;background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
 .ig-follow-btn.following{background:rgba(255,255,255,.15);}
 .ig-caption{font-size:13px;color:rgba(255,255,255,.9);line-height:1.4;}
 .ig-music-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
 .ig-music-note{font-size:12px;color:rgba(255,255,255,.7);}
+.ig-music-ticker{font-size:12px;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;max-width:200px;}
+
+/* IG bottom nav - exactly matching real Instagram */
 .ig-botnav{height:56px;background:#000;border-top:1px solid #262626;flex-shrink:0;display:flex;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom,4px);}
-.ig-nav-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10px;font-family:'Outfit',sans-serif;}
+.ig-nav-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10px;font-family:'Outfit',sans-serif;padding:4px 8px;}
 .ig-nav-btn svg{width:24px;height:24px;}
 .ig-nav-btn.ig-active{color:#fff;}
 .ig-nav-btn.ig-inactive{color:rgba(255,255,255,.5);}
+/* IG create button (middle) */
 .ig-plus-btn{width:44px;height:30px;border:2px solid #fff;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;position:relative;}
 .ig-plus-btn::before{content:'';position:absolute;inset:2px;background:#00b4d8;border-radius:4px;z-index:0;}
 .ig-plus-btn svg{width:16px;height:16px;fill:#fff;position:relative;z-index:1;}
@@ -281,44 +305,55 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 #ig-cmt-panel::-webkit-scrollbar{display:none;}
 #ig-panel-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:700;}
 
-/* TIKTOK MODE */
+/* ===== TIKTOK MODE ===== */
 #tt-page{display:none;position:fixed;inset:0;background:#000;z-index:590;flex-direction:column;}
-.tt-topnav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:12px 16px;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,transparent 100%);height:56px;}
-.tt-logo-area{display:flex;align-items:center;gap:8px;cursor:pointer;}
-.tt-logo-box{width:24px;height:17px;border-radius:4px;background:#000;border:1px solid #333;display:flex;align-items:center;justify-content:center;}
-.tt-logo-box svg{width:12px;height:12px;}
-.tt-tabs{display:flex;gap:20px;}
-.tt-tab{font-size:16px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;}
-.tt-tab.active{color:#fff;border-bottom:2px solid #fff;padding-bottom:2px;}
-.tt-arrow-btn{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.tt-arrow-btn svg{width:10px;height:10px;fill:white;}
+/* TikTok top nav - Following | For You with underline - exactly like real TikTok */
+.tt-topnav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 16px;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,transparent 100%);height:56px;}
+.tt-logo-area{display:flex;align-items:center;gap:6px;cursor:pointer;position:absolute;left:16px;top:50%;transform:translateY(-50%);}
+.tt-logo-box{width:22px;height:22px;border-radius:4px;background:#000;border:1px solid #333;display:flex;align-items:center;justify-content:center;}
+.tt-logo-box svg{width:14px;height:14px;}
+.tt-tabs{display:flex;gap:20px;align-items:center;}
+.tt-tab{font-size:16px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;padding-bottom:3px;}
+/* "For You" underline in TikTok pink - exact match */
+.tt-tab.active{color:#fff;border-bottom:2.5px solid #fff;font-weight:700;}
+.tt-tab.active-pink{color:#fff;border-bottom:2.5px solid var(--pink);font-weight:700;}
+.tt-search-btn{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;}
+
 #tt-scroller{position:absolute;inset:0;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #tt-scroller::-webkit-scrollbar{display:none;}
 .tt-slide{width:100%;height:100vh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
 .tt-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(2px) scale(1.05);opacity:.35;}
 .tt-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .tt-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,transparent 50%,rgba(0,0,0,.75) 100%);pointer-events:none;z-index:5;}
-.tt-actions{position:absolute;right:8px;bottom:90px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
-.tt-act{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+
+/* TikTok right actions - exactly like real TikTok */
+.tt-actions{position:absolute;right:8px;bottom:90px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:10;}
+.tt-act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
 .tt-act-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);transition:transform .15s;}
 .tt-act-icon:active{transform:scale(.85);}
 .tt-act.tt-liked .tt-act-icon{background:rgba(254,44,85,.35);}
 .tt-act-count{font-size:12px;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.8);}
+/* avatar with + badge */
 .tt-avatar-wrap{position:relative;margin-bottom:4px;cursor:pointer;}
-.tt-avatar{width:48px;height:48px;border-radius:50%;border:2.5px solid #fff;overflow:hidden;background:var(--red);color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.tt-avatar{width:48px;height:48px;border-radius:50%;border:2.5px solid #fff;overflow:hidden;color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;}
 .tt-plus-badge{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #000;}
 .tt-plus-badge svg{width:11px;height:11px;stroke:#fff;stroke-width:2.5;fill:none;}
-.tt-info{position:absolute;bottom:70px;left:12px;right:68px;z-index:10;}
-.tt-username{font-size:15px;font-weight:800;color:#fff;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+
+/* TikTok bottom info */
+.tt-info{position:absolute;bottom:70px;left:12px;right:70px;z-index:10;}
+.tt-username{font-size:15px;font-weight:800;color:#fff;margin-bottom:5px;}
 .tt-caption{font-size:13px;color:#fff;line-height:1.4;margin-bottom:8px;}
 .tt-music{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.85);}
 .tt-music-disc{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#333,#666);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;flex-shrink:0;}
 .tt-music-disc svg{width:10px;height:10px;fill:#fff;}
 @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* TikTok bottom nav - EXACTLY like real TikTok: Home, Discover(Friends was wrong), +, Inbox, Me */
 .tt-botnav{position:absolute;bottom:0;left:0;right:0;height:56px;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-around;align-items:center;z-index:10;padding-bottom:env(safe-area-inset-bottom,4px);}
 .tt-nav-btn{background:none;border:none;color:rgba(255,255,255,.65);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:600;font-family:'Outfit',sans-serif;min-width:50px;}
 .tt-nav-btn svg{width:24px;height:24px;}
 .tt-nav-btn.tt-active{color:#fff;}
+/* TikTok + button exactly like real */
 .tt-plus-btn{width:52px;height:33px;border-radius:9px;cursor:pointer;position:relative;overflow:hidden;border:none;background:none;}
 .tt-plus-btn::before{content:'';position:absolute;left:-4px;top:0;bottom:0;width:50%;background:var(--blue);border-radius:8px 0 0 8px;}
 .tt-plus-btn::after{content:'';position:absolute;right:-4px;top:0;bottom:0;width:50%;background:var(--pink);border-radius:0 8px 8px 0;}
@@ -374,15 +409,30 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ===== SPLASH ===== -->
 <div id="splash">
-  <div class="splash-logo-row">
+  <!-- YouTube splash (default) -->
+  <div id="splash-yt-logo" class="splash-logo-row">
     <div class="splash-logo-box">
       <svg viewBox="0 0 24 24"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg>
     </div>
     <span class="splash-name">Ansk<em>i</em>nge</span>
   </div>
-  <div class="splash-line-wrap"><div class="splash-line-bar"></div></div>
+  <!-- TikTok splash -->
+  <div id="splash-tt-logo" class="splash-logo-row">
+    <div class="splash-tt-box">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.14 8.14 0 0 0 4.77 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/></svg>
+    </div>
+    <span class="splash-name splash-name-tt">Ansk<em>i</em>nge</span>
+  </div>
+  <!-- Instagram splash -->
+  <div id="splash-ig-logo" class="splash-logo-row">
+    <div class="splash-ig-box">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </div>
+    <span class="splash-name splash-name-ig">Ansk<em>i</em>nge</span>
+  </div>
+  <div class="splash-line-wrap"><div class="splash-line-bar yt-line" id="splash-line"></div></div>
 </div>
 
 <!-- NO INTERNET -->
@@ -412,7 +462,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   </div>
 </div>
 
-<!-- TOP NAV -->
+<!-- TOP NAV (YouTube) -->
 <nav id="topnav">
   <div class="logo-wrap" onclick="showPage('home')">
     <div class="logo-box"><svg viewBox="0 0 24 24"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg></div>
@@ -427,7 +477,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   </div>
 </nav>
 
-<!-- MAIN -->
+<!-- MAIN (YouTube pages) -->
 <div id="main">
   <div id="home-page">
     <div class="cat-strip" id="cat-strip"></div>
@@ -512,10 +562,10 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   </div>
 </div>
 
-<!-- SHORTS FULLSCREEN -->
+<!-- SHORTS FULLSCREEN (YouTube style) -->
 <div id="shorts-page">
   <div id="shorts-cat-strip">
-    <div class="shorts-header-logo">
+    <div class="shorts-header-logo" onclick="leaveShorts('home')">
       <div class="shl-box"><svg viewBox="0 0 24 24" fill="white"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg></div>
       <span class="shl-name">Ansk<em>i</em>nge</span>
     </div>
@@ -530,21 +580,22 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   <button class="sbn-btn" onclick="leaveShorts('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
   <button class="sbn-btn active"><div class="shorts-dot"></div><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>Shorts</button>
   <button class="sbn-plus" onclick="leaveShorts('home')"><div class="sbn-plus-inner"><svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
-  <button class="sbn-btn" onclick="leaveShorts('subs')"><div class="sbn-badge">3</div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Subs</button>
+  <button class="sbn-btn" onclick="leaveShorts('subs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Subs</button>
   <button class="sbn-btn" onclick="leaveShorts('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
 </nav>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV (YouTube) -->
 <nav id="botnav">
   <button class="bnav-btn active" id="bn-home" onclick="showPage('home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
   <button class="bnav-btn" id="bn-shorts" onclick="openShortsPage(0)"><div class="shorts-dot"></div><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>Shorts</button>
-  <button class="bnav-plus" onclick="showPage('home')"><div class="bnav-plus-inner"><svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
+  <button class="bnav-plus" onclick="toast('➕ Upload coming soon!')"><div class="bnav-plus-inner"><svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
   <button class="bnav-btn" id="bn-subs" style="position:relative;" onclick="showPage('subs')"><div class="bnav-badge">3</div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Subs</button>
   <button class="bnav-btn" id="bn-profile" onclick="showPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
 </nav>
 
-<!-- INSTAGRAM MODE -->
+<!-- ===== INSTAGRAM MODE ===== -->
 <div id="ig-page">
+  <!-- IG Top nav -->
   <div class="ig-topnav">
     <div class="ig-logo-area">
       <div class="ig-logo-box"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
@@ -552,17 +603,35 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
     </div>
     <div class="ig-arrow-btn" onclick="togglePlatformDropdown()"><svg viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg></div>
     <div class="ig-icons">
-      <button class="ig-icon-btn" onclick="toast('❤️ Notifications')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-      <button class="ig-icon-btn" onclick="toast('💬 Messages')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+      <button class="ig-icon-btn" onclick="toast('❤️ Activity')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="ig-icon-btn" onclick="toast('💬 Direct Messages')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
     </div>
   </div>
+  <!-- IG Reels tabs (like real Instagram) -->
+  <div class="ig-reels-tabs">
+    <div class="ig-reels-tab active" onclick="toast('Reels')">Reels</div>
+    <div class="ig-reels-tab" onclick="toast('Friends')">Friends</div>
+  </div>
   <div id="ig-scroller"></div>
+  <!-- IG Bottom nav - exactly like real Instagram -->
   <div class="ig-botnav">
-    <button class="ig-nav-btn ig-active" onclick="toast('Home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-    <button class="ig-nav-btn ig-inactive" onclick="toast('Explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="ig-nav-btn ig-active" onclick="toast('Home')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </button>
+    <button class="ig-nav-btn ig-inactive" onclick="toast('Search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
     <button class="ig-plus-btn" onclick="toast('Create post')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-    <button class="ig-nav-btn ig-inactive" onclick="toast('Reels')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
-    <button class="ig-nav-btn ig-inactive" onclick="toast('Profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    <button class="ig-nav-btn ig-inactive" onclick="toast('Reels')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+    </button>
+    <button class="ig-nav-btn ig-inactive" onclick="toast('Profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
   </div>
 </div>
 
@@ -577,23 +646,45 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   <div id="ig-cmt-list"></div>
 </div>
 
-<!-- TIKTOK MODE -->
+<!-- ===== TIKTOK MODE ===== -->
 <div id="tt-page">
   <div class="tt-topnav">
-    <div class="tt-arrow-btn" onclick="togglePlatformDropdown()"><svg viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg></div>
+    <!-- Logo/arrow on left -->
+    <div class="tt-logo-area" onclick="togglePlatformDropdown()">
+      <div class="tt-logo-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.14 8.14 0 0 0 4.77 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/></svg>
+      </div>
+    </div>
+    <!-- Following | For You tabs in center -->
     <div class="tt-tabs">
       <div class="tt-tab" onclick="toast('Following')">Following</div>
-      <div class="tt-tab active">For You</div>
+      <div class="tt-tab active active-pink">For You</div>
     </div>
-    <button style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;" onclick="toast('🔍 Search')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <!-- Search on right -->
+    <button class="tt-search-btn" onclick="toast('🔍 Search')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
   </div>
   <div id="tt-scroller"></div>
+  <!-- TikTok bottom nav: Home, Discover, +, Inbox, Me -->
   <div class="tt-botnav">
-    <button class="tt-nav-btn" onclick="toast('Home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
-    <button class="tt-nav-btn" onclick="toast('Discover')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Discover</button>
+    <button class="tt-nav-btn tt-active" onclick="toast('Home')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </button>
+    <button class="tt-nav-btn" onclick="toast('Discover')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Discover
+    </button>
     <button class="tt-plus-btn" onclick="toast('Create video')"><div class="tt-plus-btn-inner"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button>
-    <button class="tt-nav-btn" onclick="toast('Inbox')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Inbox</button>
-    <button class="tt-nav-btn tt-active" onclick="toast('Profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Me</button>
+    <button class="tt-nav-btn" onclick="toast('Inbox')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Inbox
+    </button>
+    <button class="tt-nav-btn" onclick="toast('Profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Me
+    </button>
   </div>
 </div>
 
@@ -627,38 +718,38 @@ const API_BASE='https://www.googleapis.com/youtube/v3';
 
 const CATEGORIES=['All','Music','Song','Funny','Motivation','Skill','Gaming','News','Tech','Sports','Travel','Food','Animals','Fashion','Education'];
 const CAT_QUERIES={
-  All:['trending videos today','viral videos 2024','top youtube videos','best videos this week'],
+  All:['trending videos','viral videos 2024','top youtube videos','best videos this week'],
   Music:['music video 2024','top songs 2024','new music release','hit music video'],
   Song:['hit songs 2024','best song release','new song trending','popular song 2024'],
   Funny:['funny videos compilation','comedy moments','hilarious videos','try not to laugh'],
-  Motivation:['motivational speech 2024','success motivation','inspiring videos','life motivation'],
-  Skill:['skill tutorial 2024','how to learn fast','professional skills','life skills'],
-  Gaming:['gaming highlights 2024','roblox gameplay','minecraft moments','gaming funny moments'],
-  News:['world news today','breaking news 2024','news update today','latest news'],
+  Motivation:['motivational speech','success motivation','inspiring videos','life motivation'],
+  Skill:['skill tutorial','how to learn fast','professional skills','life skills'],
+  Gaming:['gaming highlights','roblox gameplay','minecraft moments','gaming funny moments'],
+  News:['world news today','breaking news 2024','news update','latest news'],
   Tech:['tech review 2024','smartphone review','AI technology','latest gadgets'],
-  Sports:['sports highlights 2024','football goals','cricket highlights','sports amazing moments'],
-  Travel:['travel vlog 2024','beautiful places world','travel documentary','travel destinations'],
-  Food:['food recipes 2024','street food','cooking tutorial','best recipes'],
-  Animals:['funny animals 2024','cute pets','wildlife amazing','animal compilation'],
+  Sports:['sports highlights','football goals','cricket highlights','sports amazing moments'],
+  Travel:['travel vlog','beautiful places world','travel documentary','travel destinations'],
+  Food:['food recipes','street food','cooking tutorial','best recipes'],
+  Animals:['funny animals','cute pets','wildlife amazing','animal compilation'],
   Fashion:['fashion trends 2024','outfit ideas','style tips','fashion vlog'],
-  Education:['learn programming 2024','educational videos','science facts','history documentary'],
+  Education:['learn programming','educational videos','science facts','history documentary'],
 };
 const SHORT_CAT_QUERIES={
-  All:['shorts viral 2024','youtube shorts trending','funny shorts','viral shorts today','best shorts'],
+  All:['shorts viral','youtube shorts trending','funny shorts','viral shorts','best shorts'],
   Music:['music shorts 2024','song short video','music video shorts'],
-  Song:['best song shorts','viral song shorts','new song shorts 2024'],
-  Funny:['funny shorts 2024','comedy shorts viral','hilarious shorts'],
-  Motivation:['motivation shorts 2024','inspirational shorts'],
-  Skill:['skill shorts tutorial','how to shorts','life hack shorts 2024'],
-  Gaming:['gaming shorts 2024','roblox shorts viral'],
+  Song:['best song shorts','viral song shorts','new song shorts'],
+  Funny:['funny shorts','comedy shorts viral','hilarious shorts'],
+  Motivation:['motivation shorts','inspirational shorts'],
+  Skill:['skill shorts tutorial','how to shorts','life hack shorts'],
+  Gaming:['gaming shorts','roblox shorts viral'],
   News:['news shorts today','breaking news shorts'],
-  Tech:['tech shorts 2024','phone review shorts'],
-  Sports:['sports shorts 2024','cricket shorts viral'],
-  Travel:['travel shorts 2024','vlog shorts viral'],
-  Food:['food shorts 2024','recipe shorts viral'],
-  Animals:['animal shorts 2024','cute pet shorts'],
-  Fashion:['fashion shorts 2024','style shorts viral'],
-  Education:['education shorts 2024','learn shorts'],
+  Tech:['tech shorts','phone review shorts'],
+  Sports:['sports shorts','cricket shorts viral'],
+  Travel:['travel shorts','vlog shorts viral'],
+  Food:['food shorts','recipe shorts viral'],
+  Animals:['animal shorts','cute pet shorts'],
+  Fashion:['fashion shorts','style shorts viral'],
+  Education:['education shorts','learn shorts'],
 };
 
 const COLORS=['#ff0000','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#00bcd4','#009688','#4caf50','#ff9800'];
@@ -666,8 +757,13 @@ let currentCat='All',currentPlatform='yt',shortVideos=[],longVideos=[],longPage=
 let loopActive=false,headphoneActive=false,currentVideoId='';
 let igVideos=[],ttVideos=[],igLikes={},ttLikes={},sLikes={};
 let igFollowing={},ttFollowing={};
+let pageHistory=[];
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 
 function checkNet(){return navigator.onLine;}
 
@@ -677,18 +773,48 @@ function retryLoad(){
     initApp();
   } else {
     toast('Still no internet. Please check connection.');
-    const btn=document.querySelector('.retry-btn');
-    btn.textContent='Retrying...';
-    setTimeout(()=>{btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.6"/></svg> Retry';},1500);
   }
 }
 
 async function apiGet(url){
-  try{const r=await fetch(url);if(!r.ok)throw new Error('API error');return await r.json();}
-  catch(e){if(!checkNet()){showNoInternet();}return null;}
+  try{
+    const r=await fetch(url);
+    if(!r.ok) throw new Error('API error '+r.status);
+    return await r.json();
+  }catch(e){
+    if(!checkNet()) showNoInternet();
+    return null;
+  }
 }
 
 function showNoInternet(){document.getElementById('no-internet').style.display='flex';}
+
+// ===== SPLASH =====
+function showSplashForPlatform(plat){
+  document.getElementById('splash-yt-logo').style.display='none';
+  document.getElementById('splash-tt-logo').style.display='none';
+  document.getElementById('splash-ig-logo').style.display='none';
+  const line=document.getElementById('splash-line');
+  line.className='splash-line-bar';
+  if(plat==='tt'){
+    document.getElementById('splash-tt-logo').style.display='flex';
+    line.classList.add('tt-line');
+  } else if(plat==='ig'){
+    document.getElementById('splash-ig-logo').style.display='flex';
+    line.classList.add('ig-line');
+  } else {
+    document.getElementById('splash-yt-logo').style.display='flex';
+    line.classList.add('yt-line');
+  }
+  // Restart animation
+  void line.offsetWidth;
+  line.style.animation='none';
+  void line.offsetWidth;
+  line.style.animation='splashLine 2.3s cubic-bezier(.4,0,.2,1) forwards';
+  const splash=document.getElementById('splash');
+  splash.style.display='flex';
+  splash.classList.remove('hide');
+}
 
 async function fetchShorts(cat){
   const q=SHORT_CAT_QUERIES[cat]||SHORT_CAT_QUERIES['All'];
@@ -716,16 +842,11 @@ async function fetchLong(cat,pageToken=''){
   const data=await apiGet(url);
   if(!data||!data.items)return{items:[],nextPage:''};
   const items=data.items.filter(i=>i.id&&i.id.videoId).map(i=>({
-    id:i.id.videoId,
-    title:i.snippet.title,
-    channel:i.snippet.channelTitle,
+    id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,
     thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',
-    views:Math.floor(Math.random()*50000000+10000),
-    duration:randomDuration(),
-    channelId:i.snippet.channelId,
-    likes:Math.floor(Math.random()*1000000+1000),
-    comments:Math.floor(Math.random()*50000+100),
-    subs:randomSubs(),
+    views:Math.floor(Math.random()*50000000+10000),duration:randomDuration(),
+    channelId:i.snippet.channelId,likes:Math.floor(Math.random()*1000000+1000),
+    comments:Math.floor(Math.random()*50000+100),subs:randomSubs(),
   }));
   return{items,nextPage:data.nextPageToken||''};
 }
@@ -735,19 +856,21 @@ function randomSubs(){const n=Math.floor(Math.random()*9900000+1000);if(n>=10000
 function fmtViews(n){if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return Math.floor(n/1000)+'K';return n;}
 function rndColor(s){return COLORS[s.charCodeAt(0)%COLORS.length];}
 function timeAgo(){const a=['2 hours ago','5 hours ago','1 day ago','3 days ago','1 week ago','2 weeks ago','1 month ago'];return a[Math.floor(Math.random()*a.length)];}
+function fakeCmts(){
+  const names=['@user123','@videofan','@reelslover','@trending_now','@watchmore','@dailyviews','@topfan99','@socialvibes'];
+  const texts=['Amazing! 🔥','This is so good!','Loved it! ❤️','Can\'t stop watching','Best content ever 🙌','So relatable 😂','This made my day!','Absolute fire 💯'];
+  return Array.from({length:8},()=>({name:names[Math.floor(Math.random()*names.length)],text:texts[Math.floor(Math.random()*texts.length)],likes:Math.floor(Math.random()*500+1),time:timeAgo()}));
+}
 
-// Category setup
 function setupCats(){
   const strip=document.getElementById('cat-strip');
   strip.innerHTML='';
   CATEGORIES.forEach(c=>{
     const chip=document.createElement('div');
     chip.className='cat-chip'+(c===currentCat?' active':'');
-    chip.textContent=c;
-    chip.onclick=()=>changeCat(c);
+    chip.textContent=c;chip.onclick=()=>changeCat(c);
     strip.appendChild(chip);
   });
-  // Shorts page chips
   const sc=document.getElementById('shorts-cat-chips');
   sc.innerHTML='';
   CATEGORIES.forEach(c=>{
@@ -762,7 +885,7 @@ function setupCats(){
 
 async function changeCat(cat){
   currentCat=cat;
-  document.querySelectorAll('.cat-chip').forEach(c=>{c.classList.toggle('active',c.textContent===cat);});
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.toggle('active',c.textContent===cat));
   longPage=0;longNextToken='';shortVideos=[];longVideos=[];
   document.getElementById('home-shorts-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
   document.getElementById('home-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
@@ -776,11 +899,10 @@ async function loadHomeData(){
 }
 
 function renderHomeShorts(){
-  const g=document.getElementById('home-shorts-grid');
-  g.innerHTML='';
+  const g=document.getElementById('home-shorts-grid');g.innerHTML='';
   shortVideos.slice(0,6).forEach((v,i)=>{
     const d=document.createElement('div');d.className='short-card';
-    d.innerHTML=`<img src="${v.thumb}" alt="" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'">
+    d.innerHTML=`<img src="${v.thumb}" alt="" loading="lazy" onerror="this.parentElement.style.background='${rndColor(v.channel)}'">
     <div class="short-card-info"><div class="short-card-title">${v.title.slice(0,60)}</div><div class="short-card-views">👁 ${fmtViews(v.views)}</div></div>`;
     d.onclick=()=>openShortsPage(i);
     g.appendChild(d);
@@ -788,103 +910,21 @@ function renderHomeShorts(){
 }
 
 function renderHomeLong(){
-  const f=document.getElementById('home-long-feed');
-  f.innerHTML='';
+  const f=document.getElementById('home-long-feed');f.innerHTML='';
   longVideos.forEach(v=>f.appendChild(makeVideoCard(v)));
 }
 
 function makeVideoCard(v){
   const d=document.createElement('div');d.className='video-card';
-  d.innerHTML=`<div class="thumb-wrap"><img src="${v.thumb}" alt="" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="thumb-dur">${v.duration}</div></div>
+  d.innerHTML=`<div class="thumb-wrap"><img src="${v.thumb}" alt="" loading="lazy" onerror="this.parentElement.style.background='${rndColor(v.channel)}'"><div class="thumb-dur">${v.duration}</div></div>
   <div class="video-row"><div class="ch-av" style="background:${rndColor(v.channel)}">${v.channel[0]}</div>
   <div class="vid-meta"><div class="vid-title">${v.title}</div><div class="vid-sub"><span>${v.channel}</span><span>${fmtViews(v.views)} views</span><span>${timeAgo()}</span></div></div></div>`;
   d.onclick=()=>openPlayer(v);
   return d;
 }
 
-// Trending
 function setupTrending(){
   const terms=['Funny Shorts 2024','Music Video Trending','Gaming Highlights','Cricket Match Highlights','Motivational Speech','Tech Review 2024','Travel Vlog','Cooking Recipes','Cute Animals','Fashion Trends'];
-  const tl=document.getElementById('trend-list');
-  tl.innerHTML='';
+  const tl=document.getElementById('trend-list');tl.innerHTML='';
   terms.forEach(t=>{
-    const d=document.createElement('div');d.className='trend-item';
-    d.innerHTML=`<span class="trend-icon">🔍</span><span class="trend-text">${t}</span>`;
-    d.onclick=()=>{document.getElementById('search-big-input').value=t;doSearch();};
-    tl.appendChild(d);
-  });
-}
-
-function showSearchPage(){
-  document.getElementById('search-suggestions').style.display='block';
-  document.getElementById('search-results-wrap').style.display='none';
-  showPage('search');
-}
-
-async function doSearch(){
-  const q=document.getElementById('search-input').value||document.getElementById('search-big-input').value;
-  if(!q.trim())return;
-  showPage('search');
-  document.getElementById('search-suggestions').style.display='none';
-  document.getElementById('search-results-wrap').style.display='block';
-  document.getElementById('search-shorts-wrap').style.display='none';
-  document.getElementById('search-vids-hdr').style.display='none';
-  document.getElementById('search-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
-  document.getElementById('search-shorts-grid').innerHTML='';
-
-  const [sData,lData]=await Promise.all([
-    apiGet(`${API_BASE}/search?part=snippet&type=video&videoDuration=short&maxResults=6&q=${encodeURIComponent(q)}&key=${API_KEY}`),
-    apiGet(`${API_BASE}/search?part=snippet&type=video&videoDuration=medium&maxResults=10&q=${encodeURIComponent(q)}&key=${API_KEY}`)
-  ]);
-
-  if(sData&&sData.items&&sData.items.length){
-    document.getElementById('search-shorts-wrap').style.display='block';
-    const sg=document.getElementById('search-shorts-grid');
-    sg.innerHTML='';
-    sData.items.filter(i=>i.id&&i.id.videoId).forEach((i,idx)=>{
-      const v={id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,thumb:i.snippet.thumbnails.high?.url||'',views:Math.floor(Math.random()*9000000+100000),likes:Math.floor(Math.random()*500000+1000),comments:Math.floor(Math.random()*10000+100),channelId:i.snippet.channelId};
-      const d=document.createElement('div');d.className='short-card';
-      d.innerHTML=`<img src="${v.thumb}" alt="" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-info"><div class="short-card-title">${v.title.slice(0,60)}</div><div class="short-card-views">👁 ${fmtViews(v.views)}</div></div>`;
-      const allS=[...shortVideos];if(!allS.find(x=>x.id===v.id))allS.push(v);
-      d.onclick=()=>{shortVideos=allS;openShortsPage(allS.findIndex(x=>x.id===v.id));};
-      sg.appendChild(d);
-    });
-  }
-
-  if(lData&&lData.items&&lData.items.length){
-    document.getElementById('search-vids-hdr').style.display='flex';
-    const lf=document.getElementById('search-long-feed');lf.innerHTML='';
-    lData.items.filter(i=>i.id&&i.id.videoId).forEach(i=>{
-      const v={id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,thumb:i.snippet.thumbnails.high?.url||'',views:Math.floor(Math.random()*50000000+10000),duration:randomDuration(),likes:Math.floor(Math.random()*1000000+1000),comments:Math.floor(Math.random()*50000+100),subs:randomSubs()};
-      lf.appendChild(makeVideoCard(v));
-    });
-  } else {
-    document.getElementById('search-long-feed').innerHTML='<div class="empty-msg">No results found</div>';
-  }
-}
-
-// SHORTS PAGE
-function openShortsPage(startIdx){
-  document.getElementById('shorts-page').style.display='block';
-  document.getElementById('shorts-botnav').style.display='flex';
-  document.getElementById('botnav').style.display='none';
-  document.getElementById('topnav').style.display='none';
-  document.getElementById('main').style.display='none';
-  loadShortsPage(startIdx);
-}
-
-function loadShortsPage(startIdx=0){
-  const scroller=document.getElementById('shorts-scroller');
-  scroller.innerHTML='';
-  if(!shortVideos.length){scroller.innerHTML='<div class="loading-dots" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><span></span><span></span><span></span></div>';fetchShorts(currentCat).then(v=>{shortVideos=v;loadShortsPage(startIdx);});return;}
-  shortVideos.forEach((v,i)=>{
-    const slide=document.createElement('div');slide.className='s-slide';
-    slide.innerHTML=`
-      <img class="s-bg-img" src="${v.thumb}" alt="">
-      <div class="s-video-wrap"><iframe class="s-iframe" src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=${i===startIdx?1:0}&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=1" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>
-      <div class="s-gradient"></div>
-      <div class="s-info">
-        <div class="s-ch-row">
-          <div class="s-avatar" style="background:${rndColor(v.channel)}">${v.channel[0]}</div>
-          <span class="s-ch-name">${v.channel}</span>
-          <button class="s-sub-btn" onclick="toggleSSub(this)">${Math.random()>.5?'
+    const d=document.createElement('div');d.className='tr
