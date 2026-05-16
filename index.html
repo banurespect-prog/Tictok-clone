@@ -125,7 +125,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-video-wrap{position:absolute;inset:0;}
 .s-iframe{width:100%;height:100%;border:0;display:block;}
 .s-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,transparent 45%,rgba(0,0,0,.9) 100%);pointer-events:none;z-index:5;}
-/* Info at bottom, below actions */
+/* Info at bottom only */
 .s-info{position:absolute;bottom:74px;left:14px;right:76px;z-index:10;}
 .s-ch-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .s-avatar{width:36px;height:36px;border-radius:50%;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.8);}
@@ -133,6 +133,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-sub-btn{padding:4px 12px;border-radius:14px;border:1.5px solid rgba(255,255,255,.9);background:transparent;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
 .s-sub-btn.subbed{background:rgba(255,255,255,.2);}
 .s-title{font-size:12px;color:rgba(255,255,255,.9);line-height:1.4;}
+/* Right side action buttons - circular only */
 .s-actions{position:absolute;right:10px;bottom:78px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
 .s-act-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:#fff;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;}
 .s-act-circle{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.15);}
@@ -146,6 +147,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .shl-box.tt{background:#000;border:1px solid #555;}
 .shl-box svg{width:12px;height:12px;}
 .shl-name{font-size:14px;font-weight:800;color:#fff;}
+.shl-name em{font-style:normal;color:#ff0000;}
 .shl-arrow{width:20px;height:20px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .shl-arrow svg{width:12px;height:12px;fill:white;}
 
@@ -226,39 +228,40 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 
 /* ===== INSTAGRAM MODE ===== */
 #ig-page{display:none;position:fixed;inset:0;background:#000;z-index:590;flex-direction:column;}
-/* IG top nav - exact Instagram style */
 .ig-topnav{display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#000;border-bottom:1px solid #1a1a1a;height:50px;flex-shrink:0;}
 .ig-logo-area{display:flex;align-items:center;gap:6px;cursor:pointer;}
-/* Instagram logo - gradient rounded square */
 .ig-logo-sq{width:28px;height:28px;border-radius:8px;background:var(--ig-grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ig-logo-sq svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;}
 .ig-name-area{display:flex;align-items:center;gap:3px;cursor:pointer;}
 .ig-sitename{font-size:20px;font-weight:800;color:#fff;font-style:italic;letter-spacing:-0.5px;}
+.ig-sitename em{font-style:normal;color:#e1306c;}
 .ig-dropdown-arrow{width:14px;height:14px;fill:#fff;opacity:.8;}
 .ig-right-icons{display:flex;gap:14px;align-items:center;}
 .ig-right-btn{background:none;border:none;cursor:pointer;color:#fff;display:flex;align-items:center;position:relative;}
 .ig-right-btn .badge{position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:#ff0000;border-radius:50%;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;}
-/* IG stories row */
 .ig-stories{display:flex;gap:14px;padding:10px 14px;overflow-x:auto;background:#000;flex-shrink:0;border-bottom:1px solid #111;}
 .ig-stories::-webkit-scrollbar{display:none;}
 .ig-story{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;}
 .ig-story-ring{width:58px;height:58px;border-radius:50%;background:var(--ig-grad);padding:2px;display:flex;align-items:center;justify-content:center;}
 .ig-story-inner{width:100%;height:100%;border-radius:50%;background:#111;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;overflow:hidden;}
 .ig-story-label{font-size:10px;color:var(--text2);text-align:center;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-/* IG Reels scroller */
-#ig-scroller{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
+
+/* IG Reels scroller - FULL SCREEN */
+#ig-scroller{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;position:relative;}
 #ig-scroller::-webkit-scrollbar{display:none;}
-.ig-slide{width:100%;height:100%;min-height:calc(100vh - 50px - 82px - 56px);scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
+.ig-slide{width:100%;height:calc(100vh - 50px - 82px - 50px);scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
 .ig-slide-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px) brightness(.35);transform:scale(1.1);}
 .ig-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .ig-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15) 0%,transparent 25%,transparent 55%,rgba(0,0,0,.9) 100%);pointer-events:none;z-index:5;}
-/* IG right actions - exact Instagram style */
-.ig-actions{position:absolute;right:10px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
-.ig-act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
-.ig-act-icon{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);}
+
+/* IG right actions - ONLY circular buttons */
+.ig-actions{position:absolute;right:10px;bottom:70px;display:flex;flex-direction:column;align-items:center;gap:20px;z-index:10;}
+.ig-act{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.ig-act-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);}
 .ig-act-count{font-size:12px;color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.8);}
+
 /* IG bottom info */
-.ig-info{position:absolute;bottom:10px;left:12px;right:62px;z-index:10;}
+.ig-info{position:absolute;bottom:8px;left:12px;right:62px;z-index:10;}
 .ig-user-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .ig-avatar{width:34px;height:34px;border-radius:50%;border:2px solid #fff;flex-shrink:0;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .ig-username{font-size:13px;font-weight:700;color:#fff;}
@@ -268,7 +271,8 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .ig-audio-row{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.75);}
 .ig-audio-disc{width:18px;height:18px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;flex-shrink:0;}
 .ig-audio-disc svg{width:10px;height:10px;fill:#fff;}
-/* IG bottom nav - exact Instagram */
+
+/* IG bottom nav - Instagram style with + button */
 .ig-botnav{height:50px;background:#000;border-top:1px solid #1a1a1a;flex-shrink:0;display:flex;justify-content:space-around;align-items:center;}
 .ig-nav-btn{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;width:48px;height:44px;}
 .ig-nav-btn svg{width:24px;height:24px;}
@@ -278,18 +282,24 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 
 /* ===== TIKTOK MODE ===== */
 #tt-page{display:none;position:fixed;inset:0;background:#000;z-index:590;}
-/* TT top nav */
-.tt-topnav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:10px 16px;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.7) 0%,transparent 100%);height:52px;}
-.tt-tabs{display:flex;gap:22px;align-items:center;}
+
+/* TT top nav - with logo like YouTube */
+.tt-topnav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:0 14px;z-index:10;background:linear-gradient(180deg,rgba(0,0,0,.8) 0%,transparent 100%);height:52px;}
+.tt-logo-area{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.tt-logo-box{width:26px;height:26px;background:#000;border-radius:6px;border:1px solid #555;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tt-logo-box svg{width:16px;height:16px;fill:white;}
+.tt-sitename{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.tt-sitename em{font-style:normal;color:#fe2c55;}
+.tt-center-tabs{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:22px;align-items:center;}
 .tt-tab{font-size:16px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;padding-bottom:2px;}
 .tt-tab.active{color:#fff;border-bottom:2.5px solid #fff;}
-.tt-arrow-btn{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:22px;height:22px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.tt-arrow-btn svg{width:13px;height:13px;fill:white;}
 .tt-search-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;}
+
 /* TT search overlay */
 .tt-search-bar{position:absolute;top:0;left:0;right:0;padding:8px 10px;background:rgba(0,0,0,.9);z-index:15;display:none;align-items:center;gap:8px;height:52px;}
 .tt-search-input{flex:1;background:#1a1a1a;border:none;border-radius:20px;padding:8px 14px;color:#fff;font-size:14px;outline:none;font-family:'Outfit',sans-serif;}
 .tt-search-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;}
+
 /* TT scroller */
 #tt-scroller{position:absolute;inset:0;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #tt-scroller::-webkit-scrollbar{display:none;}
@@ -297,15 +307,17 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .tt-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(18px) brightness(.35);transform:scale(1.1);}
 .tt-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .tt-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,transparent 45%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:5;}
-/* TT right actions */
-.tt-actions{position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
-.tt-act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
-.tt-act-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);}
+
+/* TT right actions - ONLY circular buttons */
+.tt-actions{position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:10;}
+.tt-act{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.tt-act-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);}
 .tt-act-count{font-size:12px;color:#fff;font-weight:700;}
 .tt-avatar-wrap{position:relative;margin-bottom:4px;cursor:pointer;}
 .tt-avatar{width:46px;height:46px;border-radius:50%;border:2.5px solid #fff;color:#fff;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .tt-plus-badge{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #000;}
 .tt-plus-badge svg{width:11px;height:11px;stroke:#fff;stroke-width:2.5;fill:none;}
+
 /* TT bottom info */
 .tt-info{position:absolute;bottom:65px;left:12px;right:70px;z-index:10;}
 .tt-username{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px;}
@@ -314,7 +326,8 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .tt-music-disc{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#333,#666);display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;flex-shrink:0;}
 .tt-music-disc svg{width:10px;height:10px;fill:#fff;}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-/* TT bottom nav - exact TikTok */
+
+/* TT bottom nav */
 .tt-botnav{position:absolute;bottom:0;left:0;right:0;height:56px;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-around;align-items:center;z-index:10;padding:0 4px;}
 .tt-nav-btn{background:none;border:none;color:rgba(255,255,255,.58);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:600;font-family:'Outfit',sans-serif;min-width:46px;}
 .tt-nav-btn svg{width:24px;height:24px;}
@@ -485,7 +498,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   <div id="shorts-top-bar">
     <div class="shorts-header-logo" onclick="leaveShorts('home')">
       <div class="shl-box yt" id="shl-logo-box"><svg viewBox="0 0 24 24" fill="white"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg></div>
-      <span class="shl-name">Anskinge</span>
+      <span class="shl-name">Ansk<em>i</em>nge</span>
     </div>
     <div class="shl-arrow" onclick="toggleDD()"><svg viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg></div>
   </div>
@@ -510,12 +523,11 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 
 <!-- INSTAGRAM PAGE -->
 <div id="ig-page">
-  <!-- IG top nav -->
   <div class="ig-topnav">
     <div class="ig-logo-area">
-      <div class="ig-logo-sq"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r=".8" fill="white"/></svg></div>
+      <div class="ig-logo-sq"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r=".8" fill="white" stroke="none"/></svg></div>
       <div class="ig-name-area" onclick="toggleDD()">
-        <span class="ig-sitename">Anskinge</span>
+        <span class="ig-sitename">Ansk<em>i</em>nge</span>
         <svg class="ig-dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
       </div>
     </div>
@@ -530,11 +542,8 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
       </button>
     </div>
   </div>
-  <!-- IG Stories -->
   <div class="ig-stories" id="ig-stories"></div>
-  <!-- IG scroller -->
   <div id="ig-scroller"></div>
-  <!-- IG bottom nav -->
   <div class="ig-botnav">
     <button class="ig-nav-btn ig-active" onclick="toast('Home')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
     <button class="ig-nav-btn" onclick="toast('Search')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -549,8 +558,11 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 <!-- TIKTOK PAGE -->
 <div id="tt-page">
   <div class="tt-topnav">
-    <div class="tt-arrow-btn" onclick="toggleDD()"><svg viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg></div>
-    <div class="tt-tabs">
+    <div class="tt-logo-area">
+      <div class="tt-logo-box"><svg viewBox="0 0 24 24" fill="white" width="16" height="16"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.14 8.14 0 0 0 4.77 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/></svg></div>
+      <span class="tt-sitename">Ansk<em>i</em>nge</span>
+    </div>
+    <div class="tt-center-tabs">
       <div class="tt-tab" onclick="toast('Friends')">Friends</div>
       <div class="tt-tab active">For You</div>
     </div>
@@ -585,7 +597,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 const API_KEY='AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
 const API='https://www.googleapis.com/youtube/v3';
 const CATS=['All','Music','Song','Funny','Motivation','Skill','Gaming','News','Tech','Sports','Travel','Food','Animals','Fashion','Education'];
-// Different queries each call to get NEW content
 const SHORT_POOLS={
   All:['new shorts today 2025','viral shorts this week','latest youtube shorts','trending shorts may 2025','fresh viral shorts','new funny shorts today','shorts 2025 new upload','viral short clips fresh'],
   Music:['new music shorts 2025','latest music video short','fresh song shorts'],Song:['new song shorts 2025','latest hit song short'],
@@ -608,8 +619,9 @@ let igVideos=[],ttVideos=[];
 let igLikes={},ttLikes={},sLikes={},igFollowing={},ttFollowing={};
 let loopActive=false,headphoneActive=false,currentVideoId='';
 let ttObserverRef,shortObserverRef,igObserverRef;
-// Track used video IDs to avoid repeats
 let usedShortIds=new Set(),usedLongIds=new Set(),usedIgIds=new Set(),usedTtIds=new Set();
+// Track which video IDs are unavailable
+let unavailableIds=new Set();
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 function checkNet(){return navigator.onLine;}
@@ -631,11 +643,27 @@ async function apiGet(url){
 
 function pickQ(pool){return pool[Math.floor(Math.random()*pool.length)];}
 
-// Fetch FRESH shorts - avoid repeats using pageToken randomization
+// Check if video is embeddable BEFORE showing it
+async function checkEmbeddable(ids){
+  if(!ids.length)return new Set();
+  const url=`${API}/videos?part=status,contentDetails&id=${ids.join(',')}&key=${API_KEY}`;
+  const data=await apiGet(url);
+  if(!data||!data.items)return new Set(ids);// assume all ok if check fails
+  const ok=new Set();
+  data.items.forEach(v=>{
+    const s=v.status;
+    // Only allow if embeddable and not restricted
+    if(s&&s.embeddable===true&&s.uploadStatus==='processed'&&!s.privacyStatus==='private'){
+      ok.add(v.id);
+    } else if(s&&s.embeddable===true){
+      ok.add(v.id);
+    }
+  });
+  return ok;
+}
+
 async function fetchShorts(cat,query,token){
   const q=query||pickQ(SHORT_POOLS[cat]||SHORT_POOLS.All);
-  // Use relevance + random page tokens for fresh content
-  const tokens=['','','',''];// will be filled dynamically
   let url=`${API}/search?part=snippet&type=video&videoDuration=short&maxResults=20&q=${encodeURIComponent(q)}&key=${API_KEY}&order=date`;
   if(token)url+=`&pageToken=${token}`;
   const data=await apiGet(url);
@@ -651,18 +679,22 @@ async function fetchShorts(cat,query,token){
   };
 }
 
-// Get real stats from YouTube API
 async function fetchStats(ids){
   if(!ids.length)return{};
-  const url=`${API}/videos?part=statistics&id=${ids.join(',')}&key=${API_KEY}`;
+  const url=`${API}/videos?part=statistics,status&id=${ids.join(',')}&key=${API_KEY}`;
   const data=await apiGet(url);
   if(!data||!data.items)return{};
   const map={};
   data.items.forEach(v=>{
+    // Mark unavailable if not embeddable
+    if(v.status&&v.status.embeddable===false){
+      unavailableIds.add(v.id);
+    }
     map[v.id]={
       views:parseInt(v.statistics?.viewCount||0),
       likes:parseInt(v.statistics?.likeCount||0),
-      comments:parseInt(v.statistics?.commentCount||0)
+      comments:parseInt(v.statistics?.commentCount||0),
+      embeddable:v.status?.embeddable!==false
     };
   });
   return map;
@@ -670,15 +702,17 @@ async function fetchStats(ids){
 
 async function fetchShortsWithStats(cat,query,token){
   const r=await fetchShorts(cat,query,token);
-  // Get real stats
   const ids=r.items.map(v=>v.id);
   const stats=await fetchStats(ids);
-  r.items.forEach(v=>{
+  // Filter out non-embeddable videos
+  r.items=r.items.filter(v=>{
     if(stats[v.id]){
       v.views=stats[v.id].views;
       v.likes=stats[v.id].likes;
       v.comments=stats[v.id].comments;
+      return stats[v.id].embeddable!==false;
     }
+    return true;
   });
   return r;
 }
@@ -692,11 +726,8 @@ async function fetchLong(cat,query,token){
   const items=data.items.filter(i=>i.id&&i.id.videoId).map(i=>({
     id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,
     thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',
-    views:Math.floor(Math.random()*50000000+10000),
-    duration:rndDur(),likes:Math.floor(Math.random()*1000000+1000),
-    comments:Math.floor(Math.random()*100000+100),subs:rndSubs(),
+    views:0,duration:rndDur(),likes:0,comments:0,subs:rndSubs(),publishedAt:i.snippet.publishedAt
   }));
-  // Get real stats for long videos
   const ids=items.map(v=>v.id);
   const stats=await fetchStats(ids);
   items.forEach(v=>{if(stats[v.id]){v.views=stats[v.id].views;v.likes=stats[v.id].likes;v.comments=stats[v.id].comments;}});
@@ -722,7 +753,6 @@ function showSplash(platform){
   const box=document.getElementById('splash-logo-box');
   const name=document.getElementById('splash-name');
   const bar=document.getElementById('splash-bar');
-  // Reset animation
   bar.style.animation='none';bar.offsetHeight;
   box.className='splash-logo-box';name.className='splash-name';bar.className='splash-line-bar';
   if(platform==='ig'){
@@ -738,7 +768,6 @@ function showSplash(platform){
   name.innerHTML='Ansk<em>i</em>nge';
   const splash=document.getElementById('splash');
   splash.style.display='flex';splash.style.opacity='1';splash.style.transition='';
-  // Force reflow then restart animation
   void bar.offsetWidth;
   bar.style.animation='';
   return new Promise(res=>{
@@ -808,9 +837,14 @@ function setupTrending(){
   });
 }
 function showSearchPage(){showPage('search');document.getElementById('search-suggestions').style.display='block';document.getElementById('search-results-wrap').style.display='none';}
+
+// FIXED SEARCH - single query, real results
 async function doSearch(){
   const q=(document.getElementById('search-input').value||document.getElementById('search-big-input').value).trim();
   if(!q)return;
+  // Sync both inputs
+  document.getElementById('search-input').value=q;
+  document.getElementById('search-big-input').value=q;
   showPage('search');
   document.getElementById('search-suggestions').style.display='none';
   document.getElementById('search-results-wrap').style.display='block';
@@ -819,43 +853,33 @@ async function doSearch(){
   document.getElementById('search-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
   document.getElementById('search-shorts-grid').innerHTML='';
 
-  // Fetch more results with multiple queries
-  const[s1,s2,l1,l2,l3]=await Promise.all([
+  // Single search query - no duplicates
+  const[sRes,lRes]=await Promise.all([
     fetchShortsWithStats('All',q),
-    fetchShortsWithStats('All',q+' shorts viral'),
-    fetchLong('All',q),
-    fetchLong('All',q+' 2025'),
-    fetchLong('All',q+' video'),
+    fetchLong('All',q)
   ]);
-  const allShorts=[...s1.items,...s2.items].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
-  const allLong=[...l1.items,...l2.items,...l3.items].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
 
-  if(allShorts.length){
+  // Shorts section
+  if(sRes.items.length){
     document.getElementById('search-shorts-wrap').style.display='block';
     const sg=document.getElementById('search-shorts-grid');sg.innerHTML='';
-    allShorts.forEach((v,idx)=>{
+    sRes.items.forEach((v,idx)=>{
       const d=document.createElement('div');d.className='short-card';
       d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'">
       <div class="short-card-info"><div class="short-card-title">${v.title.slice(0,50)}</div><div class="short-card-views">${fmtV(v.views)} views</div></div>`;
-      d.onclick=()=>{shortVideos=allShorts;openShortsPage(idx);};sg.appendChild(d);
+      d.onclick=()=>{shortVideos=sRes.items;openShortsPage(idx);};sg.appendChild(d);
     });
   }
+
   const lf=document.getElementById('search-long-feed');
-  if(allLong.length){
+  if(lRes.items.length){
     document.getElementById('search-vids-hdr').style.display='flex';
     lf.innerHTML='';
-    allLong.forEach(v=>lf.appendChild(makeVideoCard(v)));
-    // Load more on scroll sentinel
-    const sen=document.createElement('div');sen.style.height='20px';lf.appendChild(sen);
-    let searchNext=l1.next;
-    new IntersectionObserver(async(en)=>{
-      if(en[0].isIntersecting&&searchNext){
-        const more=await fetchLong('All',q,searchNext);searchNext=more.next;
-        more.items.forEach(v=>lf.insertBefore(makeVideoCard(v),sen));
-      }
-    },{threshold:.1}).observe(sen);
+    lRes.items.forEach(v=>lf.appendChild(makeVideoCard(v)));
+  } else if(!sRes.items.length){
+    lf.innerHTML='<div class="empty-msg">😕 No results found. Try another keyword.</div>';
   } else {
-    lf.innerHTML='<div class="empty-msg">No results found. Try another keyword.</div>';
+    lf.innerHTML='';
   }
 }
 
@@ -888,14 +912,12 @@ function renderShortsPage(startIdx=0){
       if(!e.isIntersecting||e.intersectionRatio<0.7)return;
       const slide=e.target;
       const allSlides=scroller.querySelectorAll('.s-slide');
-      // Pause ALL other slides
       allSlides.forEach(s=>{
         if(s!==slide){
           const f=s.querySelector('iframe');
           if(f&&f.src){f.src='';}
         }
       });
-      // Play this slide
       const iframe=slide.querySelector('iframe');
       const idx=Array.from(allSlides).indexOf(slide);
       if(iframe&&(!iframe.src||iframe.src==='')&&shortVideos[idx]){
@@ -903,7 +925,7 @@ function renderShortsPage(startIdx=0){
           iframe.src=`https://www.youtube-nocookie.com/embed/${shortVideos[idx].id}?autoplay=1&mute=0&loop=1&playlist=${shortVideos[idx].id}&playsinline=1&rel=0&modestbranding=1&controls=1`;
         },100);
       }
-      // Load more when near end - fetch FRESH new videos
+      // Load more fresh videos near end
       if(idx>=shortVideos.length-4){
         const nextQ=pickQ(SHORT_POOLS[currentCat]||SHORT_POOLS.All);
         fetchShortsWithStats(currentCat,nextQ).then(r=>{
@@ -925,6 +947,8 @@ function renderShortsPage(startIdx=0){
 
 function buildShortSlide(v,autoplay){
   const slide=document.createElement('div');slide.className='s-slide';
+  const likeCount=v.likes||0;
+  const cmtCount=v.comments||0;
   slide.innerHTML=`
     <img class="s-bg-img" src="${v.thumb}" alt="">
     <div class="s-video-wrap">
@@ -940,20 +964,34 @@ function buildShortSlide(v,autoplay){
       <div class="s-title">${v.title.slice(0,85)}</div>
     </div>
     <div class="s-actions">
-      <button class="s-act-btn" onclick="toggleSLike('${v.id}',this,${v.likes||0})">
+      <button class="s-act-btn" onclick="toggleSLike('${v.id}',this,${likeCount})">
         <div class="s-act-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="${sLikes[v.id]?'#ff4444':'none'}" stroke="${sLikes[v.id]?'#ff4444':'#fff'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <span>${fmtV(v.likes||0)}</span>
+        <span>${fmtV(likeCount)}</span>
       </button>
-      <button class="s-act-btn" onclick="openSCmt('${v.id}',${v.comments||0})">
+      <button class="s-act-btn" onclick="openSCmt('${v.id}',${cmtCount})">
         <div class="s-act-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <span>${fmtV(v.comments||0)}</span>
+        <span>${fmtV(cmtCount)}</span>
       </button>
-      <button class="s-act-btn" onclick="toast('🔗 Copied!')">
+      <button class="s-act-btn" onclick="shareShort('${v.id}','${v.title.replace(/'/g,"\\'")}')">
         <div class="s-act-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
-        <span>${fmtV(Math.floor(Math.random()*100000+100))}</span>
+        <span>${fmtV(v.views?Math.floor(v.views*0.01):500)}</span>
+      </button>
+      <button class="s-act-btn" onclick="toast('🔖 Saved!')">
+        <div class="s-act-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+        <span>Save</span>
       </button>
     </div>`;
   return slide;
+}
+
+// Working share function
+function shareShort(id,title){
+  const url=`https://www.youtube.com/shorts/${id}`;
+  if(navigator.share){
+    navigator.share({title:title,url:url}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(url).then(()=>toast('🔗 Link copied!')).catch(()=>toast('🔗 '+url));
+  }
 }
 
 function toggleSLike(id,btn,orig){
@@ -1012,7 +1050,7 @@ function buildVidDetails(v){
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       ${fmtV(v.likes)} Likes</button>
     <button class="vd-act save-act" onclick="toast('🔖 Saved!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save</button>
-    <button class="vd-act share-act" onclick="toast('🔗 Copied!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>
+    <button class="vd-act share-act" onclick="shareShort('${v.id}','${v.title.replace(/'/g,"\\'")}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>
   </div></div>`;
 }
 function buildCmtSection(v){
@@ -1041,7 +1079,7 @@ function genComments(){
     const cmt=cmts[Math.floor(Math.random()*cmts.length)];
     const likes=Math.floor(Math.random()*9999+10);
     html+=`<div class="cmt-item"><div class="cmt-av" style="background:${rndColor(name)}">${name[0]}</div>
-    <div class="cmt-body-inner"><span class="cmt-author">${name}</span><span class="cmt-time">${timeAgo()}</span>
+    <div class="cmt-body-inner"><span class="cmt-author">${name}</span><span class="cmt-time">Recently</span>
     <div class="cmt-text">${cmt}</div>
     <button class="cmt-likes-btn" onclick="this.classList.toggle('liked');this.querySelector('span').textContent=this.classList.contains('liked')?${likes+1}:${likes}">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -1069,7 +1107,7 @@ function toggleDD(){
 }
 document.addEventListener('click',e=>{
   const dd=document.getElementById('platform-dropdown');
-  if(dd.style.display==='block'&&!dd.contains(e.target)&&!e.target.closest('.platform-arrow')&&!e.target.closest('.shl-arrow')&&!e.target.closest('.ig-name-area')&&!e.target.closest('.tt-arrow-btn'))
+  if(dd.style.display==='block'&&!dd.contains(e.target)&&!e.target.closest('.platform-arrow')&&!e.target.closest('.shl-arrow')&&!e.target.closest('.ig-name-area')&&!e.target.closest('.tt-logo-area'))
     dd.style.display='none';
 });
 
@@ -1079,7 +1117,6 @@ async function selectPlatform(p){
   document.querySelectorAll('.pd-item').forEach(el=>el.classList.remove('active-platform'));
   document.getElementById('pd-'+p).classList.add('active-platform');
 
-  // Stop all playing media
   document.getElementById('yt-iframe').src='';
   ['shorts-scroller','ig-scroller','tt-scroller'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1089,12 +1126,10 @@ async function selectPlatform(p){
   if(igObserverRef)try{igObserverRef.disconnect();}catch(e){}
   if(ttObserverRef)try{ttObserverRef.disconnect();}catch(e){}
 
-  // Hide all
   ['topnav','botnav','main','ig-page','tt-page','shorts-page','shorts-botnav'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display='none';
   });
 
-  // Show splash for platform
   await showSplash(p);
 
   if(p==='yt'){
@@ -1117,7 +1152,6 @@ async function selectPlatform(p){
 function buildIgStories(){
   const users=['anas_pk','farah.ali','bilal_77','sara_noor','hamza_k','zara.ig','usman99','nida_j','rizwan.official','mehar_k'];
   const row=document.getElementById('ig-stories');row.innerHTML='';
-  // Add story
   const addStory=document.createElement('div');addStory.className='ig-story';
   addStory.innerHTML=`<div class="ig-story-ring" style="background:#333;padding:0;"><div class="ig-story-inner" style="border:2px solid #333;font-size:22px;">+</div></div><div class="ig-story-label">Your story</div>`;
   addStory.onclick=()=>toast('📷 Add story');row.appendChild(addStory);
@@ -1131,12 +1165,11 @@ function buildIgStories(){
 async function loadIgReels(query){
   const sc=document.getElementById('ig-scroller');
   sc.innerHTML='<div class="loading-dots" style="justify-content:center;padding:60px 0;"><span></span><span></span><span></span></div>';
-  const data=await fetchShortsWithStats('All',query||(pickQ(SHORT_POOLS.All)+' reels'));
+  const data=await fetchShortsWithStats('All',query||(pickQ(SHORT_POOLS.All)));
   igVideos=data.items.filter(v=>!usedIgIds.has(v.id));
   igVideos.forEach(v=>usedIgIds.add(v.id));
   renderIgReels();
 
-  // Infinite scroll
   sc.onscroll=async()=>{
     if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<400&&!sc._loading){
       sc._loading=true;
@@ -1170,20 +1203,22 @@ function renderIgReels(){
 function buildIgSlide(v,autoplay){
   const slide=document.createElement('div');slide.className='ig-slide';
   const uname='@'+v.channel.replace(/\s+/g,'_').toLowerCase().slice(0,20);
+  const likeCount=v.likes||0;
+  const cmtCount=v.comments||0;
   slide.innerHTML=`
     <img class="ig-slide-bg" src="${v.thumb}" alt="">
     <iframe class="ig-iframe" ${autoplay?`src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0"`:''} frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>
     <div class="ig-gradient"></div>
     <div class="ig-actions">
-      <div class="ig-act" onclick="toggleIgLike('${v.id}',this,${v.likes||0})">
+      <div class="ig-act" onclick="toggleIgLike('${v.id}',this,${likeCount})">
         <div class="ig-act-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="${igLikes[v.id]?'#ff4444':'none'}" stroke="${igLikes[v.id]?'#ff4444':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <div class="ig-act-count" id="igLc-${v.id}">${fmtV(v.likes||0)}</div>
+        <div class="ig-act-count" id="igLc-${v.id}">${fmtV(likeCount)}</div>
       </div>
-      <div class="ig-act" onclick="openIgCmt('${v.id}',${v.comments||0})">
+      <div class="ig-act" onclick="openIgCmt('${v.id}',${cmtCount})">
         <div class="ig-act-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <div class="ig-act-count">${fmtV(v.comments||0)}</div>
+        <div class="ig-act-count">${fmtV(cmtCount)}</div>
       </div>
-      <div class="ig-act" onclick="toast('🔗 Shared!')">
+      <div class="ig-act" onclick="shareShort('${v.id}','${v.title.replace(/'/g,"\\'")}')">
         <div class="ig-act-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
         <div class="ig-act-count">${fmtV(v.views?Math.floor(v.views*0.02):1200)}</div>
       </div>
@@ -1209,7 +1244,6 @@ function toggleIgLike(id,act,orig){
   const svg=act.querySelector('svg');const cnt=document.getElementById('igLc-'+id);
   svg.setAttribute('fill',igLikes[id]?'#ff4444':'none');svg.setAttribute('stroke',igLikes[id]?'#ff4444':'white');
   if(cnt)cnt.textContent=fmtV(igLikes[id]?orig+1:orig);
-  // Instagram-style heart animation
   if(igLikes[id]){
     const heart=document.createElement('div');
     heart.style.cssText='position:absolute;font-size:80px;z-index:50;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:heartPop .6s ease forwards;';
@@ -1267,6 +1301,8 @@ function renderTtReels(){
 function buildTtSlide(v,autoplay){
   const slide=document.createElement('div');slide.className='tt-slide';
   const uname='@'+v.channel.replace(/\s+/g,'').toLowerCase().slice(0,20);
+  const likeCount=v.likes||0;
+  const cmtCount=v.comments||0;
   slide.innerHTML=`
     <img class="tt-bg" src="${v.thumb}" alt="">
     <iframe class="tt-iframe" ${autoplay?`src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0"`:''} frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>
@@ -1278,15 +1314,15 @@ function buildTtSlide(v,autoplay){
           <div class="tt-plus-badge"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
         </div>
       </div>
-      <div class="tt-act" onclick="toggleTtLike('${v.id}',this,${v.likes||0})">
+      <div class="tt-act" onclick="toggleTtLike('${v.id}',this,${likeCount})">
         <div class="tt-act-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="${ttLikes[v.id]?'#fe2c55':'none'}" stroke="${ttLikes[v.id]?'#fe2c55':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <div class="tt-act-count" id="ttLc-${v.id}">${fmtV(v.likes||0)}</div>
+        <div class="tt-act-count" id="ttLc-${v.id}">${fmtV(likeCount)}</div>
       </div>
-      <div class="tt-act" onclick="openTtCmt('${v.id}',${v.comments||0})">
+      <div class="tt-act" onclick="openTtCmt('${v.id}',${cmtCount})">
         <div class="tt-act-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="white" opacity=".9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <div class="tt-act-count">${fmtV(v.comments||0)}</div>
+        <div class="tt-act-count">${fmtV(cmtCount)}</div>
       </div>
-      <div class="tt-act" onclick="toast('🔗 Shared!')">
+      <div class="tt-act" onclick="shareShort('${v.id}','${v.title.replace(/'/g,"\\'")}')">
         <div class="tt-act-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
         <div class="tt-act-count">${fmtV(v.views?Math.floor(v.views*0.03):3400)}</div>
       </div>
@@ -1352,7 +1388,6 @@ async function initApp(){
   setupInfiniteScroll();
 }
 
-// Show splash always on load
 window.addEventListener('load',async()=>{
   await showSplash('yt');
   initApp();
@@ -1360,10 +1395,10 @@ window.addEventListener('load',async()=>{
 window.addEventListener('online',()=>{document.getElementById('no-internet').style.display='none';if(!longVideos.length)initApp();});
 window.addEventListener('offline',()=>showNoInternet());
 
-// Add heart animation keyframes dynamically
+// Heart animation
 const style=document.createElement('style');
 style.textContent=`@keyframes heartPop{0%{opacity:1;transform:translate(-50%,-50%) scale(0.5)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}`;
 document.head.appendChild(style);
 </script>
 </body>
-                              </html>
+                                                                                                                                                                                              </html>
