@@ -32,9 +32,9 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .splash-name.tt-name em{color:#fe2c55;}
 .splash-line-wrap{width:240px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
 .splash-line-bar{height:100%;width:0%;border-radius:2px;}
-.splash-line-bar.yt-bar{background:#ff0000;animation:splashLine 2.4s cubic-bezier(.4,0,.2,1) forwards;}
-.splash-line-bar.ig-bar{background:var(--ig-grad);animation:splashLine 2.4s cubic-bezier(.4,0,.2,1) forwards;}
-.splash-line-bar.tt-bar{background:#fe2c55;animation:splashLine 2.4s cubic-bezier(.4,0,.2,1) forwards;}
+.splash-line-bar.yt-bar{background:#ff0000;animation:splashLine 3s cubic-bezier(.4,0,.2,1) forwards;}
+.splash-line-bar.ig-bar{background:var(--ig-grad);animation:splashLine 3s cubic-bezier(.4,0,.2,1) forwards;}
+.splash-line-bar.tt-bar{background:#fe2c55;animation:splashLine 3s cubic-bezier(.4,0,.2,1) forwards;}
 @keyframes splashLine{0%{width:0%}25%{width:20%}55%{width:58%}80%{width:85%}100%{width:100%}}
 
 /* AUTH */
@@ -184,7 +184,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-video-wrap{position:absolute;inset:0;}
 .s-iframe{width:100%;height:100%;border:0;display:block;}
 .s-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:5;}
-/* ONLY bottom info - no top title */
 .s-info{position:absolute;bottom:78px;left:14px;right:72px;z-index:10;}
 .s-ch-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
 .s-avatar{width:34px;height:34px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.8);overflow:hidden;cursor:pointer;}
@@ -192,12 +191,9 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-ch-name{font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);cursor:pointer;}
 .s-sub-btn{padding:3px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.9);background:transparent;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
 .s-title{font-size:12px;color:rgba(255,255,255,.9);line-height:1.4;}
-/* Actions - pushed UP so not hidden */
 .s-actions{position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:10;}
 .s-act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:#fff;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;}
 .s-act-circle{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;}
-
-/* Center double-tap pause button */
 .s-center-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:15;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .2s;pointer-events:none;}
 .s-center-btn.visible{opacity:1;pointer-events:all;}
 .s-center-btn svg{width:30px;height:30px;fill:white;}
@@ -330,14 +326,12 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .ig-sitename{font-size:20px;font-weight:800;color:#fff;font-style:italic;}
 .ig-sitename em{font-style:normal;color:#e1306c;}
 .ig-dropdown-arrow{width:14px;height:14px;fill:#fff;opacity:.8;}
-/* IG Q PAGE */
 #ig-q-page{display:none;position:fixed;inset:0;z-index:800;background:#000;flex-direction:column;}
 .ig-q-topbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#000;border-bottom:1px solid #222;}
 .ig-q-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;}
 .ig-q-search{flex:1;background:#1a1a1a;border:none;border-radius:10px;padding:9px 14px;color:#fff;font-size:14px;outline:none;font-family:'Outfit',sans-serif;}
 .ig-q-grid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .ig-q-grid::-webkit-scrollbar{display:none;}
-/* IG scroller */
 #ig-scroller{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #ig-scroller::-webkit-scrollbar{display:none;}
 .ig-slide{width:100%;height:calc(100vh - 50px - 50px);scroll-snap-align:start;scroll-snap-stop:always;position:relative;background:#000;overflow:hidden;flex-shrink:0;}
@@ -345,12 +339,10 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .ig-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .ig-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .ig-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,transparent 20%,transparent 55%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:5;}
-/* IG Actions - NO gol black line, clean circular */
 .ig-actions{position:absolute;right:10px;bottom:70px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
 .ig-act{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
 .ig-act-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;}
 .ig-act-count{font-size:12px;color:#fff;font-weight:600;}
-/* IG bottom info */
 .ig-info{position:absolute;bottom:8px;left:12px;right:62px;z-index:10;}
 .ig-user-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .ig-avatar{width:34px;height:34px;border-radius:50%;border:2px solid #fff;flex-shrink:0;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;}
@@ -362,7 +354,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .ig-audio-row{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.75);}
 .ig-audio-disc{width:18px;height:18px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;animation:spin 3s linear infinite;flex-shrink:0;}
 .ig-audio-disc svg{width:10px;height:10px;fill:#fff;}
-/* IG bottom nav - + in center, camera icon LEFT, Q icon RIGHT */
 .ig-botnav{height:50px;background:#000;border-top:1px solid #1a1a1a;flex-shrink:0;display:flex;justify-content:space-around;align-items:center;}
 .ig-nav-btn{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;width:48px;height:44px;}
 .ig-nav-btn svg{width:24px;height:24px;}
@@ -378,7 +369,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .tt-logo-box svg{width:16px;height:16px;fill:white;}
 .tt-sitename{font-size:16px;font-weight:800;color:#fff;}
 .tt-sitename em{font-style:normal;color:#fe2c55;}
-/* TikTok platform arrow - visible */
 .tt-platform-arrow{display:flex;align-items:center;width:20px;height:20px;cursor:pointer;color:rgba(255,255,255,.8);margin-left:1px;}
 .tt-platform-arrow svg{width:16px;height:16px;}
 .tt-center-tabs{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:22px;align-items:center;}
@@ -395,7 +385,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .tt-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .tt-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .tt-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:5;}
-/* TT Actions - NO gol black line */
 .tt-actions{position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:10;}
 .tt-act{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
 .tt-act-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;}
@@ -529,12 +518,10 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 <div id="main" style="display:none;">
   <div id="home-page">
     <div class="cat-strip" id="cat-strip"></div>
-    <!-- YT style: 2-grid shorts with search -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px;">
       <div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;"><span class="red-pill">SHORTS</span><span>Trending</span></div>
       <button onclick="showSearchPage()" style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;">🔍 Search</button>
     </div>
-    <!-- YT 2-grid -->
     <div class="shorts-grid-yt" id="home-shorts-grid"><div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div></div>
     <div class="section-hdr" style="margin-top:12px;"><span>📺</span><span>Videos</span></div>
     <div id="home-long-feed"><div class="loading-dots"><span></span><span></span><span></span></div></div>
@@ -672,7 +659,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
     </div>
   </div>
   <div id="ig-scroller"></div>
-  <!-- IG bottom nav: camera LEFT, home, +, Q RIGHT, profile -->
   <div class="ig-botnav">
     <button class="ig-nav-btn" onclick="openUpload()" title="Camera">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -686,7 +672,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   </div>
 </div>
 
-<!-- IG Q PAGE (3-grid explore) -->
+<!-- IG Q PAGE -->
 <div id="ig-q-page" style="display:none;position:fixed;inset:0;z-index:800;background:#000;flex-direction:column;">
   <div class="ig-q-topbar">
     <button class="ig-q-back" onclick="closeIgQPage()">✕</button>
@@ -701,7 +687,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 <!-- TIKTOK PAGE -->
 <div id="tt-page">
   <div class="tt-topnav">
-    <!-- TikTok logo + platform arrow (visible) -->
     <div class="tt-logo-area">
       <div class="tt-logo-box"><svg viewBox="0 0 24 24" fill="white" width="16" height="16"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.14 8.14 0 0 0 4.77 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/></svg></div>
       <span class="tt-sitename">Ansk<em>i</em>nge</span>
@@ -906,8 +891,6 @@ function rndDur(){const m=Math.floor(Math.random()*28+1),s=Math.floor(Math.rando
 function rndSubs(){const n=Math.floor(Math.random()*9900000+1000);if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return Math.floor(n/1e3)+'K';return n;}
 function timeAgo(pub){if(!pub)return'Recently';const diff=(Date.now()-new Date(pub))/1000;if(diff<3600)return Math.floor(diff/60)+'m ago';if(diff<86400)return Math.floor(diff/3600)+'h ago';if(diff<604800)return Math.floor(diff/86400)+'d ago';if(diff<2592000)return Math.floor(diff/604800)+'w ago';return Math.floor(diff/2592000)+'mo ago';}
 function pickQ(pool){return pool[Math.floor(Math.random()*pool.length)];}
-// Get real YT channel avatar
-function ytAvatar(channelId){return channelId?`https://yt3.ggpht.com/${channelId}=s48-c-k-c0x00ffffff-no-rj`:'';;}
 
 // ===== AUTH =====
 let authMode='login';
@@ -961,13 +944,10 @@ function updateProfileUI(){
   const name=currentProfile?.username||'User';
   const init=name[0].toUpperCase();
   const av=currentProfile?.avatar_url||'';
-  // Nav user btn
   const navBtn=document.getElementById('nav-user-btn');
   if(navBtn){navBtn.innerHTML=av?`<img src="${av}" onerror="this.parentElement.textContent='${init}'">`:`${init}`;}
-  // IG profile
   const igAv=document.getElementById('ig-profile-av');
   if(igAv){igAv.innerHTML=av?`<img src="${av}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.textContent='${init}'">`:`${init}`;}
-  // Profile page
   const pAv=document.getElementById('profile-avatar-el');
   if(pAv){pAv.innerHTML=av?`<img src="${av}" onerror="this.parentElement.textContent='${init}'">`:`${init}`;}
   const un=document.getElementById('profile-username-el');const ph=document.getElementById('profile-handle-el');
@@ -1031,7 +1011,6 @@ async function openChannelPage(channelId,channelName,avatarUrl){
   currentChannelData={channelId,channelName,avatarUrl};
   const page=document.getElementById('channel-page');
   page.style.display='block';
-  // Set info
   const avEl=document.getElementById('ch-avatar');
   if(avatarUrl){avEl.innerHTML=`<img src="${avatarUrl}" onerror="this.parentElement.textContent='${channelName[0]}'">`;} 
   else{avEl.textContent=channelName[0];avEl.style.background=rndColor(channelName);}
@@ -1039,7 +1018,6 @@ async function openChannelPage(channelId,channelName,avatarUrl){
   document.getElementById('ch-handle').textContent='@'+channelName.toLowerCase().replace(/\s+/g,'_');
   document.getElementById('ch-sub-btn').textContent='Subscribe';
   document.getElementById('ch-sub-btn').classList.remove('subscribed');
-  // Fetch channel stats via YT API
   document.getElementById('ch-subs').textContent='...';
   document.getElementById('ch-vids').textContent='...';
   document.getElementById('ch-views').textContent='...';
@@ -1050,7 +1028,6 @@ async function openChannelPage(channelId,channelName,avatarUrl){
       document.getElementById('ch-subs').textContent=fmtV(stats.subscriberCount||0);
       document.getElementById('ch-vids').textContent=fmtV(stats.videoCount||0);
       document.getElementById('ch-views').textContent=fmtV(stats.viewCount||0);
-      // Update avatar from YT
       const thumb=data.items[0].snippet?.thumbnails?.high?.url||data.items[0].snippet?.thumbnails?.default?.url;
       if(thumb){avEl.innerHTML=`<img src="${thumb}" onerror="this.parentElement.textContent='${channelName[0]}'">`;}
     }
@@ -1076,7 +1053,6 @@ async function loadChTab(tabName,el,chId,chName){
       <p>📍 Pakistan / India</p><p style="margin-top:8px;">🔗 youtube.com</p></div>`;
     return;
   }
-  // Fetch videos
   if(cId){
     const dur=tabName==='shorts'?'&videoDuration=short':'&videoDuration=medium';
     const data=await ytGet(`${YT_API}/search?part=snippet&type=video&channelId=${cId}&maxResults=12${dur}&key=${YT_KEY}&order=date`);
@@ -1102,8 +1078,10 @@ async function loadChTab(tabName,el,chId,chName){
 
 // ===== SB VIDEOS =====
 async function fetchSbVideos(){
-  const {data}=await SB.from('videos').select('*,profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);
-  return data||[];
+  try{
+    const {data}=await SB.from('videos').select('*,profiles(username,avatar_url)').order('created_at',{ascending:false}).limit(20);
+    return data||[];
+  }catch(e){return[];}
 }
 function sbToCommon(v){
   return{id:'sb_'+v.id,sbId:v.id,title:v.title,channel:v.profiles?.username||'Anskinge User',
@@ -1159,7 +1137,7 @@ async function fetchLong(cat,query,token){
   return{items,next:data.nextPageToken||''};
 }
 
-// ===== SPLASH =====
+// ===== SPLASH - 3 second line =====
 function showSplash(platform){
   const box=document.getElementById('splash-logo-box'),name=document.getElementById('splash-name'),bar=document.getElementById('splash-bar');
   bar.style.animation='none';bar.offsetHeight;
@@ -1174,7 +1152,14 @@ function showSplash(platform){
   const splash=document.getElementById('splash');
   splash.style.display='flex';splash.style.opacity='1';splash.style.transition='';
   void bar.offsetWidth;bar.style.animation='';
-  return new Promise(res=>{setTimeout(()=>{splash.style.opacity='0';splash.style.transition='opacity 0.4s';setTimeout(()=>{splash.style.display='none';res();},400);},2500);});
+  // Returns promise that resolves after exactly 3 seconds then fades out
+  return new Promise(res=>{
+    setTimeout(()=>{
+      splash.style.opacity='0';
+      splash.style.transition='opacity 0.4s';
+      setTimeout(()=>{splash.style.display='none';res();},400);
+    },3000);
+  });
 }
 
 // ===== HOME DATA =====
@@ -1208,7 +1193,7 @@ async function changeCat(cat){
   await loadHomeData();
 }
 
-// ===== HOME RENDER - YT 2-grid =====
+// ===== HOME RENDER =====
 function renderHomeShorts(){
   const g=document.getElementById('home-shorts-grid');g.innerHTML='';
   if(!shortVideos.length){g.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No shorts found</div>';return;}
@@ -1286,7 +1271,7 @@ async function doSearch(){
   } else {lf.innerHTML='';}
 }
 
-// ===== IG Q PAGE (3-grid explore) =====
+// ===== IG Q PAGE =====
 function openIgQPage(){
   const page=document.getElementById('ig-q-page');
   page.style.display='flex';
@@ -1319,14 +1304,13 @@ function renderIgQGrid(){
     d.onclick=()=>{shortVideos=igQVideos;openShortsPage(i);};
     grid.appendChild(d);
   });
-  // Infinite scroll for Q page
   const sentinel=document.createElement('div');sentinel.style.height='20px';grid.appendChild(sentinel);
   new IntersectionObserver(async(en)=>{
     if(en[0].isIntersecting&&!igQLoading){await loadIgQGrid();}
   },{threshold:.1}).observe(sentinel);
 }
 
-// ===== SHORTS PAGE - SMOOTH, NO RELOAD, NO TOP TITLE =====
+// ===== SHORTS PAGE =====
 function openShortsPage(startIdx){
   document.getElementById('shorts-page').style.display='block';
   document.getElementById('shorts-botnav').style.display='flex';
@@ -1358,11 +1342,9 @@ function renderShortsPage(startIdx=0){
       const allSlides=Array.from(scroller.querySelectorAll('.s-slide'));
       const idx=allSlides.indexOf(slide);
       if(idx<0)return;
-      // Stop all other
       allSlides.forEach((s,si)=>{
         if(si!==idx){const f=s.querySelector('iframe');if(f&&f.src)f.src='';const vv=s.querySelector('video');if(vv&&!vv.paused){vv.pause();}}
       });
-      // Play current - immediately no delay
       const v=shortVideos[idx];if(!v)return;
       if(v.source==='sb'&&v.videoUrl){
         const vv=slide.querySelector('video');
@@ -1375,7 +1357,6 @@ function renderShortsPage(startIdx=0){
         }
       }
       if(v.source==='sb'&&v.sbId)incrementView(v.sbId);
-      // Load more when near end
       if(idx>=shortVideos.length-3){
         fetchShortsWithStats(currentCat,pickQ(SHORT_POOLS[currentCat]||SHORT_POOLS.All)).then(r=>{
           r.items.filter(vv=>!usedShortIds.has(vv.id)).forEach(vv=>{
@@ -1415,11 +1396,9 @@ function buildShortSlide(v){
       }
     </div>
     <div class="s-gradient"></div>
-    <!-- Center double-tap pause - ONLY shows on double-tap -->
     <div class="s-center-btn" id="scb-${vid}">
       <svg viewBox="0 0 24 24"><path d="M10 4H6v16h4V4zm8 0h-4v16h4V4z"/></svg>
     </div>
-    <!-- ONLY bottom info - NO top title -->
     <div class="s-info">
       <div class="s-ch-row">
         <div class="s-avatar" style="background:${rndColor(v.channel)}" onclick="event.stopPropagation();openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||''}')">
@@ -1451,16 +1430,13 @@ function buildShortSlide(v){
       </button>
     </div>`;
 
-  // Double-tap to pause/play
   let lastTap=0;
   slide.addEventListener('click',function(e){
     if(e.target.closest('.s-actions')||e.target.closest('.s-sub-btn')||e.target.closest('.s-ch-name')||e.target.closest('.s-avatar'))return;
     const now=Date.now();
     if(now-lastTap<300){
-      // Double tap - toggle pause
       const cb=this.querySelector('.s-center-btn');
       const vv=this.querySelector('video');
-      const iframe=this.querySelector('iframe');
       const vid2=v.sbId||v.id;
       slidePaused[vid2]=!slidePaused[vid2];
       if(vv){
@@ -1829,7 +1805,7 @@ function buildIgSlide(v,autoplay){
     </div>
     <div class="ig-info">
       <div class="ig-user-row">
-        <div class="ig-avatar" style="background:${rndColor(v.channel)}" onclick="openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||'}'")">${avHtml}</div>
+        <div class="ig-avatar" style="background:${rndColor(v.channel)}" onclick="openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||'}')">${avHtml}</div>
         <span class="ig-username" onclick="openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||'}')">${uname}</span>
         <button class="ig-follow-btn" onclick="this.classList.toggle('following');this.textContent=this.classList.contains('following')?'Following':'Follow';toast(this.classList.contains('following')?'✅ Following!':'Unfollowed')">Follow</button>
       </div>
@@ -1931,7 +1907,7 @@ function buildTtSlide(v,autoplay){
       </div>
     </div>
     <div class="tt-info">
-      <div class="tt-username" onclick="openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||'}'")">${uname}</div>
+      <div class="tt-username" onclick="openChannelPage('${v.channelId||''}','${(v.channel||'').replace(/'/g,"\\'")}','${v.channelAvatar||'}')">${uname}</div>
       <div class="tt-caption">${v.title.slice(0,70)} <span style="color:rgba(255,255,255,.5)">#viral #trending</span></div>
       <div class="tt-music"><div class="tt-music-disc"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>${v.channel} · Original Sound</span></div>
     </div>`;
@@ -2029,12 +2005,28 @@ function setupInfiniteScroll(){
   },{threshold:0.1}).observe(sentinel);
 }
 
-// ===== INIT =====
-window.addEventListener('load',async()=>{
+// ===== INIT - FIXED: splash puri hoti he phir auth screen aati he =====
+window.addEventListener('load', async () => {
+  // Pehle splash 3 second chalao, phir app start karo
   await showSplash('yt');
-  const {data:{session}}=await SB.auth.getSession();
-  if(session?.user){currentUser=session.user;await loadProfile();enterApp();}
-  else{document.getElementById('auth-screen').style.display='flex';}
+  
+  // Splash khatam - ab session check karo with timeout
+  try {
+    const sessionPromise = SB.auth.getSession();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({data:{session:null}}), 5000));
+    const {data} = await Promise.race([sessionPromise, timeoutPromise]);
+    
+    if(data?.session?.user){
+      currentUser = data.session.user;
+      try { await loadProfile(); } catch(e) {}
+      enterApp();
+    } else {
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+  } catch(e) {
+    // Agar koi bhi error aaye toh auth screen show karo
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
 });
 
 // Animations
@@ -2045,4 +2037,4 @@ styleEl.textContent=`
 document.head.appendChild(styleEl);
 </script>
 </body>
-  </html>
+      </html>
