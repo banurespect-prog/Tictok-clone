@@ -84,16 +84,22 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   filter:drop-shadow(0 0 20px rgba(255,0,0,0.4));
 }
 .splash-app-name em{font-style:normal;background:linear-gradient(135deg,#ff0000,#ff4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.splash-tagline{font-size:12px;color:rgba(255,255,255,0.4);font-weight:500;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
 .splash-line-wrap{
-  width:200px;height:2px;background:rgba(255,255,255,0.08);
-  border-radius:2px;overflow:hidden;margin-top:28px;
+  width:200px;height:3px;background:rgba(255,255,255,0.08);
+  border-radius:3px;overflow:hidden;margin-top:28px;
   animation:splashTextIn 0.8s ease 0.4s both;
+  box-shadow:0 0 8px rgba(255,0,0,0.2);
 }
 .splash-line-bar{
-  height:100%;width:0%;border-radius:2px;
-  background:linear-gradient(90deg,transparent,#ff0000,#ff6600,#ff0000,transparent);
-  background-size:200% 100%;
+  height:100%;width:0%;border-radius:3px;
+  background:linear-gradient(90deg,#cc0000,#ff0000,#ff6600,#ffaa00,#ff6600,#ff0000,#cc0000);
+  background-size:300% 100%;
+  animation:lineShimmer 1.5s linear infinite;
+  box-shadow:0 0 10px rgba(255,100,0,0.8),0 0 20px rgba(255,0,0,0.4);
+}
+@keyframes lineShimmer{
+  0%{background-position:100% 0;}
+  100%{background-position:-100% 0;}
 }
 
 /* PLATFORM DROPDOWN */
@@ -177,10 +183,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .trend-item{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);}
 .trend-text{font-size:14px;color:var(--text);flex:1;}
 
-/* =============================================
-   SHORTS FULLSCREEN
-   100% FIX: NO center buttons, NO top title
-   ============================================= */
+/* SHORTS FULLSCREEN */
 #shorts-page{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:100vh;z-index:600;background:#000;overflow:hidden;}
 #shorts-scroller{width:100%;height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:none;}
 #shorts-scroller::-webkit-scrollbar{display:none;}
@@ -189,7 +192,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-video-wrap{position:absolute;inset:0;z-index:1;}
 .s-iframe{width:100%;height:100%;border:0;display:block;background:#000;}
 .s-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(0,0,0,.92) 100%);pointer-events:none;z-index:5;}
-/* CRITICAL FIX: ONLY bottom info - no top, no center buttons */
 .s-info{position:absolute;bottom:78px;left:14px;right:72px;z-index:10;}
 .s-ch-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
 .s-avatar{width:34px;height:34px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.8);overflow:hidden;cursor:pointer;}
@@ -197,13 +199,12 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 .s-ch-name{font-size:13px;font-weight:700;color:#fff;cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.8);}
 .s-sub-btn{padding:3px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.9);background:transparent;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
 .s-title{font-size:12px;color:rgba(255,255,255,.9);line-height:1.4;margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,.8);}
-/* FIXED ACTIONS - like comment share save ONLY */
 .s-actions{position:absolute;right:8px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:10;}
 .s-act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:#fff;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;}
 .s-act-btn svg{width:28px;height:28px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.9));}
 .s-act-count{font-size:11px;color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.8);}
 
-/* SHORTS TOP BAR - logo only, no video title here */
+/* SHORTS TOP BAR */
 #shorts-top-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:620;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 100%);padding:10px 14px 24px;display:flex;align-items:center;gap:8px;pointer-events:none;}
 #shorts-top-bar *{pointer-events:all;}
 .shorts-header-logo{display:flex;align-items:center;gap:6px;cursor:pointer;}
@@ -485,14 +486,13 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 </head>
 <body>
 
-<!-- PREMIUM SPLASH SCREEN - Aapki Photo + Anskinge -->
+<!-- SPLASH SCREEN -->
 <div id="splash">
   <div class="splash-bg-glow"></div>
   <div class="splash-photo-wrap">
     <div class="splash-photo-outer-ring">
       <div class="splash-photo-inner">
-        <!-- AAPKI PHOTO - sunglasses wali - base64 embed needed, placeholder use kar raha hun -->
-        <img src="data:image/jpeg;base64,PHOTO_BASE64_HERE" alt="Profile" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#ff0000,#cc0000)'">
+        <img id="splash-photo-img" src="" alt="Profile">
         <div class="splash-photo-shine"></div>
       </div>
     </div>
@@ -504,7 +504,6 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
       </div>
       <div class="splash-app-name">Ansk<em>i</em>nge</div>
     </div>
-    <div class="splash-tagline">Watch · Upload · Discover</div>
   </div>
   <div class="splash-line-wrap">
     <div class="splash-line-bar" id="splash-bar"></div>
@@ -579,7 +578,7 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
   <div class="ch-page-videos" id="ch-videos-list"></div>
 </div>
 
-<!-- SHORTS PAGE - CRITICAL FIX: NO center buttons in HTML structure -->
+<!-- SHORTS PAGE -->
 <div id="shorts-page">
   <div id="shorts-top-bar">
     <div class="shorts-header-logo" onclick="leaveShorts('home')"><div class="shl-box yt" id="shl-logo-box"><svg viewBox="0 0 24 24" fill="white" width="12" height="12"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg></div><span class="shl-name">Ansk<em>i</em>nge</span></div>
@@ -681,21 +680,8 @@ body{color:var(--text);font-family:'Outfit',sans-serif;max-width:430px;margin:0 
 const YT_KEY='AIzaSyAXmWdEwssA7_NUJGJCQqR60fzrFpZ-mfI';
 const YT_API='https://www.googleapis.com/youtube/v3';
 const CATS=['All','Music','Song','Funny','Motivation','Skill','Gaming','News','Tech','Sports','Travel','Food','Animals','Fashion','Education'];
-const SHORT_POOLS={
-  All:['new shorts 2025','viral shorts today','latest youtube shorts','trending shorts 2025','fresh funny shorts','comedy shorts new','amazing shorts viral','hindi shorts 2025','pakistan shorts new','trending reels 2025','best viral short clips 2025','new funny short 2025'],
-  Music:['new music shorts 2025'],Song:['new song shorts 2025'],Funny:['funny shorts 2025','comedy viral short'],
-  Motivation:['motivation shorts 2025'],Skill:['skill shorts 2025'],Gaming:['gaming shorts 2025'],
-  News:['news shorts 2025'],Tech:['tech shorts 2025'],Sports:['cricket short 2025'],
-  Travel:['travel short 2025'],Food:['food short 2025'],Animals:['cute animals short 2025'],
-  Fashion:['fashion short 2025'],Education:['educational short 2025']
-};
-const LONG_POOLS={
-  All:['viral youtube 2025','trending today 2025','popular youtube 2025','best videos 2025','new upload 2025','hindi viral 2025','pakistan viral 2025','new trending video 2025'],
-  Music:['music video 2025'],Song:['hit song 2025'],Funny:['funny 2025'],Motivation:['motivational 2025'],
-  Skill:['skill 2025'],Gaming:['gaming 2025'],News:['news 2025'],Tech:['tech review 2025'],
-  Sports:['sports 2025'],Travel:['travel vlog 2025'],Food:['food recipe 2025'],
-  Animals:['cute animals 2025'],Fashion:['fashion 2025'],Education:['educational 2025']
-};
+const SHORT_POOLS={All:['new shorts 2025','viral shorts today','latest youtube shorts','trending shorts 2025','fresh funny shorts','comedy shorts new','amazing shorts viral','hindi shorts 2025','pakistan shorts new','trending reels 2025','best viral short clips 2025','new funny short 2025'],Music:['new music shorts 2025'],Song:['new song shorts 2025'],Funny:['funny shorts 2025','comedy viral short'],Motivation:['motivation shorts 2025'],Skill:['skill shorts 2025'],Gaming:['gaming shorts 2025'],News:['news shorts 2025'],Tech:['tech shorts 2025'],Sports:['cricket short 2025'],Travel:['travel short 2025'],Food:['food short 2025'],Animals:['cute animals short 2025'],Fashion:['fashion short 2025'],Education:['educational short 2025']};
+const LONG_POOLS={All:['viral youtube 2025','trending today 2025','popular youtube 2025','best videos 2025','new upload 2025','hindi viral 2025','pakistan viral 2025','new trending video 2025'],Music:['music video 2025'],Song:['hit song 2025'],Funny:['funny 2025'],Motivation:['motivational 2025'],Skill:['skill 2025'],Gaming:['gaming 2025'],News:['news 2025'],Tech:['tech review 2025'],Sports:['sports 2025'],Travel:['travel vlog 2025'],Food:['food recipe 2025'],Animals:['cute animals 2025'],Fashion:['fashion 2025'],Education:['educational 2025']};
 const COLORS=['#ff0000','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#00bcd4','#009688','#4caf50','#ff9800','#ff5722','#795548'];
 
 // STATE
@@ -717,6 +703,14 @@ let currentChannelData=null;
 let searchLoadingMore=false;
 
 // ============================================================
+// PHOTO EMBED - Aapki photo base64 mein convert karke splash mein lagana
+// ============================================================
+const MY_PHOTO_BASE64 = "REPLACE_WITH_BASE64";
+// ^ Yahan aapko apni photo ka base64 paste karna hoga
+// Kaise karein: https://www.base64-image.de/ par photo upload karein
+// phir data:image/jpeg;base64,.... wala poora string yahan paste karein
+
+// ============================================================
 // HELPERS
 // ============================================================
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
@@ -729,20 +723,45 @@ function pickQ(pool){return pool[Math.floor(Math.random()*pool.length)];}
 function escQ(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'\\"');}
 
 // ============================================================
-// SPLASH SCREEN - 3 second animated line then auth
+// SPLASH SCREEN
 // ============================================================
 function runSplash(){
+  // Photo load karo
+  const photoEl=document.getElementById('splash-photo-img');
+  if(photoEl){
+    // Pehle uploaded photo try karo
+    if(MY_PHOTO_BASE64 && MY_PHOTO_BASE64!=="REPLACE_WITH_BASE64"){
+      photoEl.src=MY_PHOTO_BASE64;
+    } else {
+      // Fallback: initials show karo
+      photoEl.style.display='none';
+      const inner=photoEl.parentElement;
+      inner.style.background='linear-gradient(135deg,#1a0a0a,#2d1a1a)';
+      const init=document.createElement('div');
+      init.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:800;color:#fff;font-family:Outfit,sans-serif;text-shadow:0 2px 10px rgba(255,0,0,0.5);';
+      init.textContent='A';
+      inner.appendChild(init);
+    }
+    photoEl.onerror=function(){
+      this.style.display='none';
+      const inner=this.parentElement;
+      inner.style.background='linear-gradient(135deg,#1a0a0a,#2d1a1a)';
+      const init=document.createElement('div');
+      init.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:800;color:#fff;font-family:Outfit,sans-serif;text-shadow:0 2px 10px rgba(255,0,0,0.5);';
+      init.textContent='A';
+      inner.appendChild(init);
+    };
+  }
+
   const bar=document.getElementById('splash-bar');
   const splash=document.getElementById('splash');
   bar.style.width='0%';
-  // Animate line from 0 to 100% in 3 seconds using rAF
   const DURATION=3000;
   let startTime=null;
   function animLine(ts){
     if(!startTime)startTime=ts;
     const elapsed=ts-startTime;
     const progress=Math.min(elapsed/DURATION,1);
-    // Smooth easing
     let w;
     if(progress<0.3)w=progress/0.3*30;
     else if(progress<0.7)w=30+(progress-0.3)/0.4*50;
@@ -752,15 +771,11 @@ function runSplash(){
       requestAnimationFrame(animLine);
     }else{
       bar.style.width='100%';
-      // Shimmer effect on complete
-      bar.style.background='linear-gradient(90deg,#ff6600,#ffaa00,#ff0000)';
       setTimeout(()=>{
-        // Fade out splash
         splash.style.transition='opacity 0.4s ease';
         splash.style.opacity='0';
         setTimeout(()=>{
           splash.style.display='none';
-          // Show auth screen
           document.getElementById('auth-screen').style.display='flex';
         },400);
       },200);
@@ -769,20 +784,10 @@ function runSplash(){
   requestAnimationFrame(animLine);
 }
 
-// Platform splash (for switching)
 function showPlatformSplash(platform){
   return new Promise(resolve=>{
     const splash=document.getElementById('splash');
-    const box=document.getElementById('splash-logo-box');
-    const nameEl=document.getElementById('splash-name');
     const bar=document.getElementById('splash-bar');
-    // Update splash for platform
-    const icons={
-      yt:'<svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M19.6 3H4.4C2.5 3 1 4.5 1 6.4v11.2C1 19.5 2.5 21 4.4 21h15.2c1.9 0 3.4-1.5 3.4-3.4V6.4C23 4.5 21.5 3 19.6 3zm-3.1 9.5l-7 4c-.2.1-.4.1-.6 0-.2-.1-.3-.3-.3-.5v-8c0-.2.1-.4.3-.5.2-.1.4-.1.6 0l7 4c.2.1.3.3.3.5s-.1.4-.3.5z"/></svg>',
-      ig:'<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="26" height="26"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r=".8" fill="white" stroke="none"/></svg>',
-      tt:'<svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.14 8.14 0 0 0 4.77 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/></svg>'
-    };
-    // Hide photo wrap for platform switch, show quick splash
     const photoWrap=splash.querySelector('.splash-photo-wrap');
     if(photoWrap)photoWrap.style.display='none';
     splash.style.display='flex';splash.style.opacity='1';splash.style.transition='none';
@@ -804,422 +809,103 @@ function showPlatformSplash(platform){
 // ============================================================
 // AUTH
 // ============================================================
-function switchAuthTab(mode){
-  authMode=mode;
-  document.getElementById('tab-login').className='auth-tab'+(mode==='login'?' active':'');
-  document.getElementById('tab-signup').className='auth-tab'+(mode==='signup'?' active':'');
-  document.getElementById('signup-name-field').style.display=mode==='signup'?'block':'none';
-  document.getElementById('auth-submit-btn').textContent=mode==='login'?'Login':'Create Account';
-  document.getElementById('auth-err').textContent='';
-}
-async function submitAuth(){
-  const email=document.getElementById('auth-email').value.trim();
-  const pass=document.getElementById('auth-password').value;
-  const errEl=document.getElementById('auth-err');errEl.textContent='';
-  if(!email||!pass){errEl.textContent='Please fill all fields';return;}
-  if(pass.length<6){errEl.textContent='Password min 6 chars';return;}
-  if(!email.includes('@')){errEl.textContent='Enter valid email';return;}
-  const btn=document.getElementById('auth-submit-btn');btn.textContent='...';btn.disabled=true;
-  try{
-    if(authMode==='signup'){
-      const uname=document.getElementById('auth-username').value.trim()||email.split('@')[0];
-      localStorage.setItem('anskinge_user',JSON.stringify({email,username:uname,id:'u_'+Date.now()}));
-      currentProfile={username:uname,email};currentUser={email,id:'u_'+Date.now()};isGuest=false;
-      toast('✅ Welcome '+uname+'!');enterApp();
-    }else{
-      const stored=localStorage.getItem('anskinge_user');
-      let uname=email.split('@')[0];
-      if(stored){const u=JSON.parse(stored);if(u.email===email)uname=u.username;}
-      currentProfile={username:uname,email};currentUser={email,id:'u_'+Date.now()};isGuest=false;
-      toast('✅ Welcome back!');enterApp();
-    }
-  }catch(e){errEl.textContent='Error. Try again.';}
-  btn.textContent=authMode==='login'?'Login':'Create Account';btn.disabled=false;
-}
+function switchAuthTab(mode){authMode=mode;document.getElementById('tab-login').className='auth-tab'+(mode==='login'?' active':'');document.getElementById('tab-signup').className='auth-tab'+(mode==='signup'?' active':'');document.getElementById('signup-name-field').style.display=mode==='signup'?'block':'none';document.getElementById('auth-submit-btn').textContent=mode==='login'?'Login':'Create Account';document.getElementById('auth-err').textContent='';}
+async function submitAuth(){const email=document.getElementById('auth-email').value.trim();const pass=document.getElementById('auth-password').value;const errEl=document.getElementById('auth-err');errEl.textContent='';if(!email||!pass){errEl.textContent='Please fill all fields';return;}if(pass.length<6){errEl.textContent='Password min 6 chars';return;}if(!email.includes('@')){errEl.textContent='Enter valid email';return;}const btn=document.getElementById('auth-submit-btn');btn.textContent='...';btn.disabled=true;try{if(authMode==='signup'){const uname=document.getElementById('auth-username').value.trim()||email.split('@')[0];localStorage.setItem('anskinge_user',JSON.stringify({email,username:uname,id:'u_'+Date.now()}));currentProfile={username:uname,email};currentUser={email,id:'u_'+Date.now()};isGuest=false;toast('✅ Welcome '+uname+'!');enterApp();}else{const stored=localStorage.getItem('anskinge_user');let uname=email.split('@')[0];if(stored){const u=JSON.parse(stored);if(u.email===email)uname=u.username;}currentProfile={username:uname,email};currentUser={email,id:'u_'+Date.now()};isGuest=false;toast('✅ Welcome back!');enterApp();}}catch(e){errEl.textContent='Error. Try again.';}btn.textContent=authMode==='login'?'Login':'Create Account';btn.disabled=false;}
 function guestMode(){isGuest=true;currentUser=null;currentProfile={username:'Guest',email:''};enterApp();}
-function doLogout(){
-  currentUser=null;currentProfile=null;isGuest=false;
-  ['topnav','botnav','main','ig-page','tt-page'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('auth-screen').style.display='flex';toast('👋 Logged out');
-}
-function updateProfileUI(){
-  const name=currentProfile?.username||'Guest';const init=name[0].toUpperCase();
-  const navBtn=document.getElementById('nav-user-btn');if(navBtn)navBtn.textContent=init;
-  const igAv=document.getElementById('ig-profile-av');if(igAv)igAv.textContent=init;
-  const pAv=document.getElementById('profile-avatar-el');if(pAv)pAv.textContent=init;
-  const un=document.getElementById('profile-username-el');const ph=document.getElementById('profile-handle-el');
-  if(un)un.textContent=name;if(ph)ph.textContent='@'+name.toLowerCase().replace(/\s+/g,'_');
-}
-function enterApp(){
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('topnav').style.display='flex';document.getElementById('botnav').style.display='flex';document.getElementById('main').style.display='block';
-  updateProfileUI();setupCats();setupTrending();loadSubsPage();loadHomeData();setupInfiniteScroll();
-  setTimeout(()=>loadTtSpGrid(),2500);
-}
+function doLogout(){currentUser=null;currentProfile=null;isGuest=false;['topnav','botnav','main','ig-page','tt-page'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('auth-screen').style.display='flex';toast('👋 Logged out');}
+function updateProfileUI(){const name=currentProfile?.username||'Guest';const init=name[0].toUpperCase();const navBtn=document.getElementById('nav-user-btn');if(navBtn)navBtn.textContent=init;const igAv=document.getElementById('ig-profile-av');if(igAv)igAv.textContent=init;const pAv=document.getElementById('profile-avatar-el');if(pAv)pAv.textContent=init;const un=document.getElementById('profile-username-el');const ph=document.getElementById('profile-handle-el');if(un)un.textContent=name;if(ph)ph.textContent='@'+name.toLowerCase().replace(/\s+/g,'_');}
+function enterApp(){document.getElementById('auth-screen').style.display='none';document.getElementById('topnav').style.display='flex';document.getElementById('botnav').style.display='flex';document.getElementById('main').style.display='block';updateProfileUI();setupCats();setupTrending();loadSubsPage();loadHomeData();setupInfiniteScroll();setTimeout(()=>loadTtSpGrid(),2500);}
 
 // ============================================================
 // YOUTUBE API
 // ============================================================
-async function ytGet(url){
-  try{const r=await fetch(url);if(!r.ok)return null;return await r.json();}catch(e){return null;}
-}
-async function fetchChannelAvatars(channelIds){
-  const toFetch=[...new Set(channelIds.filter(id=>id&&!channelAvatarCache[id]))].slice(0,50);
-  if(!toFetch.length)return;
-  try{const data=await ytGet(`${YT_API}/channels?part=snippet&id=${toFetch.join(',')}&key=${YT_KEY}`);if(data&&data.items)data.items.forEach(ch=>{channelAvatarCache[ch.id]=ch.snippet?.thumbnails?.medium?.url||ch.snippet?.thumbnails?.default?.url||'';});}catch(e){}
-}
-async function fetchStats(ids){
-  if(!ids||!ids.length)return{};
-  try{const data=await ytGet(`${YT_API}/videos?part=statistics&id=${ids.join(',')}&key=${YT_KEY}`);if(!data||!data.items)return{};const map={};data.items.forEach(v=>{map[v.id]={views:parseInt(v.statistics?.viewCount||0),likes:parseInt(v.statistics?.likeCount||0),comments:parseInt(v.statistics?.commentCount||0)};});return map;}catch(e){return{};}
-}
-async function fetchShortsWithStats(cat,query){
-  const q=query||pickQ(SHORT_POOLS[cat]||SHORT_POOLS.All);
-  try{
-    const daysBack=Math.floor(Math.random()*90+7);const d=new Date();d.setDate(d.getDate()-daysBack);const after=d.toISOString().split('T')[0]+'T00:00:00Z';
-    const url=`${YT_API}/search?part=snippet&type=video&videoDuration=short&maxResults=20&q=${encodeURIComponent(q)}&key=${YT_KEY}&order=relevance&publishedAfter=${after}`;
-    const data=await ytGet(url);if(!data||!data.items)return{items:[]};
-    let items=data.items.filter(i=>i.id?.videoId).map(i=>({id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,channelId:i.snippet.channelId,channelAvatar:'',thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||i.snippet.thumbnails.default?.url||'',publishedAt:i.snippet.publishedAt,views:0,likes:0,comments:0}));
-    const ids=items.map(v=>v.id);const stats=await fetchStats(ids);const chIds=items.map(v=>v.channelId).filter(Boolean);await fetchChannelAvatars(chIds);
-    items.forEach(v=>{if(stats[v.id])Object.assign(v,{views:stats[v.id].views,likes:stats[v.id].likes,comments:stats[v.id].comments});if(v.channelId&&channelAvatarCache[v.channelId])v.channelAvatar=channelAvatarCache[v.channelId];});
-    return{items};
-  }catch(e){return{items:[]};}
-}
-async function fetchLong(cat,query,token){
-  const q=query||pickQ(LONG_POOLS[cat]||LONG_POOLS.All);
-  try{
-    let url=`${YT_API}/search?part=snippet&type=video&videoDuration=medium&maxResults=15&q=${encodeURIComponent(q)}&key=${YT_KEY}&order=relevance&publishedAfter=2024-01-01T00:00:00Z`;
-    if(token)url+=`&pageToken=${token}`;
-    const data=await ytGet(url);if(!data||!data.items)return{items:[],next:''};
-    const items=data.items.filter(i=>i.id?.videoId).map(i=>({id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,channelId:i.snippet.channelId,channelAvatar:'',thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:0,duration:rndDur(),likes:0,comments:0,subs:rndSubs(),publishedAt:i.snippet.publishedAt}));
-    const ids=items.map(v=>v.id);const stats=await fetchStats(ids);const chIds=items.map(v=>v.channelId).filter(Boolean);await fetchChannelAvatars(chIds);
-    items.forEach(v=>{if(stats[v.id])Object.assign(v,{views:stats[v.id].views,likes:stats[v.id].likes,comments:stats[v.id].comments});if(v.channelId&&channelAvatarCache[v.channelId])v.channelAvatar=channelAvatarCache[v.channelId];});
-    return{items,next:data.nextPageToken||''};
-  }catch(e){return{items:[],next:''};}
-}
+async function ytGet(url){try{const r=await fetch(url);if(!r.ok)return null;return await r.json();}catch(e){return null;}}
+async function fetchChannelAvatars(channelIds){const toFetch=[...new Set(channelIds.filter(id=>id&&!channelAvatarCache[id]))].slice(0,50);if(!toFetch.length)return;try{const data=await ytGet(`${YT_API}/channels?part=snippet&id=${toFetch.join(',')}&key=${YT_KEY}`);if(data&&data.items)data.items.forEach(ch=>{channelAvatarCache[ch.id]=ch.snippet?.thumbnails?.medium?.url||ch.snippet?.thumbnails?.default?.url||'';});}catch(e){}}
+async function fetchStats(ids){if(!ids||!ids.length)return{};try{const data=await ytGet(`${YT_API}/videos?part=statistics&id=${ids.join(',')}&key=${YT_KEY}`);if(!data||!data.items)return{};const map={};data.items.forEach(v=>{map[v.id]={views:parseInt(v.statistics?.viewCount||0),likes:parseInt(v.statistics?.likeCount||0),comments:parseInt(v.statistics?.commentCount||0)};});return map;}catch(e){return{};}}
+async function fetchShortsWithStats(cat,query){const q=query||pickQ(SHORT_POOLS[cat]||SHORT_POOLS.All);try{const daysBack=Math.floor(Math.random()*90+7);const d=new Date();d.setDate(d.getDate()-daysBack);const after=d.toISOString().split('T')[0]+'T00:00:00Z';const url=`${YT_API}/search?part=snippet&type=video&videoDuration=short&maxResults=20&q=${encodeURIComponent(q)}&key=${YT_KEY}&order=relevance&publishedAfter=${after}`;const data=await ytGet(url);if(!data||!data.items)return{items:[]};let items=data.items.filter(i=>i.id?.videoId).map(i=>({id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,channelId:i.snippet.channelId,channelAvatar:'',thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||i.snippet.thumbnails.default?.url||'',publishedAt:i.snippet.publishedAt,views:0,likes:0,comments:0}));const ids=items.map(v=>v.id);const stats=await fetchStats(ids);const chIds=items.map(v=>v.channelId).filter(Boolean);await fetchChannelAvatars(chIds);items.forEach(v=>{if(stats[v.id])Object.assign(v,{views:stats[v.id].views,likes:stats[v.id].likes,comments:stats[v.id].comments});if(v.channelId&&channelAvatarCache[v.channelId])v.channelAvatar=channelAvatarCache[v.channelId];});return{items};}catch(e){return{items:[]};}}
+async function fetchLong(cat,query,token){const q=query||pickQ(LONG_POOLS[cat]||LONG_POOLS.All);try{let url=`${YT_API}/search?part=snippet&type=video&videoDuration=medium&maxResults=15&q=${encodeURIComponent(q)}&key=${YT_KEY}&order=relevance&publishedAfter=2024-01-01T00:00:00Z`;if(token)url+=`&pageToken=${token}`;const data=await ytGet(url);if(!data||!data.items)return{items:[],next:''};const items=data.items.filter(i=>i.id?.videoId).map(i=>({id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,channelId:i.snippet.channelId,channelAvatar:'',thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:0,duration:rndDur(),likes:0,comments:0,subs:rndSubs(),publishedAt:i.snippet.publishedAt}));const ids=items.map(v=>v.id);const stats=await fetchStats(ids);const chIds=items.map(v=>v.channelId).filter(Boolean);await fetchChannelAvatars(chIds);items.forEach(v=>{if(stats[v.id])Object.assign(v,{views:stats[v.id].views,likes:stats[v.id].likes,comments:stats[v.id].comments});if(v.channelId&&channelAvatarCache[v.channelId])v.channelAvatar=channelAvatarCache[v.channelId];});return{items,next:data.nextPageToken||''};}catch(e){return{items:[],next:''};}}
 
-// PRELOADING for zero-loading shorts
-async function preloadShorts(){
-  if(preloadingNow||preloadCache.length>=20)return;preloadingNow=true;
-  try{const r=await fetchShortsWithStats(currentCat);preloadCache.push(...r.items.filter(v=>!usedShortIds.has(v.id)));}catch(e){}
-  preloadingNow=false;
-}
+async function preloadShorts(){if(preloadingNow||preloadCache.length>=20)return;preloadingNow=true;try{const r=await fetchShortsWithStats(currentCat);preloadCache.push(...r.items.filter(v=>!usedShortIds.has(v.id)));}catch(e){}preloadingNow=false;}
 function getPreloadedShorts(n){const b=preloadCache.splice(0,n).filter(v=>!usedShortIds.has(v.id));b.forEach(v=>usedShortIds.add(v.id));if(preloadCache.length<8)preloadShorts();return b;}
 
 // ============================================================
 // HOME DATA
 // ============================================================
-async function loadHomeData(){
-  usedShortIds.clear();usedLongIds.clear();preloadCache=[];
-  document.getElementById('home-shorts-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
-  document.getElementById('home-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
-  const[ytShorts,ytLong]=await Promise.all([fetchShortsWithStats(currentCat),fetchLong(currentCat)]);
-  shortVideos=ytShorts.items.filter(v=>!usedShortIds.has(v.id));shortVideos.forEach(v=>usedShortIds.add(v.id));
-  longVideos=ytLong.items.filter(v=>!usedLongIds.has(v.id));longVideos.forEach(v=>usedLongIds.add(v.id));
-  longNextToken=ytLong.next;renderHomeShorts();renderHomeLong();preloadShorts();
-}
-function setupCats(){
-  const strip=document.getElementById('cat-strip');strip.innerHTML='';
-  CATS.forEach(c=>{const chip=document.createElement('div');chip.className='cat-chip'+(c===currentCat?' active':'');chip.textContent=c;chip.onclick=()=>changeCat(c);strip.appendChild(chip);});
-}
+async function loadHomeData(){usedShortIds.clear();usedLongIds.clear();preloadCache=[];document.getElementById('home-shorts-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';document.getElementById('home-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';const[ytShorts,ytLong]=await Promise.all([fetchShortsWithStats(currentCat),fetchLong(currentCat)]);shortVideos=ytShorts.items.filter(v=>!usedShortIds.has(v.id));shortVideos.forEach(v=>usedShortIds.add(v.id));longVideos=ytLong.items.filter(v=>!usedLongIds.has(v.id));longVideos.forEach(v=>usedLongIds.add(v.id));longNextToken=ytLong.next;renderHomeShorts();renderHomeLong();preloadShorts();}
+function setupCats(){const strip=document.getElementById('cat-strip');strip.innerHTML='';CATS.forEach(c=>{const chip=document.createElement('div');chip.className='cat-chip'+(c===currentCat?' active':'');chip.textContent=c;chip.onclick=()=>changeCat(c);strip.appendChild(chip);});}
 async function changeCat(cat){currentCat=cat;document.querySelectorAll('#cat-strip .cat-chip').forEach(c=>c.classList.toggle('active',c.textContent===cat));longNextToken='';preloadCache=[];await loadHomeData();}
-function renderHomeShorts(){
-  const g=document.getElementById('home-shorts-grid');g.innerHTML='';
-  if(!shortVideos.length){g.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No shorts found</div>';return;}
-  shortVideos.slice(0,8).forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-yt';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-yt-info"><div class="short-card-yt-title">${v.title.slice(0,50)}</div><div class="short-card-yt-views">${fmtV(v.views)} views</div></div>`;d.onclick=()=>openShortsPage(i);g.appendChild(d);});
-}
-function renderHomeLong(){
-  const f=document.getElementById('home-long-feed');f.innerHTML='';
-  if(!longVideos.length){f.innerHTML='<div class="empty-msg">No videos found</div>';return;}
-  longVideos.forEach(v=>f.appendChild(makeVideoCard(v)));
-}
-function makeVideoCard(v){
-  const d=document.createElement('div');d.className='video-card';
-  const avColor=rndColor(v.channel);const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');
-  const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentNode.style.background='${avColor}';this.remove()">`:`${(v.channel||'?')[0]}`;
-  d.innerHTML=`<div class="thumb-wrap"><img src="${v.thumb}" loading="lazy" onerror="this.style.background='${avColor}'"><div class="thumb-dur">${v.duration||'5:00'}</div></div><div class="video-row"><div class="ch-av" style="background:${avColor}" onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><div class="vid-meta"><div class="vid-title">${v.title}</div><div class="vid-sub"><span onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')" style="cursor:pointer;">${v.channel}</span><span>${fmtV(v.views)} views</span><span>${timeAgo(v.publishedAt)}</span></div></div></div>`;
-  d.onclick=()=>openPlayer(v);return d;
-}
+function renderHomeShorts(){const g=document.getElementById('home-shorts-grid');g.innerHTML='';if(!shortVideos.length){g.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No shorts found</div>';return;}shortVideos.slice(0,8).forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-yt';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-yt-info"><div class="short-card-yt-title">${v.title.slice(0,50)}</div><div class="short-card-yt-views">${fmtV(v.views)} views</div></div>`;d.onclick=()=>openShortsPage(i);g.appendChild(d);});}
+function renderHomeLong(){const f=document.getElementById('home-long-feed');f.innerHTML='';if(!longVideos.length){f.innerHTML='<div class="empty-msg">No videos found</div>';return;}longVideos.forEach(v=>f.appendChild(makeVideoCard(v)));}
+function makeVideoCard(v){const d=document.createElement('div');d.className='video-card';const avColor=rndColor(v.channel);const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentNode.style.background='${avColor}';this.remove()">`:`${(v.channel||'?')[0]}`;d.innerHTML=`<div class="thumb-wrap"><img src="${v.thumb}" loading="lazy" onerror="this.style.background='${avColor}'"><div class="thumb-dur">${v.duration||'5:00'}</div></div><div class="video-row"><div class="ch-av" style="background:${avColor}" onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><div class="vid-meta"><div class="vid-title">${v.title}</div><div class="vid-sub"><span onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')" style="cursor:pointer;">${v.channel}</span><span>${fmtV(v.views)} views</span><span>${timeAgo(v.publishedAt)}</span></div></div></div>`;d.onclick=()=>openPlayer(v);return d;}
 
 // ============================================================
 // SEARCH
 // ============================================================
-function setupTrending(){
-  const terms=['Funny Shorts 2025','New Music 2025','Gaming Highlights','Cricket Viral','Motivational Speech','Tech Review 2025','Travel Vlog','Food Recipe Viral','Cute Animals','Fashion Trends'];
-  const tl=document.getElementById('trend-list');tl.innerHTML='';
-  terms.forEach(t=>{const d=document.createElement('div');d.className='trend-item';d.innerHTML=`<span style="color:var(--text3)">🔍</span><span class="trend-text">${t}</span>`;d.onclick=()=>{document.getElementById('search-big-input').value=t;doSearch();};tl.appendChild(d);});
-}
+function setupTrending(){const terms=['Funny Shorts 2025','New Music 2025','Gaming Highlights','Cricket Viral','Motivational Speech','Tech Review 2025','Travel Vlog','Food Recipe Viral','Cute Animals','Fashion Trends'];const tl=document.getElementById('trend-list');tl.innerHTML='';terms.forEach(t=>{const d=document.createElement('div');d.className='trend-item';d.innerHTML=`<span style="color:var(--text3)">🔍</span><span class="trend-text">${t}</span>`;d.onclick=()=>{document.getElementById('search-big-input').value=t;doSearch();};tl.appendChild(d);});}
 function showSearchPage(){showPage('search');document.getElementById('search-suggestions').style.display='block';document.getElementById('search-results-wrap').style.display='none';}
-async function doSearch(){
-  const q=(document.getElementById('search-input').value||document.getElementById('search-big-input').value).trim();if(!q)return;
-  document.getElementById('search-input').value=q;document.getElementById('search-big-input').value=q;
-  showPage('search');document.getElementById('search-suggestions').style.display='none';document.getElementById('search-results-wrap').style.display='block';
-  document.getElementById('search-shorts-wrap').style.display='none';document.getElementById('search-vids-hdr').style.display='none';
-  document.getElementById('search-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';document.getElementById('search-shorts-grid').innerHTML='';
-  const[sRes,lRes]=await Promise.all([fetchShortsWithStats('All',q),fetchLong('All',q)]);
-  if(sRes.items.length){document.getElementById('search-shorts-wrap').style.display='block';const sg=document.getElementById('search-shorts-grid');sg.innerHTML='';sRes.items.slice(0,10).forEach((v,idx)=>{const d=document.createElement('div');d.className='short-card-yt';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-yt-info"><div class="short-card-yt-title">${v.title.slice(0,50)}</div><div class="short-card-yt-views">${fmtV(v.views)} views</div></div>`;d.onclick=()=>{shortVideos=sRes.items;openShortsPage(idx);};sg.appendChild(d);});}
-  const lf=document.getElementById('search-long-feed');
-  if(lRes.items.length){document.getElementById('search-vids-hdr').style.display='flex';lf.innerHTML='';lRes.items.forEach(v=>lf.appendChild(makeVideoCard(v)));let sToken=lRes.next;searchLoadingMore=false;const sen=document.createElement('div');sen.style.height='20px';lf.appendChild(sen);new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!searchLoadingMore){searchLoadingMore=true;const more=await fetchLong('All',q,sToken);sToken=more.next;more.items.forEach(v=>lf.insertBefore(makeVideoCard(v),sen));searchLoadingMore=false;}},{threshold:.1}).observe(sen);}
-  else{lf.innerHTML='<div class="empty-msg">No results. Try different keywords.</div>';}
-}
+async function doSearch(){const q=(document.getElementById('search-input').value||document.getElementById('search-big-input').value).trim();if(!q)return;document.getElementById('search-input').value=q;document.getElementById('search-big-input').value=q;showPage('search');document.getElementById('search-suggestions').style.display='none';document.getElementById('search-results-wrap').style.display='block';document.getElementById('search-shorts-wrap').style.display='none';document.getElementById('search-vids-hdr').style.display='none';document.getElementById('search-long-feed').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';document.getElementById('search-shorts-grid').innerHTML='';const[sRes,lRes]=await Promise.all([fetchShortsWithStats('All',q),fetchLong('All',q)]);if(sRes.items.length){document.getElementById('search-shorts-wrap').style.display='block';const sg=document.getElementById('search-shorts-grid');sg.innerHTML='';sRes.items.slice(0,10).forEach((v,idx)=>{const d=document.createElement('div');d.className='short-card-yt';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-yt-info"><div class="short-card-yt-title">${v.title.slice(0,50)}</div><div class="short-card-yt-views">${fmtV(v.views)} views</div></div>`;d.onclick=()=>{shortVideos=sRes.items;openShortsPage(idx);};sg.appendChild(d);});}const lf=document.getElementById('search-long-feed');if(lRes.items.length){document.getElementById('search-vids-hdr').style.display='flex';lf.innerHTML='';lRes.items.forEach(v=>lf.appendChild(makeVideoCard(v)));let sToken=lRes.next;searchLoadingMore=false;const sen=document.createElement('div');sen.style.height='20px';lf.appendChild(sen);new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!searchLoadingMore){searchLoadingMore=true;const more=await fetchLong('All',q,sToken);sToken=more.next;more.items.forEach(v=>lf.insertBefore(makeVideoCard(v),sen));searchLoadingMore=false;}},{threshold:.1}).observe(sen);}else{lf.innerHTML='<div class="empty-msg">No results. Try different keywords.</div>';}}
 
-// IG Q PAGE
 function openIgQPage(){document.getElementById('ig-q-page').style.display='flex';if(!igQVideos.length)loadIgQGrid();}
 function closeIgQPage(){document.getElementById('ig-q-page').style.display='none';}
 async function doIgQSearch(){const q=document.getElementById('ig-q-search-input').value.trim();if(!q)return;usedIgQIds.clear();igQVideos=[];loadIgQGrid(q);}
-async function loadIgQGrid(query){
-  if(igQLoading)return;igQLoading=true;const grid=document.getElementById('ig-q-grid');
-  if(!query&&igQVideos.length===0)grid.innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
-  const ytData=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));ytData.items.filter(v=>!usedIgQIds.has(v.id)).forEach(v=>{usedIgQIds.add(v.id);igQVideos.push(v);});renderIgQGrid();igQLoading=false;
-}
-function renderIgQGrid(){
-  const grid=document.getElementById('ig-q-grid');grid.innerHTML='';
-  igQVideos.forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-3';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-3-views">👁 ${fmtV(v.views)}</div>`;d.onclick=()=>{shortVideos=igQVideos;openShortsPage(i);};grid.appendChild(d);});
-  const s=document.createElement('div');s.style.height='20px';grid.appendChild(s);
-  new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!igQLoading)await loadIgQGrid();},{threshold:.1}).observe(s);
-}
+async function loadIgQGrid(query){if(igQLoading)return;igQLoading=true;const grid=document.getElementById('ig-q-grid');if(!query&&igQVideos.length===0)grid.innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';const ytData=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));ytData.items.filter(v=>!usedIgQIds.has(v.id)).forEach(v=>{usedIgQIds.add(v.id);igQVideos.push(v);});renderIgQGrid();igQLoading=false;}
+function renderIgQGrid(){const grid=document.getElementById('ig-q-grid');grid.innerHTML='';igQVideos.forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-3';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-3-views">👁 ${fmtV(v.views)}</div>`;d.onclick=()=>{shortVideos=igQVideos;openShortsPage(i);};grid.appendChild(d);});const s=document.createElement('div');s.style.height='20px';grid.appendChild(s);new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!igQLoading)await loadIgQGrid();},{threshold:.1}).observe(s);}
 
-// TT SEARCH
 function openTtSearchPage(){document.getElementById('tt-search-page').style.display='flex';if(!ttSpVideos.length)loadTtSpGrid();}
 function closeTtSearchPage(){document.getElementById('tt-search-page').style.display='none';}
-async function runTtSearch(){
-  const q=document.getElementById('tt-sp-input').value.trim();if(!q)return;
-  usedTtSpIds.clear();ttSpVideos=[];document.getElementById('tt-sp-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
-  await loadTtSpGrid(q);
-}
-async function loadTtSpGrid(query){
-  if(ttSpLoading)return;ttSpLoading=true;
-  const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));
-  const newVids=data.items.filter(v=>!usedTtSpIds.has(v.id));newVids.forEach(v=>{usedTtSpIds.add(v.id);ttSpVideos.push(v);});
-  if(!newVids.length&&query){const data2=await fetchShortsWithStats('All',query+' shorts viral 2025');data2.items.filter(v=>!usedTtSpIds.has(v.id)).forEach(v=>{usedTtSpIds.add(v.id);ttSpVideos.push(v);});}
-  renderTtSpGrid();ttSpLoading=false;
-}
-function renderTtSpGrid(){
-  const grid=document.getElementById('tt-sp-grid');grid.innerHTML='';
-  if(!ttSpVideos.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No results. Try different keywords.</div>';return;}
-  ttSpVideos.forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-tt2';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-tt2-badge">SHORT</div><div class="short-card-tt2-info"><div class="short-card-tt2-title">${v.title.slice(0,55)}</div><div class="short-card-tt2-views">${fmtV(v.views)} · ${v.channel.slice(0,20)}</div></div>`;d.onclick=()=>{shortVideos=ttSpVideos;openShortsPage(i);};grid.appendChild(d);});
-  const body=document.getElementById('tt-sp-body');const sentinel=document.getElementById('tt-sp-sentinel');
-  if(!body._obs){body._obs=new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!ttSpLoading)await loadTtSpGrid(document.getElementById('tt-sp-input').value.trim()||null);},{threshold:.1,root:body});body._obs.observe(sentinel);}
-}
+async function runTtSearch(){const q=document.getElementById('tt-sp-input').value.trim();if(!q)return;usedTtSpIds.clear();ttSpVideos=[];document.getElementById('tt-sp-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';await loadTtSpGrid(q);}
+async function loadTtSpGrid(query){if(ttSpLoading)return;ttSpLoading=true;const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));const newVids=data.items.filter(v=>!usedTtSpIds.has(v.id));newVids.forEach(v=>{usedTtSpIds.add(v.id);ttSpVideos.push(v);});if(!newVids.length&&query){const data2=await fetchShortsWithStats('All',query+' shorts viral 2025');data2.items.filter(v=>!usedTtSpIds.has(v.id)).forEach(v=>{usedTtSpIds.add(v.id);ttSpVideos.push(v);});}renderTtSpGrid();ttSpLoading=false;}
+function renderTtSpGrid(){const grid=document.getElementById('tt-sp-grid');grid.innerHTML='';if(!ttSpVideos.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No results. Try different keywords.</div>';return;}ttSpVideos.forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-tt2';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-tt2-badge">SHORT</div><div class="short-card-tt2-info"><div class="short-card-tt2-title">${v.title.slice(0,55)}</div><div class="short-card-tt2-views">${fmtV(v.views)} · ${v.channel.slice(0,20)}</div></div>`;d.onclick=()=>{shortVideos=ttSpVideos;openShortsPage(i);};grid.appendChild(d);});const body=document.getElementById('tt-sp-body');const sentinel=document.getElementById('tt-sp-sentinel');if(!body._obs){body._obs=new IntersectionObserver(async en=>{if(en[0].isIntersecting&&!ttSpLoading)await loadTtSpGrid(document.getElementById('tt-sp-input').value.trim()||null);},{threshold:.1,root:body});body._obs.observe(sentinel);}}
 
 // ============================================================
 // SHORTS PAGE
-// THE REAL FIX: buildShortSlide has ZERO center buttons
-// Observer loads video ONLY on 75% visibility
-// No loading flicker - background hidden until ready
 // ============================================================
-function openShortsPage(startIdx){
-  document.getElementById('shorts-page').style.display='block';document.getElementById('shorts-botnav').style.display='flex';
-  document.getElementById('botnav').style.display='none';document.getElementById('topnav').style.display='none';document.getElementById('main').style.display='none';
-  renderShortsPage(startIdx);
-}
+function openShortsPage(startIdx){document.getElementById('shorts-page').style.display='block';document.getElementById('shorts-botnav').style.display='flex';document.getElementById('botnav').style.display='none';document.getElementById('topnav').style.display='none';document.getElementById('main').style.display='none';renderShortsPage(startIdx);}
 
 function renderShortsPage(startIdx=0){
   const scroller=document.getElementById('shorts-scroller');scroller.innerHTML='';
   if(shortObserverRef)try{shortObserverRef.disconnect();}catch(e){}
-  if(!shortVideos.length){
-    fetchShortsWithStats(currentCat).then(r=>{if(r.items.length){shortVideos=r.items;shortVideos.forEach(v=>usedShortIds.add(v.id));renderShortsPage(startIdx);}});return;
-  }
+  if(!shortVideos.length){fetchShortsWithStats(currentCat).then(r=>{if(r.items.length){shortVideos=r.items;shortVideos.forEach(v=>usedShortIds.add(v.id));renderShortsPage(startIdx);}});return;}
   shortVideos.forEach(v=>scroller.appendChild(buildShortSlide(v)));
-
-  shortObserverRef=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      // CRITICAL: Only act when truly visible (75%)
-      if(e.intersectionRatio<0.75)return;
-      const slide=e.target;
-      const allSlides=Array.from(scroller.querySelectorAll('.s-slide'));
-      const idx=allSlides.indexOf(slide);if(idx<0)return;
-
-      // STOP ALL other iframes immediately
-      allSlides.forEach((s,si)=>{
-        if(si!==idx){
-          const f=s.querySelector('iframe');
-          if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';
-        }
-      });
-
-      const v=shortVideos[idx];if(!v)return;
-      const iframe=slide.querySelector('iframe');
-      // Load only if not already loaded with this video
-      if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){
-        iframe.setAttribute('data-vid',v.id);
-        iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=1`;
-      }
-
-      // Load more near end
-      if(idx>=shortVideos.length-3){
-        const cached=getPreloadedShorts(10);
-        if(cached.length){cached.forEach(vv=>{shortVideos.push(vv);const ns=buildShortSlide(vv);scroller.appendChild(ns);try{shortObserverRef.observe(ns);}catch(err){}});}
-        else{fetchShortsWithStats(currentCat).then(r=>{r.items.filter(vv=>!usedShortIds.has(vv.id)).forEach(vv=>{usedShortIds.add(vv.id);shortVideos.push(vv);const ns=buildShortSlide(vv);scroller.appendChild(ns);try{shortObserverRef.observe(ns);}catch(err){}});preloadShorts();});}
-      }
-    });
-  },{threshold:0.75});
-
+  shortObserverRef=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.intersectionRatio<0.75)return;const slide=e.target;const allSlides=Array.from(scroller.querySelectorAll('.s-slide'));const idx=allSlides.indexOf(slide);if(idx<0)return;allSlides.forEach((s,si)=>{if(si!==idx){const f=s.querySelector('iframe');if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';}});const v=shortVideos[idx];if(!v)return;const iframe=slide.querySelector('iframe');if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=1`;}if(idx>=shortVideos.length-3){const cached=getPreloadedShorts(10);if(cached.length){cached.forEach(vv=>{shortVideos.push(vv);const ns=buildShortSlide(vv);scroller.appendChild(ns);try{shortObserverRef.observe(ns);}catch(err){}});}else{fetchShortsWithStats(currentCat).then(r=>{r.items.filter(vv=>!usedShortIds.has(vv.id)).forEach(vv=>{usedShortIds.add(vv.id);shortVideos.push(vv);const ns=buildShortSlide(vv);scroller.appendChild(ns);try{shortObserverRef.observe(ns);}catch(err){}});preloadShorts();});}}});},{threshold:0.75});
   scroller.querySelectorAll('.s-slide').forEach(s=>shortObserverRef.observe(s));
-  setTimeout(()=>{
-    scroller.scrollTo({top:startIdx*window.innerHeight,behavior:'instant'});
-    const firstSlide=scroller.querySelectorAll('.s-slide')[startIdx];
-    if(firstSlide){const v=shortVideos[startIdx];if(!v)return;const iframe=firstSlide.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=1`;}}
-  },50);
+  setTimeout(()=>{scroller.scrollTo({top:startIdx*window.innerHeight,behavior:'instant'});const firstSlide=scroller.querySelectorAll('.s-slide')[startIdx];if(firstSlide){const v=shortVideos[startIdx];if(!v)return;const iframe=firstSlide.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=1`;}}},50);
 }
 
-// THE KEY FIX: buildShortSlide
-// - ZERO center buttons (no prev/pause/next)
-// - NO top title/id overlay
-// - ONLY bottom info
-// - iframe starts empty (no loading flash)
 function buildShortSlide(v){
   const slide=document.createElement('div');slide.className='s-slide';
   const likeCount=v.likes||0,cmtCount=v.comments||0,vid=v.id;
   const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');
   const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.style.display='none'">`:'';
-
-  // iframe starts with src='' - observer will load it only when visible
-  slide.innerHTML=`
-    <img class="s-bg-img" src="${v.thumb}" alt="" loading="lazy">
-    <div class="s-video-wrap">
-      <iframe class="s-iframe" src="about:blank" frameborder="0" allowfullscreen
-        allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
-        style="width:100%;height:100%;border:0;background:#000;"></iframe>
-    </div>
-    <div class="s-gradient"></div>
-    <div class="s-info">
-      <div class="s-ch-row">
-        <div class="s-avatar" style="background:${rndColor(v.channel)}"
-          onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">
-          ${avHtml}${!v.channelAvatar?(v.channel||'?')[0]:''}
-        </div>
-        <span class="s-ch-name"
-          onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">${v.channel}</span>
-        <button class="s-sub-btn"
-          onclick="event.stopPropagation();this.classList.toggle('s');toast(this.classList.contains('s')?'✅ Subscribed!':'Unsubscribed')">
-          Subscribe
-        </button>
-      </div>
-      <div class="s-title">${v.title.slice(0,80)}</div>
-    </div>
-    <div class="s-actions">
-      <button class="s-act-btn" onclick="event.stopPropagation();toggleSLike('${vid}',this,${likeCount})">
-        <svg id="slk-${vid}" width="28" height="28" viewBox="0 0 24 24"
-          fill="${sLikes[vid]?'#ff4444':'none'}"
-          stroke="${sLikes[vid]?'#ff4444':'#fff'}" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-        <span id="slkc-${vid}">${fmtV(likeCount)}</span>
-      </button>
-      <button class="s-act-btn" onclick="event.stopPropagation();openSCmt('${vid}',${cmtCount})">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span>${fmtV(cmtCount)}</span>
-      </button>
-      <button class="s-act-btn" onclick="event.stopPropagation();shareV('${vid}','${escQ(v.title)}')">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-        <span>Share</span>
-      </button>
-      <button class="s-act-btn" onclick="event.stopPropagation();toast('🔖 Saved!')">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span>Save</span>
-      </button>
-    </div>`;
-
-  // Double tap to like ONLY. No single tap pause/play button.
+  slide.innerHTML=`<img class="s-bg-img" src="${v.thumb}" alt="" loading="lazy"><div class="s-video-wrap"><iframe class="s-iframe" src="about:blank" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" style="width:100%;height:100%;border:0;background:#000;"></iframe></div><div class="s-gradient"></div><div class="s-info"><div class="s-ch-row"><div class="s-avatar" style="background:${rndColor(v.channel)}" onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">${avHtml}${!v.channelAvatar?(v.channel||'?')[0]:''}</div><span class="s-ch-name" onclick="event.stopPropagation();openChannelPage('${si}','${sc}','${sa}')">${v.channel}</span><button class="s-sub-btn" onclick="event.stopPropagation();this.classList.toggle('s');toast(this.classList.contains('s')?'✅ Subscribed!':'Unsubscribed')">Subscribe</button></div><div class="s-title">${v.title.slice(0,80)}</div></div><div class="s-actions"><button class="s-act-btn" onclick="event.stopPropagation();toggleSLike('${vid}',this,${likeCount})"><svg id="slk-${vid}" width="28" height="28" viewBox="0 0 24 24" fill="${sLikes[vid]?'#ff4444':'none'}" stroke="${sLikes[vid]?'#ff4444':'#fff'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="slkc-${vid}">${fmtV(likeCount)}</span></button><button class="s-act-btn" onclick="event.stopPropagation();openSCmt('${vid}',${cmtCount})"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${fmtV(cmtCount)}</span></button><button class="s-act-btn" onclick="event.stopPropagation();shareV('${vid}','${escQ(v.title)}')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share</span></button><button class="s-act-btn" onclick="event.stopPropagation();toast('🔖 Saved!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Save</span></button></div>`;
   let lt=0;
-  slide.addEventListener('click',function(e){
-    if(e.target.closest('.s-actions')||e.target.closest('.s-sub-btn')||e.target.closest('.s-ch-name')||e.target.closest('.s-avatar'))return;
-    const now=Date.now();
-    if(now-lt<300){
-      // Double tap = like
-      sLikes[vid]=true;
-      const svg=document.getElementById('slk-'+vid);if(svg){svg.setAttribute('fill','#ff4444');svg.setAttribute('stroke','#ff4444');}
-      const sp=document.getElementById('slkc-'+vid);if(sp)sp.textContent=fmtV(likeCount+1);
-      const heart=document.createElement('div');
-      heart.style.cssText='position:absolute;font-size:80px;z-index:50;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:heartPop .6s ease forwards;';
-      heart.textContent='❤️';this.appendChild(heart);setTimeout(()=>heart.remove(),700);toast('❤️ Liked!');
-    }
-    lt=now;
-  });
+  slide.addEventListener('click',function(e){if(e.target.closest('.s-actions')||e.target.closest('.s-sub-btn')||e.target.closest('.s-ch-name')||e.target.closest('.s-avatar'))return;const now=Date.now();if(now-lt<300){sLikes[vid]=true;const svg=document.getElementById('slk-'+vid);if(svg){svg.setAttribute('fill','#ff4444');svg.setAttribute('stroke','#ff4444');}const sp=document.getElementById('slkc-'+vid);if(sp)sp.textContent=fmtV(likeCount+1);const heart=document.createElement('div');heart.style.cssText='position:absolute;font-size:80px;z-index:50;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:heartPop .6s ease forwards;';heart.textContent='❤️';this.appendChild(heart);setTimeout(()=>heart.remove(),700);toast('❤️ Liked!');}lt=now;});
   return slide;
 }
 
-function toggleSLike(id,btn,orig){
-  sLikes[id]=!sLikes[id];const svg=document.getElementById('slk-'+id)||btn.querySelector('svg');const span=document.getElementById('slkc-'+id)||btn.querySelector('span');
-  if(svg){svg.setAttribute('fill',sLikes[id]?'#ff4444':'none');svg.setAttribute('stroke',sLikes[id]?'#ff4444':'#fff');}
-  if(span)span.textContent=fmtV(sLikes[id]?orig+1:Math.max(0,orig-1));
-  toast(sLikes[id]?'❤️ Liked!':'Like removed');
-}
+function toggleSLike(id,btn,orig){sLikes[id]=!sLikes[id];const svg=document.getElementById('slk-'+id)||btn.querySelector('svg');const span=document.getElementById('slkc-'+id)||btn.querySelector('span');if(svg){svg.setAttribute('fill',sLikes[id]?'#ff4444':'none');svg.setAttribute('stroke',sLikes[id]?'#ff4444':'#fff');}if(span)span.textContent=fmtV(sLikes[id]?orig+1:Math.max(0,orig-1));toast(sLikes[id]?'❤️ Liked!':'Like removed');}
 function openSCmt(id,count){document.getElementById('panel-cmt-count').textContent=`${fmtV(count)} Comments`;document.getElementById('s-cmt-list').innerHTML=genComments();document.getElementById('s-cmt-panel').style.display='block';document.getElementById('s-panel-overlay').style.display='block';}
 function closeSPanel(){document.getElementById('s-cmt-panel').style.display='none';document.getElementById('s-panel-overlay').style.display='none';}
 function shareV(id,title){const url=`https://www.youtube.com/shorts/${id}`;if(navigator.share)navigator.share({title,url}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(url).then(()=>toast('🔗 Copied!')).catch(()=>toast('🔗 Copied!'));}
-function leaveShorts(page){
-  if(shortObserverRef)try{shortObserverRef.disconnect();}catch(e){}
-  // Stop all iframes
-  document.getElementById('shorts-scroller').querySelectorAll('iframe').forEach(f=>{f.src='about:blank';});
-  document.getElementById('shorts-page').style.display='none';document.getElementById('shorts-botnav').style.display='none';
-  document.getElementById('botnav').style.display='flex';document.getElementById('topnav').style.display='flex';document.getElementById('main').style.display='block';
-  showPage(page);
-}
+function leaveShorts(page){if(shortObserverRef)try{shortObserverRef.disconnect();}catch(e){}document.getElementById('shorts-scroller').querySelectorAll('iframe').forEach(f=>{f.src='about:blank';});document.getElementById('shorts-page').style.display='none';document.getElementById('shorts-botnav').style.display='none';document.getElementById('botnav').style.display='flex';document.getElementById('topnav').style.display='flex';document.getElementById('main').style.display='block';showPage(page);}
 
 // ============================================================
 // CHANNEL PAGE
 // ============================================================
-async function openChannelPage(channelId,channelName,avatarUrl){
-  if(!channelId&&!channelName)return;
-  currentChannelData={channelId,channelName,avatarUrl};document.getElementById('channel-page').style.display='block';
-  const avEl=document.getElementById('ch-avatar');
-  if(avatarUrl){avEl.innerHTML=`<img src="${avatarUrl}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}
-  else if(channelId&&channelAvatarCache[channelId]){avEl.innerHTML=`<img src="${channelAvatarCache[channelId]}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}
-  else{avEl.textContent=(channelName||'C')[0];avEl.style.background=rndColor(channelName);}
-  document.getElementById('ch-name').textContent=channelName;document.getElementById('ch-handle').textContent='@'+channelName.toLowerCase().replace(/\s+/g,'_');
-  document.getElementById('ch-sub-btn').textContent='Subscribe';document.getElementById('ch-sub-btn').classList.remove('subscribed');
-  document.getElementById('ch-subs').textContent='...';document.getElementById('ch-vids').textContent='...';document.getElementById('ch-views').textContent='...';
-  if(channelId){
-    try{const data=await ytGet(`${YT_API}/channels?part=statistics,snippet&id=${channelId}&key=${YT_KEY}`);if(data&&data.items&&data.items[0]){const stats=data.items[0].statistics;document.getElementById('ch-subs').textContent=fmtV(stats.subscriberCount||0);document.getElementById('ch-vids').textContent=fmtV(stats.videoCount||0);document.getElementById('ch-views').textContent=fmtV(stats.viewCount||0);const thumb=data.items[0].snippet?.thumbnails?.high?.url||data.items[0].snippet?.thumbnails?.default?.url;if(thumb){avEl.innerHTML=`<img src="${thumb}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}channelAvatarCache[channelId]=thumb||'';}}catch(e){}
-  }else{document.getElementById('ch-subs').textContent=rndSubs();document.getElementById('ch-vids').textContent=Math.floor(Math.random()*500+10);document.getElementById('ch-views').textContent=fmtV(Math.floor(Math.random()*50000000+100000));}
-  loadChTab('videos',null,channelId,channelName);
-}
+async function openChannelPage(channelId,channelName,avatarUrl){if(!channelId&&!channelName)return;currentChannelData={channelId,channelName,avatarUrl};document.getElementById('channel-page').style.display='block';const avEl=document.getElementById('ch-avatar');if(avatarUrl){avEl.innerHTML=`<img src="${avatarUrl}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}else if(channelId&&channelAvatarCache[channelId]){avEl.innerHTML=`<img src="${channelAvatarCache[channelId]}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}else{avEl.textContent=(channelName||'C')[0];avEl.style.background=rndColor(channelName);}document.getElementById('ch-name').textContent=channelName;document.getElementById('ch-handle').textContent='@'+channelName.toLowerCase().replace(/\s+/g,'_');document.getElementById('ch-sub-btn').textContent='Subscribe';document.getElementById('ch-sub-btn').classList.remove('subscribed');document.getElementById('ch-subs').textContent='...';document.getElementById('ch-vids').textContent='...';document.getElementById('ch-views').textContent='...';if(channelId){try{const data=await ytGet(`${YT_API}/channels?part=statistics,snippet&id=${channelId}&key=${YT_KEY}`);if(data&&data.items&&data.items[0]){const stats=data.items[0].statistics;document.getElementById('ch-subs').textContent=fmtV(stats.subscriberCount||0);document.getElementById('ch-vids').textContent=fmtV(stats.videoCount||0);document.getElementById('ch-views').textContent=fmtV(stats.viewCount||0);const thumb=data.items[0].snippet?.thumbnails?.high?.url||data.items[0].snippet?.thumbnails?.default?.url;if(thumb){avEl.innerHTML=`<img src="${thumb}" onerror="this.parentElement.textContent='${(channelName||'C')[0]}'">`;}channelAvatarCache[channelId]=thumb||'';}}catch(e){}}else{document.getElementById('ch-subs').textContent=rndSubs();document.getElementById('ch-vids').textContent=Math.floor(Math.random()*500+10);document.getElementById('ch-views').textContent=fmtV(Math.floor(Math.random()*50000000+100000));}loadChTab('videos',null,channelId,channelName);}
 function closeChannelPage(){document.getElementById('channel-page').style.display='none';}
 function toggleChSub(btn){btn.classList.toggle('subscribed');btn.textContent=btn.classList.contains('subscribed')?'Subscribed':'Subscribe';toast(btn.classList.contains('subscribed')?'✅ Subscribed!':'Unsubscribed');}
-async function loadChTab(tabName,el,chId,chName){
-  if(el){document.querySelectorAll('.ch-page-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
-  const list=document.getElementById('ch-videos-list');const cId=chId||currentChannelData?.channelId;const cName=chName||currentChannelData?.channelName||'';
-  list.innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
-  if(tabName==='about'){list.innerHTML=`<div style="padding:20px 16px;color:var(--text2);font-size:14px;line-height:1.6;"><p style="font-weight:700;color:#fff;margin-bottom:8px;">${cName}</p><p>YouTube Channel</p><br><p>📍 Pakistan / India</p></div>`;return;}
-  if(cId){
-    try{const dur=tabName==='shorts'?'&videoDuration=short':'&videoDuration=medium';const data=await ytGet(`${YT_API}/search?part=snippet&type=video&channelId=${cId}&maxResults=15${dur}&key=${YT_KEY}&order=date`);
-    if(data&&data.items&&data.items.length){list.innerHTML='';const ids=data.items.filter(i=>i.id?.videoId).map(i=>i.id.videoId);const stats=await fetchStats(ids);
-    if(tabName==='shorts'){const grid=document.createElement('div');grid.className='shorts-grid-3';data.items.filter(i=>i.id?.videoId).forEach(i=>{const v={id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:stats[i.id.videoId]?.views||0,channelId:i.snippet.channelId};const d=document.createElement('div');d.className='short-card-3';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-3-views">👁 ${fmtV(v.views)}</div>`;d.onclick=()=>{shortVideos=[v,...shortVideos.slice(0,19)];openShortsPage(0);};grid.appendChild(d);});list.appendChild(grid);}
-    else{data.items.filter(i=>i.id?.videoId).forEach(i=>{const v={id:i.id.videoId,title:i.snippet.title,channel:cName,channelId:cId,thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:stats[i.id.videoId]?.views||0,likes:stats[i.id.videoId]?.likes||0,duration:rndDur(),publishedAt:i.snippet.publishedAt,channelAvatar:channelAvatarCache[cId]||''};list.appendChild(makeVideoCard(v));});}
-    }else{list.innerHTML='<div class="empty-msg">No videos found</div>';}
-    }catch(e){list.innerHTML='<div class="empty-msg">Error loading</div>';}
-  }else{list.innerHTML='<div class="empty-msg">No videos found</div>';}
-}
+async function loadChTab(tabName,el,chId,chName){if(el){document.querySelectorAll('.ch-page-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}const list=document.getElementById('ch-videos-list');const cId=chId||currentChannelData?.channelId;const cName=chName||currentChannelData?.channelName||'';list.innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';if(tabName==='about'){list.innerHTML=`<div style="padding:20px 16px;color:var(--text2);font-size:14px;line-height:1.6;"><p style="font-weight:700;color:#fff;margin-bottom:8px;">${cName}</p><p>YouTube Channel</p><br><p>📍 Pakistan / India</p></div>`;return;}if(cId){try{const dur=tabName==='shorts'?'&videoDuration=short':'&videoDuration=medium';const data=await ytGet(`${YT_API}/search?part=snippet&type=video&channelId=${cId}&maxResults=15${dur}&key=${YT_KEY}&order=date`);if(data&&data.items&&data.items.length){list.innerHTML='';const ids=data.items.filter(i=>i.id?.videoId).map(i=>i.id.videoId);const stats=await fetchStats(ids);if(tabName==='shorts'){const grid=document.createElement('div');grid.className='shorts-grid-3';data.items.filter(i=>i.id?.videoId).forEach(i=>{const v={id:i.id.videoId,title:i.snippet.title,channel:i.snippet.channelTitle,thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:stats[i.id.videoId]?.views||0,channelId:i.snippet.channelId};const d=document.createElement('div');d.className='short-card-3';d.innerHTML=`<img src="${v.thumb}" loading="lazy" onerror="this.style.background='${rndColor(v.channel)}'"><div class="short-card-3-views">👁 ${fmtV(v.views)}</div>`;d.onclick=()=>{shortVideos=[v,...shortVideos.slice(0,19)];openShortsPage(0);};grid.appendChild(d);});list.appendChild(grid);}else{data.items.filter(i=>i.id?.videoId).forEach(i=>{const v={id:i.id.videoId,title:i.snippet.title,channel:cName,channelId:cId,thumb:i.snippet.thumbnails.high?.url||i.snippet.thumbnails.medium?.url||'',views:stats[i.id.videoId]?.views||0,likes:stats[i.id.videoId]?.likes||0,duration:rndDur(),publishedAt:i.snippet.publishedAt,channelAvatar:channelAvatarCache[cId]||''};list.appendChild(makeVideoCard(v));});}}else{list.innerHTML='<div class="empty-msg">No videos found</div>';}})catch(e){list.innerHTML='<div class="empty-msg">Error loading</div>';}}else{list.innerHTML='<div class="empty-msg">No videos found</div>';}}
 
 // ============================================================
 // PLAYER
 // ============================================================
-function openPlayer(v){
-  currentVideoId=v.id;currentVideoData=v;loopActive=false;headphoneActive=false;
-  document.getElementById('loop-btn').classList.remove('ctrl-active');document.getElementById('hdph-btn').classList.remove('ctrl-active');
-  showPage('player');document.getElementById('player-title').textContent=v.title;document.getElementById('player-thumb').src=v.thumb;
-  document.getElementById('fake-play').style.display='flex';document.getElementById('yt-iframe').style.display='none';document.getElementById('yt-iframe').src='';
-  document.getElementById('vid-details').innerHTML=buildVidDetails(v);document.getElementById('cmt-section').innerHTML=buildCmtSection(v);loadMoreVids(v);
-}
+function openPlayer(v){currentVideoId=v.id;currentVideoData=v;loopActive=false;headphoneActive=false;document.getElementById('loop-btn').classList.remove('ctrl-active');document.getElementById('hdph-btn').classList.remove('ctrl-active');showPage('player');document.getElementById('player-title').textContent=v.title;document.getElementById('player-thumb').src=v.thumb;document.getElementById('fake-play').style.display='flex';document.getElementById('yt-iframe').style.display='none';document.getElementById('yt-iframe').src='';document.getElementById('vid-details').innerHTML=buildVidDetails(v);document.getElementById('cmt-section').innerHTML=buildCmtSection(v);loadMoreVids(v);}
 function playVideo(){const f=document.getElementById('yt-iframe');f.src=`https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1${loopActive?'&loop=1&playlist='+currentVideoId:''}`;document.getElementById('fake-play').style.display='none';f.style.display='block';}
 function toggleLoop(){loopActive=!loopActive;document.getElementById('loop-btn').classList.toggle('ctrl-active',loopActive);toast(loopActive?'🔁 Loop ON':'🔁 Loop OFF');if(document.getElementById('yt-iframe').style.display!=='none')playVideo();}
 function toggleHeadphone(){headphoneActive=!headphoneActive;document.getElementById('hdph-btn').classList.toggle('ctrl-active',headphoneActive);toast(headphoneActive?'🎧 Audio ON':'🎧 Audio OFF');}
-function buildVidDetails(v){
-  const avColor=rndColor(v.channel);const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentElement.textContent='${(v.channel||'C')[0]}'">`:`${(v.channel||'?')[0]}`;const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');
-  return`<div class="vid-details"><div class="vd-title">${v.title}</div><div class="vd-ch-row"><div class="vd-ch-left"><div class="vd-av" style="background:${avColor}" onclick="openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><div><div class="vd-ch-name" onclick="openChannelPage('${si}','${sc}','${sa}')">${v.channel}</div><div class="vd-subs">${v.subs||rndSubs()} subscribers</div></div></div><button class="sub-btn" onclick="this.classList.toggle('subscribed');this.textContent=this.classList.contains('subscribed')?'Subscribed':'Subscribe';toast(this.classList.contains('subscribed')?'✅ Subscribed!':'Unsubscribed')">Subscribe</button></div><div class="vd-stats"><div class="stat-chip">👁 ${fmtV(v.views)} views</div><div class="stat-chip">📅 ${timeAgo(v.publishedAt)}</div></div><div class="vd-actions"><button class="vd-act like-act" onclick="this.classList.toggle('liked');toast(this.classList.contains('liked')?'❤️ Liked!':'Like removed')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${fmtV(v.likes)} Likes</button><button class="vd-act save-act" onclick="toast('🔖 Saved!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save</button><button class="vd-act share-act" onclick="shareV('${v.id}','${escQ(v.title)}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button></div></div>`;
-}
-function buildCmtSection(v){
-  return`<div class="cmt-section"><div class="cmt-toggle-row" onclick="toggleCmts(this)"><span style="font-weight:700;font-size:14px;">💬 ${fmtV(v.comments||0)} Comments</span><span class="cmt-toggle-icon">▼</span></div><div class="cmt-body"><div class="cmt-input-row"><div class="my-av">${(currentProfile?.username||'G')[0]}</div><div style="flex:1"><textarea class="cmt-textarea" placeholder="Add a comment..." rows="1" onfocus="this.nextElementSibling.style.display='flex'" oninput="this.nextElementSibling.querySelector('button:last-child').classList.toggle('ready',this.value.trim().length>0)"></textarea><div class="cmt-btns"><button class="cmt-cancel" onclick="this.parentElement.previousElementSibling.value='';this.parentElement.style.display='none'">Cancel</button><button class="cmt-submit" onclick="if(this.classList.contains('ready')){toast('✅ Comment posted!');this.parentElement.previousElementSibling.value='';this.parentElement.style.display='none';}">Comment</button></div></div></div><div>${genComments()}</div></div></div>`;
-}
+function buildVidDetails(v){const avColor=rndColor(v.channel);const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentElement.textContent='${(v.channel||'C')[0]}'">`:`${(v.channel||'?')[0]}`;const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');return`<div class="vid-details"><div class="vd-title">${v.title}</div><div class="vd-ch-row"><div class="vd-ch-left"><div class="vd-av" style="background:${avColor}" onclick="openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><div><div class="vd-ch-name" onclick="openChannelPage('${si}','${sc}','${sa}')">${v.channel}</div><div class="vd-subs">${v.subs||rndSubs()} subscribers</div></div></div><button class="sub-btn" onclick="this.classList.toggle('subscribed');this.textContent=this.classList.contains('subscribed')?'Subscribed':'Subscribe';toast(this.classList.contains('subscribed')?'✅ Subscribed!':'Unsubscribed')">Subscribe</button></div><div class="vd-stats"><div class="stat-chip">👁 ${fmtV(v.views)} views</div><div class="stat-chip">📅 ${timeAgo(v.publishedAt)}</div></div><div class="vd-actions"><button class="vd-act like-act" onclick="this.classList.toggle('liked');toast(this.classList.contains('liked')?'❤️ Liked!':'Like removed')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${fmtV(v.likes)} Likes</button><button class="vd-act save-act" onclick="toast('🔖 Saved!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save</button><button class="vd-act share-act" onclick="shareV('${v.id}','${escQ(v.title)}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button></div></div>`;}
+function buildCmtSection(v){return`<div class="cmt-section"><div class="cmt-toggle-row" onclick="toggleCmts(this)"><span style="font-weight:700;font-size:14px;">💬 ${fmtV(v.comments||0)} Comments</span><span class="cmt-toggle-icon">▼</span></div><div class="cmt-body"><div class="cmt-input-row"><div class="my-av">${(currentProfile?.username||'G')[0]}</div><div style="flex:1"><textarea class="cmt-textarea" placeholder="Add a comment..." rows="1" onfocus="this.nextElementSibling.style.display='flex'" oninput="this.nextElementSibling.querySelector('button:last-child').classList.toggle('ready',this.value.trim().length>0)"></textarea><div class="cmt-btns"><button class="cmt-cancel" onclick="this.parentElement.previousElementSibling.value='';this.parentElement.style.display='none'">Cancel</button><button class="cmt-submit" onclick="if(this.classList.contains('ready')){toast('✅ Comment posted!');this.parentElement.previousElementSibling.value='';this.parentElement.style.display='none';}">Comment</button></div></div></div><div>${genComments()}</div></div></div>`;}
 function toggleCmts(row){const b=row.nextElementSibling;const i=row.querySelector('.cmt-toggle-icon');const open=b.style.display==='block';b.style.display=open?'none':'block';i.style.transform=open?'':'rotate(180deg)';}
 async function loadMoreVids(v){const sec=document.getElementById('more-videos-section');sec.style.display='none';try{const data=await fetchLong(currentCat);if(data.items.length){sec.style.display='block';const list=document.getElementById('more-videos-list');list.innerHTML='';data.items.filter(x=>x.id!==v.id).slice(0,5).forEach(mv=>list.appendChild(makeVideoCard(mv)));}}catch(e){}}
 
@@ -1230,18 +916,8 @@ function openIgCmt(id,count){document.getElementById('ig-panel-count').textConte
 function closeIgPanel(){document.getElementById('ig-cmt-panel').style.display='none';document.getElementById('ig-panel-overlay').style.display='none';}
 function openTtCmt(id,count){document.getElementById('tt-panel-count').textContent=`${fmtV(count)} Comments`;document.getElementById('tt-cmt-list').innerHTML=genComments();document.getElementById('tt-cmt-panel').style.display='block';document.getElementById('tt-panel-overlay').style.display='block';}
 function closeTtPanel(){document.getElementById('tt-cmt-panel').style.display='none';document.getElementById('tt-panel-overlay').style.display='none';}
-function postCmt(panel){
-  const input=document.getElementById(panel+'-cmt-input');const text=input.value.trim();if(!text)return;
-  input.value='';const name=currentProfile?.username||'Guest';
-  document.getElementById(panel+'-cmt-list').insertAdjacentHTML('afterbegin',`<div class="cmt-item"><div class="cmt-av" style="background:${rndColor(name)}">${name[0]}</div><div class="cmt-body-inner"><span class="cmt-author">${name}</span><span class="cmt-time-txt">Just now</span><div class="cmt-text">${text}</div></div></div>`);
-  toast('✅ Comment posted!');
-}
-function genComments(){
-  const ns=['Ahmad Khan','Sara Ali','Muhammad Usman','Fatima Malik','Bilal Ahmed','Ayesha Siddiqui','Hamza Raza','Nida Jabbar','Zain Abideen','Hira Baig'];
-  const cs=['Mashallah amazing! 🔥','Keep it up! 👍','So good!','Watching from Pakistan 🇵🇰','Love this ❤️','Subscribed! 🙌','Made my day 😂','Brilliant! 💯','Kya baat he yaar 😍','Fire content 🔥'];
-  let html='';for(let i=0;i<8;i++){const n=ns[Math.floor(Math.random()*ns.length)];const c=cs[Math.floor(Math.random()*cs.length)];html+=`<div class="cmt-item"><div class="cmt-av" style="background:${rndColor(n)}">${n[0]}</div><div class="cmt-body-inner"><span class="cmt-author">${n}</span><span class="cmt-time-txt">Recently</span><div class="cmt-text">${c}</div></div></div>`;}
-  return html;
-}
+function postCmt(panel){const input=document.getElementById(panel+'-cmt-input');const text=input.value.trim();if(!text)return;input.value='';const name=currentProfile?.username||'Guest';document.getElementById(panel+'-cmt-list').insertAdjacentHTML('afterbegin',`<div class="cmt-item"><div class="cmt-av" style="background:${rndColor(name)}">${name[0]}</div><div class="cmt-body-inner"><span class="cmt-author">${name}</span><span class="cmt-time-txt">Just now</span><div class="cmt-text">${text}</div></div></div>`);toast('✅ Comment posted!');}
+function genComments(){const ns=['Ahmad Khan','Sara Ali','Muhammad Usman','Fatima Malik','Bilal Ahmed','Ayesha Siddiqui','Hamza Raza','Nida Jabbar','Zain Abideen','Hira Baig'];const cs=['Mashallah amazing! 🔥','Keep it up! 👍','So good!','Watching from Pakistan 🇵🇰','Love this ❤️','Subscribed! 🙌','Made my day 😂','Brilliant! 💯','Kya baat he yaar 😍','Fire content 🔥'];let html='';for(let i=0;i<8;i++){const n=ns[Math.floor(Math.random()*ns.length)];const c=cs[Math.floor(Math.random()*cs.length)];html+=`<div class="cmt-item"><div class="cmt-av" style="background:${rndColor(n)}">${n[0]}</div><div class="cmt-body-inner"><span class="cmt-author">${n}</span><span class="cmt-time-txt">Recently</span><div class="cmt-text">${c}</div></div></div>`;}return html;}
 
 // ============================================================
 // UPLOAD
@@ -1249,25 +925,12 @@ function genComments(){
 function openUpload(){uploadFile=null;document.getElementById('ufile-name').textContent='Tap to select video';document.getElementById('utitle').value='';document.getElementById('udesc').value='';document.getElementById('uprog-wrap').style.display='none';document.getElementById('uprog-bar').style.width='0%';document.getElementById('upload-status').style.display='none';const pv=document.getElementById('upreview');pv.style.display='none';pv.src='';document.getElementById('upload-modal').style.display='flex';}
 function closeUpload(){document.getElementById('upload-modal').style.display='none';}
 function onVideoSelect(input){const file=input.files[0];if(!file)return;uploadFile=file;document.getElementById('ufile-name').textContent=file.name+' ('+Math.round(file.size/1024/1024)+'MB)';const title=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');if(!document.getElementById('utitle').value)document.getElementById('utitle').value=title;const pv=document.getElementById('upreview');pv.src=URL.createObjectURL(file);pv.style.display='block';pv.play().catch(()=>{});}
-async function submitUpload(){
-  if(!uploadFile){toast('Please select a video file');return;}const title=document.getElementById('utitle').value.trim();if(!title){toast('Please enter a title');return;}
-  const prog=document.getElementById('uprog-wrap');const bar=document.getElementById('uprog-bar');const status=document.getElementById('upload-status');prog.style.display='block';status.style.display='block';
-  const steps=[10,25,50,75,90,100];for(const pct of steps){bar.style.width=pct+'%';status.textContent=pct<100?`Uploading... ${pct}%`:'✅ Done!';await new Promise(r=>setTimeout(r,350));}
-  const uploads=JSON.parse(localStorage.getItem('anskinge_uploads')||'[]');uploads.unshift({id:'v_'+Date.now(),title,created:new Date().toISOString()});localStorage.setItem('anskinge_uploads',JSON.stringify(uploads.slice(0,50)));
-  toast('✅ Video uploaded!');setTimeout(()=>{closeUpload();document.getElementById('p-videos').textContent=uploads.length;},1000);
-}
+async function submitUpload(){if(!uploadFile){toast('Please select a video file');return;}const title=document.getElementById('utitle').value.trim();if(!title){toast('Please enter a title');return;}const prog=document.getElementById('uprog-wrap');const bar=document.getElementById('uprog-bar');const status=document.getElementById('upload-status');prog.style.display='block';status.style.display='block';const steps=[10,25,50,75,90,100];for(const pct of steps){bar.style.width=pct+'%';status.textContent=pct<100?`Uploading... ${pct}%`:'✅ Done!';await new Promise(r=>setTimeout(r,350));}const uploads=JSON.parse(localStorage.getItem('anskinge_uploads')||'[]');uploads.unshift({id:'v_'+Date.now(),title,created:new Date().toISOString()});localStorage.setItem('anskinge_uploads',JSON.stringify(uploads.slice(0,50)));toast('✅ Video uploaded!');setTimeout(()=>{closeUpload();document.getElementById('p-videos').textContent=uploads.length;},1000);}
 
 // ============================================================
 // PAGE NAV
 // ============================================================
-function showPage(page){
-  ['home','search','player','subs','profile'].forEach(p=>document.getElementById(p+'-page').style.display='none');
-  document.getElementById(page+'-page').style.display='block';document.getElementById('main').scrollTo(0,0);
-  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
-  const map={home:'bn-home',shorts:'bn-shorts',subs:'bn-subs',profile:'bn-profile'};
-  if(map[page])document.getElementById(map[page])?.classList.add('active');
-  if(page!=='player'){document.getElementById('yt-iframe').src='';document.getElementById('yt-iframe').style.display='none';document.getElementById('fake-play').style.display='flex';}
-}
+function showPage(page){['home','search','player','subs','profile'].forEach(p=>document.getElementById(p+'-page').style.display='none');document.getElementById(page+'-page').style.display='block';document.getElementById('main').scrollTo(0,0);document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));const map={home:'bn-home',shorts:'bn-shorts',subs:'bn-subs',profile:'bn-profile'};if(map[page])document.getElementById(map[page])?.classList.add('active');if(page!=='player'){document.getElementById('yt-iframe').src='';document.getElementById('yt-iframe').style.display='none';document.getElementById('fake-play').style.display='flex';}}
 function goBack(){showPage('home');}
 
 // ============================================================
@@ -1276,178 +939,36 @@ function goBack(){showPage('home');}
 function toggleDD(){const dd=document.getElementById('platform-dropdown');dd.style.display=dd.style.display==='block'?'none':'block';}
 document.addEventListener('click',e=>{const dd=document.getElementById('platform-dropdown');if(dd.style.display==='block'&&!dd.contains(e.target)&&!e.target.closest('.platform-arrow')&&!e.target.closest('.shl-arrow')&&!e.target.closest('.ig-name-area')&&!e.target.closest('.tt-platform-arrow'))dd.style.display='none';});
 
-async function selectPlatform(p){
-  currentPlatform=p;document.getElementById('platform-dropdown').style.display='none';
-  document.querySelectorAll('.pd-item').forEach(el=>el.classList.remove('active-platform'));document.getElementById('pd-'+p).classList.add('active-platform');
-  document.getElementById('yt-iframe').src='';
-  ['shorts-scroller','ig-scroller','tt-scroller'].forEach(id=>{const el=document.getElementById(id);if(el)el.querySelectorAll('iframe').forEach(f=>{f.src='about:blank';});});
-  if(shortObserverRef)try{shortObserverRef.disconnect();}catch(e){}if(igObserverRef)try{igObserverRef.disconnect();}catch(e){}if(ttObserverRef)try{ttObserverRef.disconnect();}catch(e){}
-  ['topnav','botnav','main','ig-page','tt-page','shorts-page','shorts-botnav','tt-search-page'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  await showPlatformSplash(p);
-  if(p==='yt'){document.getElementById('topnav').style.display='flex';document.getElementById('botnav').style.display='flex';document.getElementById('main').style.display='block';showPage('home');}
-  else if(p==='ig'){document.getElementById('ig-page').style.display='flex';usedIgIds.clear();igVideos=[];loadIgReels();}
-  else if(p==='tt'){document.getElementById('tt-page').style.display='flex';usedTtIds.clear();ttVideos=[];loadTtReels();}
-}
+async function selectPlatform(p){currentPlatform=p;document.getElementById('platform-dropdown').style.display='none';document.querySelectorAll('.pd-item').forEach(el=>el.classList.remove('active-platform'));document.getElementById('pd-'+p).classList.add('active-platform');document.getElementById('yt-iframe').src='';['shorts-scroller','ig-scroller','tt-scroller'].forEach(id=>{const el=document.getElementById(id);if(el)el.querySelectorAll('iframe').forEach(f=>{f.src='about:blank';});});if(shortObserverRef)try{shortObserverRef.disconnect();}catch(e){}if(igObserverRef)try{igObserverRef.disconnect();}catch(e){}if(ttObserverRef)try{ttObserverRef.disconnect();}catch(e){}['topnav','botnav','main','ig-page','tt-page','shorts-page','shorts-botnav','tt-search-page'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});await showPlatformSplash(p);if(p==='yt'){document.getElementById('topnav').style.display='flex';document.getElementById('botnav').style.display='flex';document.getElementById('main').style.display='block';showPage('home');}else if(p==='ig'){document.getElementById('ig-page').style.display='flex';usedIgIds.clear();igVideos=[];loadIgReels();}else if(p==='tt'){document.getElementById('tt-page').style.display='flex';usedTtIds.clear();ttVideos=[];loadTtReels();}}
 
 // ============================================================
 // INSTAGRAM
-// FIX: NO top title, NO center buttons in ig slides
 // ============================================================
-async function loadIgReels(query){
-  if(igReelsLoading)return;igReelsLoading=true;
-  const sc=document.getElementById('ig-scroller');
-  sc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
-  const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));
-  igVideos=data.items.filter(v=>!usedIgIds.has(v.id));igVideos.forEach(v=>usedIgIds.add(v.id));
-  igReelsLoading=false;renderIgReels();
-  sc.onscroll=async()=>{if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!igReelsLoading){igReelsLoading=true;const more=await fetchShortsWithStats('All',pickQ(SHORT_POOLS.All));more.items.filter(v=>!usedIgIds.has(v.id)).forEach(v=>{usedIgIds.add(v.id);igVideos.push(v);const sl=buildIgSlide(v);sc.appendChild(sl);try{igObserverRef?.observe(sl);}catch(e){}});igReelsLoading=false;}};
-}
-function renderIgReels(){
-  const sc=document.getElementById('ig-scroller');sc.innerHTML='';if(igObserverRef)try{igObserverRef.disconnect();}catch(e){}
-  igVideos.forEach(v=>sc.appendChild(buildIgSlide(v)));
-  igObserverRef=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.intersectionRatio<0.75)return;const slide=e.target;sc.querySelectorAll('.ig-slide').forEach(s=>{if(s!==slide){const f=s.querySelector('iframe');if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';}});const idx=Array.from(sc.children).indexOf(slide);const v=igVideos[idx];if(!v)return;const iframe=slide.querySelector('iframe');if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}});},{threshold:0.75});
-  sc.querySelectorAll('.ig-slide').forEach(s=>igObserverRef.observe(s));
-  setTimeout(()=>{const f=sc.querySelector('.ig-slide');if(f&&igVideos[0]){const iframe=f.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',igVideos[0].id);iframe.src=`https://www.youtube-nocookie.com/embed/${igVideos[0].id}?autoplay=1&mute=0&loop=1&playlist=${igVideos[0].id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}}},150);
-}
-// FIX: IG slide - NO top title/id, ONLY bottom info, NO center buttons
-function buildIgSlide(v){
-  const slide=document.createElement('div');slide.className='ig-slide';
-  const uname='@'+v.channel.replace(/\s+/g,'_').toLowerCase().slice(0,20);
-  const likeCount=v.likes||0,cmtCount=v.comments||0,vid=v.id;
-  const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');
-  const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentElement.textContent='${(v.channel||'U')[0]}'">`:`${(v.channel||'U')[0]}`;
-  slide.innerHTML=`
-    <img class="ig-slide-bg" src="${v.thumb}" alt="" loading="lazy">
-    <iframe class="ig-iframe" src="about:blank" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>
-    <div class="ig-gradient"></div>
-    <div class="ig-actions">
-      <div class="ig-act" onclick="toggleIgLike('${vid}',this,${likeCount})"><svg id="iglk-${vid}" width="28" height="28" viewBox="0 0 24 24" fill="${igLikes[vid]?'#ff4444':'none'}" stroke="${igLikes[vid]?'#ff4444':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div class="ig-act-count" id="iglkc-${vid}">${fmtV(likeCount)}</div></div>
-      <div class="ig-act" onclick="openIgCmt('${vid}',${cmtCount})"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="ig-act-count">${fmtV(cmtCount)}</div></div>
-      <div class="ig-act" onclick="toast('🔁 Reposted!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><div class="ig-act-count">Repost</div></div>
-      <div class="ig-act" onclick="shareV('${vid}','${escQ(v.title)}')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><div class="ig-act-count">Share</div></div>
-      <div class="ig-act" onclick="toast('🔖 Saved!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><div class="ig-act-count">Save</div></div>
-    </div>
-    <div class="ig-info">
-      <div class="ig-user-row"><div class="ig-avatar" style="background:${rndColor(v.channel)}" onclick="openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><span class="ig-username" onclick="openChannelPage('${si}','${sc}','${sa}')">${uname}</span><button class="ig-follow-btn" onclick="this.classList.toggle('following');this.textContent=this.classList.contains('following')?'Following':'Follow';toast(this.classList.contains('following')?'✅ Following!':'Unfollowed')">Follow</button></div>
-      <div class="ig-caption">${v.title.slice(0,70)} <span style="color:rgba(255,255,255,.55);font-size:11px;">#reels #viral</span></div>
-      <div class="ig-audio-row"><div class="ig-audio-disc"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>${v.channel} · Original Audio</span></div>
-    </div>`;
-  let lt=0;
-  slide.addEventListener('click',function(e){if(e.target.closest('.ig-actions')||e.target.closest('.ig-follow-btn')||e.target.closest('.ig-username')||e.target.closest('.ig-avatar'))return;const now=Date.now();if(now-lt<300)toggleIgLike(vid,slide.querySelector('.ig-act'),likeCount);lt=now;});
-  return slide;
-}
-function toggleIgLike(id,act,orig){
-  igLikes[id]=!igLikes[id];const svg=document.getElementById('iglk-'+id)||act?.querySelector('svg');const cnt=document.getElementById('iglkc-'+id);
-  if(svg){svg.setAttribute('fill',igLikes[id]?'#ff4444':'none');svg.setAttribute('stroke',igLikes[id]?'#ff4444':'white');}
-  if(cnt)cnt.textContent=fmtV(igLikes[id]?orig+1:Math.max(0,orig-1));
-  if(igLikes[id]){const sl=act?.closest('.ig-slide');if(sl){const h=document.createElement('div');h.style.cssText='position:absolute;font-size:80px;z-index:50;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:heartPop .6s ease forwards;';h.textContent='❤️';sl.appendChild(h);setTimeout(()=>h.remove(),700);}}
-  toast(igLikes[id]?'❤️ Liked!':'Like removed');
-}
+async function loadIgReels(query){if(igReelsLoading)return;igReelsLoading=true;const sc=document.getElementById('ig-scroller');sc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div class="loading-dots"><span></span><span></span><span></span></div></div>';const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));igVideos=data.items.filter(v=>!usedIgIds.has(v.id));igVideos.forEach(v=>usedIgIds.add(v.id));igReelsLoading=false;renderIgReels();sc.onscroll=async()=>{if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!igReelsLoading){igReelsLoading=true;const more=await fetchShortsWithStats('All',pickQ(SHORT_POOLS.All));more.items.filter(v=>!usedIgIds.has(v.id)).forEach(v=>{usedIgIds.add(v.id);igVideos.push(v);const sl=buildIgSlide(v);sc.appendChild(sl);try{igObserverRef?.observe(sl);}catch(e){}});igReelsLoading=false;}};}
+function renderIgReels(){const sc=document.getElementById('ig-scroller');sc.innerHTML='';if(igObserverRef)try{igObserverRef.disconnect();}catch(e){}igVideos.forEach(v=>sc.appendChild(buildIgSlide(v)));igObserverRef=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.intersectionRatio<0.75)return;const slide=e.target;sc.querySelectorAll('.ig-slide').forEach(s=>{if(s!==slide){const f=s.querySelector('iframe');if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';}});const idx=Array.from(sc.children).indexOf(slide);const v=igVideos[idx];if(!v)return;const iframe=slide.querySelector('iframe');if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}});},{threshold:0.75});sc.querySelectorAll('.ig-slide').forEach(s=>igObserverRef.observe(s));setTimeout(()=>{const f=sc.querySelector('.ig-slide');if(f&&igVideos[0]){const iframe=f.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',igVideos[0].id);iframe.src=`https://www.youtube-nocookie.com/embed/${igVideos[0].id}?autoplay=1&mute=0&loop=1&playlist=${igVideos[0].id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}}},150);}
+function buildIgSlide(v){const slide=document.createElement('div');slide.className='ig-slide';const uname='@'+v.channel.replace(/\s+/g,'_').toLowerCase().slice(0,20);const likeCount=v.likes||0,cmtCount=v.comments||0,vid=v.id;const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentElement.textContent='${(v.channel||'U')[0]}'">`:`${(v.channel||'U')[0]}`;slide.innerHTML=`<img class="ig-slide-bg" src="${v.thumb}" alt="" loading="lazy"><iframe class="ig-iframe" src="about:blank" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe><div class="ig-gradient"></div><div class="ig-actions"><div class="ig-act" onclick="toggleIgLike('${vid}',this,${likeCount})"><svg id="iglk-${vid}" width="28" height="28" viewBox="0 0 24 24" fill="${igLikes[vid]?'#ff4444':'none'}" stroke="${igLikes[vid]?'#ff4444':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div class="ig-act-count" id="iglkc-${vid}">${fmtV(likeCount)}</div></div><div class="ig-act" onclick="openIgCmt('${vid}',${cmtCount})"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="ig-act-count">${fmtV(cmtCount)}</div></div><div class="ig-act" onclick="toast('🔁 Reposted!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><div class="ig-act-count">Repost</div></div><div class="ig-act" onclick="shareV('${vid}','${escQ(v.title)}')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><div class="ig-act-count">Share</div></div><div class="ig-act" onclick="toast('🔖 Saved!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><div class="ig-act-count">Save</div></div></div><div class="ig-info"><div class="ig-user-row"><div class="ig-avatar" style="background:${rndColor(v.channel)}" onclick="openChannelPage('${si}','${sc}','${sa}')">${avHtml}</div><span class="ig-username" onclick="openChannelPage('${si}','${sc}','${sa}')">${uname}</span><button class="ig-follow-btn" onclick="this.classList.toggle('following');this.textContent=this.classList.contains('following')?'Following':'Follow';toast(this.classList.contains('following')?'✅ Following!':'Unfollowed')">Follow</button></div><div class="ig-caption">${v.title.slice(0,70)} <span style="color:rgba(255,255,255,.55);font-size:11px;">#reels #viral</span></div><div class="ig-audio-row"><div class="ig-audio-disc"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>${v.channel} · Original Audio</span></div></div>`;let lt=0;slide.addEventListener('click',function(e){if(e.target.closest('.ig-actions')||e.target.closest('.ig-follow-btn')||e.target.closest('.ig-username')||e.target.closest('.ig-avatar'))return;const now=Date.now();if(now-lt<300)toggleIgLike(vid,slide.querySelector('.ig-act'),likeCount);lt=now;});return slide;}
+function toggleIgLike(id,act,orig){igLikes[id]=!igLikes[id];const svg=document.getElementById('iglk-'+id)||act?.querySelector('svg');const cnt=document.getElementById('iglkc-'+id);if(svg){svg.setAttribute('fill',igLikes[id]?'#ff4444':'none');svg.setAttribute('stroke',igLikes[id]?'#ff4444':'white');}if(cnt)cnt.textContent=fmtV(igLikes[id]?orig+1:Math.max(0,orig-1));if(igLikes[id]){const sl=act?.closest('.ig-slide');if(sl){const h=document.createElement('div');h.style.cssText='position:absolute;font-size:80px;z-index:50;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:heartPop .6s ease forwards;';h.textContent='❤️';sl.appendChild(h);setTimeout(()=>h.remove(),700);}}toast(igLikes[id]?'❤️ Liked!':'Like removed');}
 
 // ============================================================
 // TIKTOK
-// FIX: NO top title, NO center buttons
 // ============================================================
-async function loadTtReels(query){
-  if(ttReelsLoading)return;ttReelsLoading=true;
-  const sc=document.getElementById('tt-scroller');
-  sc.innerHTML='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
-  const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));
-  ttVideos=data.items.filter(v=>!usedTtIds.has(v.id));ttVideos.forEach(v=>usedTtIds.add(v.id));
-  ttReelsLoading=false;renderTtReels();
-  sc.onscroll=async()=>{if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!ttReelsLoading){ttReelsLoading=true;const more=await fetchShortsWithStats('All',pickQ(SHORT_POOLS.All));more.items.filter(v=>!usedTtIds.has(v.id)).forEach(v=>{usedTtIds.add(v.id);ttVideos.push(v);const sl=buildTtSlide(v);sc.appendChild(sl);try{ttObserverRef?.observe(sl);}catch(e){}});ttReelsLoading=false;}};
-}
-function renderTtReels(){
-  const sc=document.getElementById('tt-scroller');sc.innerHTML='';if(ttObserverRef)try{ttObserverRef.disconnect();}catch(e){}
-  ttVideos.forEach(v=>sc.appendChild(buildTtSlide(v)));
-  ttObserverRef=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.intersectionRatio<0.75)return;const slide=e.target;sc.querySelectorAll('.tt-slide').forEach(s=>{if(s!==slide){const f=s.querySelector('iframe');if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';}});const idx=Array.from(sc.children).indexOf(slide);const v=ttVideos[idx];if(!v)return;const iframe=slide.querySelector('iframe');if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}});},{threshold:0.75});
-  sc.querySelectorAll('.tt-slide').forEach(s=>ttObserverRef.observe(s));
-  setTimeout(()=>{const f=sc.querySelector('.tt-slide');if(f&&ttVideos[0]){const iframe=f.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',ttVideos[0].id);iframe.src=`https://www.youtube-nocookie.com/embed/${ttVideos[0].id}?autoplay=1&mute=0&loop=1&playlist=${ttVideos[0].id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}}},150);
-}
-// FIX: TT slide - NO top title, NO center buttons, ONLY bottom info
-function buildTtSlide(v){
-  const slide=document.createElement('div');slide.className='tt-slide';
-  const uname='@'+v.channel.replace(/\s+/g,'').toLowerCase().slice(0,20);
-  const likeCount=v.likes||0,cmtCount=v.comments||0,vid=v.id;
-  const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');
-  const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.style.display='none'">`:`${(v.channel||'U')[0]}`;
-  slide.innerHTML=`
-    <img class="tt-bg" src="${v.thumb}" alt="" loading="lazy">
-    <iframe class="tt-iframe" src="about:blank" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>
-    <div class="tt-gradient"></div>
-    <div class="tt-actions">
-      <div class="tt-act"><div class="tt-avatar-wrap" onclick="openChannelPage('${si}','${sc}','${sa}')"><div class="tt-avatar" style="background:${rndColor(v.channel)}">${avHtml}</div><div class="tt-plus-badge"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div>
-      <div class="tt-act" onclick="toggleTtLike('${vid}',this,${likeCount})"><svg id="ttlk-${vid}" width="28" height="28" viewBox="0 0 24 24" fill="${ttLikes[vid]?'#fe2c55':'none'}" stroke="${ttLikes[vid]?'#fe2c55':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div class="tt-act-count" id="ttlkc-${vid}">${fmtV(likeCount)}</div></div>
-      <div class="tt-act" onclick="openTtCmt('${vid}',${cmtCount})"><svg width="26" height="26" viewBox="0 0 24 24" fill="white" opacity=".9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="tt-act-count">${fmtV(cmtCount)}</div></div>
-      <div class="tt-act" onclick="shareV('${vid}','${escQ(v.title)}')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><div class="tt-act-count">Share</div></div>
-      <div class="tt-act" onclick="toast('🔖 Saved!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><div class="tt-act-count">Save</div></div>
-    </div>
-    <div class="tt-info">
-      <div class="tt-username" onclick="openChannelPage('${si}','${sc}','${sa}')">${uname}</div>
-      <div class="tt-caption">${v.title.slice(0,70)} <span style="color:rgba(255,255,255,.5)">#viral #trending</span></div>
-      <div class="tt-music"><div class="tt-music-disc"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>${v.channel} · Original Sound</span></div>
-    </div>`;
-  let lt=0;
-  slide.addEventListener('click',function(e){if(e.target.closest('.tt-actions')||e.target.closest('.tt-username'))return;const now=Date.now();if(now-lt<300)toggleTtLike(vid,slide.querySelector('.tt-act:nth-child(2)'),likeCount);lt=now;});
-  return slide;
-}
-function toggleTtLike(id,act,orig){
-  ttLikes[id]=!ttLikes[id];const svg=document.getElementById('ttlk-'+id)||act?.querySelector('svg');const cnt=document.getElementById('ttlkc-'+id);
-  if(svg){svg.setAttribute('fill',ttLikes[id]?'#fe2c55':'none');svg.setAttribute('stroke',ttLikes[id]?'#fe2c55':'white');}
-  if(cnt)cnt.textContent=fmtV(ttLikes[id]?orig+1:Math.max(0,orig-1));
-  toast(ttLikes[id]?'❤️ Liked!':'Like removed');
-}
+async function loadTtReels(query){if(ttReelsLoading)return;ttReelsLoading=true;const sc=document.getElementById('tt-scroller');sc.innerHTML='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><div class="loading-dots"><span></span><span></span><span></span></div></div>';const data=await fetchShortsWithStats('All',query||pickQ(SHORT_POOLS.All));ttVideos=data.items.filter(v=>!usedTtIds.has(v.id));ttVideos.forEach(v=>usedTtIds.add(v.id));ttReelsLoading=false;renderTtReels();sc.onscroll=async()=>{if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!ttReelsLoading){ttReelsLoading=true;const more=await fetchShortsWithStats('All',pickQ(SHORT_POOLS.All));more.items.filter(v=>!usedTtIds.has(v.id)).forEach(v=>{usedTtIds.add(v.id);ttVideos.push(v);const sl=buildTtSlide(v);sc.appendChild(sl);try{ttObserverRef?.observe(sl);}catch(e){}});ttReelsLoading=false;}};}
+function renderTtReels(){const sc=document.getElementById('tt-scroller');sc.innerHTML='';if(ttObserverRef)try{ttObserverRef.disconnect();}catch(e){}ttVideos.forEach(v=>sc.appendChild(buildTtSlide(v)));ttObserverRef=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.intersectionRatio<0.75)return;const slide=e.target;sc.querySelectorAll('.tt-slide').forEach(s=>{if(s!==slide){const f=s.querySelector('iframe');if(f&&f.src&&f.src!=='about:blank')f.src='about:blank';}});const idx=Array.from(sc.children).indexOf(slide);const v=ttVideos[idx];if(!v)return;const iframe=slide.querySelector('iframe');if(iframe&&(iframe.src===''||iframe.src==='about:blank'||iframe.getAttribute('data-vid')!==v.id)){iframe.setAttribute('data-vid',v.id);iframe.src=`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}});},{threshold:0.75});sc.querySelectorAll('.tt-slide').forEach(s=>ttObserverRef.observe(s));setTimeout(()=>{const f=sc.querySelector('.tt-slide');if(f&&ttVideos[0]){const iframe=f.querySelector('iframe');if(iframe){iframe.setAttribute('data-vid',ttVideos[0].id);iframe.src=`https://www.youtube-nocookie.com/embed/${ttVideos[0].id}?autoplay=1&mute=0&loop=1&playlist=${ttVideos[0].id}&playsinline=1&rel=0&modestbranding=1&controls=0`;}}},150);}
+function buildTtSlide(v){const slide=document.createElement('div');slide.className='tt-slide';const uname='@'+v.channel.replace(/\s+/g,'').toLowerCase().slice(0,20);const likeCount=v.likes||0,cmtCount=v.comments||0,vid=v.id;const sc=escQ(v.channel||''),si=v.channelId||'',sa=escQ(v.channelAvatar||'');const avHtml=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.style.display='none'">`:`${(v.channel||'U')[0]}`;slide.innerHTML=`<img class="tt-bg" src="${v.thumb}" alt="" loading="lazy"><iframe class="tt-iframe" src="about:blank" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe><div class="tt-gradient"></div><div class="tt-actions"><div class="tt-act"><div class="tt-avatar-wrap" onclick="openChannelPage('${si}','${sc}','${sa}')"><div class="tt-avatar" style="background:${rndColor(v.channel)}">${avHtml}</div><div class="tt-plus-badge"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div><div class="tt-act" onclick="toggleTtLike('${vid}',this,${likeCount})"><svg id="ttlk-${vid}" width="28" height="28" viewBox="0 0 24 24" fill="${ttLikes[vid]?'#fe2c55':'none'}" stroke="${ttLikes[vid]?'#fe2c55':'white'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div class="tt-act-count" id="ttlkc-${vid}">${fmtV(likeCount)}</div></div><div class="tt-act" onclick="openTtCmt('${vid}',${cmtCount})"><svg width="26" height="26" viewBox="0 0 24 24" fill="white" opacity=".9"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="tt-act-count">${fmtV(cmtCount)}</div></div><div class="tt-act" onclick="shareV('${vid}','${escQ(v.title)}')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><div class="tt-act-count">Share</div></div><div class="tt-act" onclick="toast('🔖 Saved!')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><div class="tt-act-count">Save</div></div></div><div class="tt-info"><div class="tt-username" onclick="openChannelPage('${si}','${sc}','${sa}')">${uname}</div><div class="tt-caption">${v.title.slice(0,70)} <span style="color:rgba(255,255,255,.5)">#viral #trending</span></div><div class="tt-music"><div class="tt-music-disc"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span>${v.channel} · Original Sound</span></div></div>`;let lt=0;slide.addEventListener('click',function(e){if(e.target.closest('.tt-actions')||e.target.closest('.tt-username'))return;const now=Date.now();if(now-lt<300)toggleTtLike(vid,slide.querySelector('.tt-act:nth-child(2)'),likeCount);lt=now;});return slide;}
+function toggleTtLike(id,act,orig){ttLikes[id]=!ttLikes[id];const svg=document.getElementById('ttlk-'+id)||act?.querySelector('svg');const cnt=document.getElementById('ttlkc-'+id);if(svg){svg.setAttribute('fill',ttLikes[id]?'#fe2c55':'none');svg.setAttribute('stroke',ttLikes[id]?'#fe2c55':'white');}if(cnt)cnt.textContent=fmtV(ttLikes[id]?orig+1:Math.max(0,orig-1));toast(ttLikes[id]?'❤️ Liked!':'Like removed');}
 
 // ============================================================
 // SUBS & INFINITE SCROLL
 // ============================================================
-function loadSubsPage(){
-  const channels=['Tech Burner','MrBeast','CarryMinati','T-Series','PewDiePie','Nas Daily','BB Ki Vines','Round2hell','Technical Guruji','Mythpat'];
-  const list=document.getElementById('subs-list');list.innerHTML='';
-  channels.forEach(ch=>{const d=document.createElement('div');d.className='sub-ch-item';d.innerHTML=`<div class="sub-ch-av" style="background:${rndColor(ch)}">${ch[0]}</div><div class="sub-ch-info"><div class="sub-ch-name">${ch}</div><div class="sub-ch-count">${rndSubs()} subscribers</div></div><button class="unsub-btn" onclick="this.textContent=this.textContent==='Subscribed'?'Subscribe':'Subscribed';toast('Done!')">Subscribed</button>`;list.appendChild(d);});
-}
-function setupInfiniteScroll(){
-  const sentinel=document.getElementById('load-sentinel');
-  new IntersectionObserver(async(entries)=>{
-    if(entries[0].isIntersecting&&document.getElementById('home-page').style.display!=='none'&&!document.getElementById('main')._lm){
-      document.getElementById('main')._lm=true;
-      try{const q=pickQ(LONG_POOLS[currentCat]||LONG_POOLS.All);const more=await fetchLong(currentCat,q,longNextToken);longNextToken=more.next;const newVids=more.items.filter(v=>!usedLongIds.has(v.id));newVids.forEach(v=>usedLongIds.add(v.id));const feed=document.getElementById('home-long-feed');const sent=document.getElementById('load-sentinel');newVids.forEach(v=>feed.insertBefore(makeVideoCard(v),sent));}catch(e){}
-      document.getElementById('main')._lm=false;
-    }
-  },{threshold:0.1}).observe(sentinel);
-}
-
-// ============================================================
-// SPLASH PHOTO LOADING
-// Photo aapki gallery se base64 main convert karke yahan
-// ya simple URL se load ho
-// ============================================================
-function loadSplashPhoto(){
-  // Aapki uploaded photo ka path
-  const photoEl=document.querySelector('.splash-photo-inner img');
-  if(!photoEl)return;
-  // Try to load from the uploaded file reference
-  // Since we can't embed base64 directly, we use a canvas-based approach
-  // or just show a colored placeholder with initials if photo not available
-  photoEl.onerror=function(){
-    this.style.display='none';
-    const parent=this.parentElement;
-    parent.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';
-    // Add initials
-    const init=document.createElement('div');
-    init.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:800;color:#fff;font-family:Outfit,sans-serif;';
-    init.textContent='A';
-    parent.appendChild(init);
-  };
-}
+function loadSubsPage(){const channels=['Tech Burner','MrBeast','CarryMinati','T-Series','PewDiePie','Nas Daily','BB Ki Vines','Round2hell','Technical Guruji','Mythpat'];const list=document.getElementById('subs-list');list.innerHTML='';channels.forEach(ch=>{const d=document.createElement('div');d.className='sub-ch-item';d.innerHTML=`<div class="sub-ch-av" style="background:${rndColor(ch)}">${ch[0]}</div><div class="sub-ch-info"><div class="sub-ch-name">${ch}</div><div class="sub-ch-count">${rndSubs()} subscribers</div></div><button class="unsub-btn" onclick="this.textContent=this.textContent==='Subscribed'?'Subscribe':'Subscribed';toast('Done!')">Subscribed</button>`;list.appendChild(d);});}
+function setupInfiniteScroll(){const sentinel=document.getElementById('load-sentinel');new IntersectionObserver(async(entries)=>{if(entries[0].isIntersecting&&document.getElementById('home-page').style.display!=='none'&&!document.getElementById('main')._lm){document.getElementById('main')._lm=true;try{const q=pickQ(LONG_POOLS[currentCat]||LONG_POOLS.All);const more=await fetchLong(currentCat,q,longNextToken);longNextToken=more.next;const newVids=more.items.filter(v=>!usedLongIds.has(v.id));newVids.forEach(v=>usedLongIds.add(v.id));const feed=document.getElementById('home-long-feed');const sent=document.getElementById('load-sentinel');newVids.forEach(v=>feed.insertBefore(makeVideoCard(v),sent));}catch(e){}document.getElementById('main')._lm=false;}},{threshold:0.1}).observe(sentinel);}
 
 // ============================================================
 // INIT
 // ============================================================
 window.addEventListener('load',()=>{
-  loadSplashPhoto();
   runSplash();
 });
 </script>
 </body>
-</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                              </html>
