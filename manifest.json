@@ -1,0 +1,13 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Flixa",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Flixa",
+  "start_url": "/",
+  "theme_color": "#000000",
+  "id": "com.flixa.app",
+  "description": "3-in-1 video platform"
+}
