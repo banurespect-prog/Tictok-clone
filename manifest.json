@@ -2,12 +2,12 @@
   "name": "Flixa",
   "short_name": "Flixa",
   "description": "3-in-1 video platform",
-  "start_url": "/",
+  "start_url": "/Tictok-clone/",
+  "scope": "/Tictok-clone/",
   "display": "standalone",
   "background_color": "#000",
   "theme_color": "#000",
   "id": "com.flixa.app",
-  "scope": "/",
   "icons": [
     {
       "src": "icon-512.png",
@@ -15,4 +15,4 @@
       "type": "image/png"
     }
   ]
-}
+} 
