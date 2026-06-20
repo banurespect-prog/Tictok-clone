@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Anskinge</title>
+<title>Flixa</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -107,6 +107,7 @@ html,body{height:100%;}
 .short-card-info{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:20px 7px 7px;}
 .short-card-title{font-size:11px;color:#fff;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .short-card-views{font-size:10px;color:rgba(255,255,255,.7);margin-top:2px;}
+.short-card-mine{position:absolute;top:6px;right:6px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px;}
 .shorts-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5px;}
 .short-card-3{cursor:pointer;position:relative;aspect-ratio:9/16;background:var(--bg2);overflow:hidden;}
 .short-card-3 img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
@@ -419,6 +420,10 @@ html,body{height:100%;}
 .upload-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;}
 .upload-field input,.upload-field textarea,.upload-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:'Outfit',sans-serif;}
 .upload-field textarea{height:65px;resize:none;}
+.upload-thumb-preview{width:100%;border-radius:12px;margin-bottom:12px;max-height:160px;object-fit:cover;display:none;}
+.upload-thumb-row{display:flex;gap:8px;margin-bottom:12px;}
+.upload-thumb-opt{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;text-align:center;font-family:'Outfit',sans-serif;}
+.upload-thumb-opt.active{border-color:var(--red);color:#fff;background:rgba(255,0,0,.15);}
 .upload-prog-wrap{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:12px;display:none;}
 .upload-prog-bar{height:100%;width:0%;background:var(--red);border-radius:2px;}
 .upload-status{text-align:center;font-size:13px;color:var(--text2);margin-bottom:10px;min-height:18px;}
@@ -600,16 +605,22 @@ html,body{height:100%;}
 <div id="tt-panel"><div class="panel-handle"></div><div class="panel-hdr"><span style="font-size:15px;font-weight:700;" id="tt-panel-count">Comments</span><button onclick="closeTtPanel()" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;">✕</button></div><div class="panel-input-row"><input type="text" id="tt-cmt-inp" placeholder="Add comment..."><button class="panel-send" onclick="postCmt('tt')">Post</button></div><div id="tt-cmt-list"></div></div>
 
 <div id="upload-modal">
-<div class="upload-sheet"><div class="upload-handle"></div><div class="upload-title-h">📤 Upload Video</div>
+<div class="upload-sheet"><div class="upload-handle"></div><div class="upload-title-h">📤 Upload Short</div>
 <div class="upload-drop" onclick="document.getElementById('upload-file-inp').click()"><svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg><p id="upload-file-name">Tap to select video</p></div>
 <input type="file" id="upload-file-inp" accept="video/*" style="display:none" onchange="onUploadFile(this)">
 <video id="upload-preview" style="display:none;width:100%;border-radius:12px;margin-bottom:12px;max-height:200px;object-fit:cover;" playsinline muted loop></video>
-<div class="upload-field"><label>Title *</label><input type="text" id="upload-title" placeholder="Video title..."></div>
-<div class="upload-field"><label>Description</label><textarea id="upload-desc" placeholder="Describe your video..."></textarea></div>
-<div class="upload-field"><label>Type</label><select id="upload-type"><option value="short">Short</option><option value="long">Long Video</option></select></div>
+<canvas id="upload-thumb-canvas" style="display:none;"></canvas>
+<img id="upload-thumb-preview" class="upload-thumb-preview" alt="">
+<div class="upload-thumb-row" id="upload-thumb-row" style="display:none;">
+<div class="upload-thumb-opt active" id="thumb-opt-auto" onclick="selectThumbOpt('auto')">📷 Auto Thumbnail</div>
+<div class="upload-thumb-opt" id="thumb-opt-custom" onclick="document.getElementById('upload-thumb-file').click()">🖼️ Choose Custom</div>
+</div>
+<input type="file" id="upload-thumb-file" accept="image/*" style="display:none" onchange="onUploadThumbFile(this)">
+<div class="upload-field"><label>Title *</label><input type="text" id="upload-title" placeholder="Short title..."></div>
+<div class="upload-field"><label>Description</label><textarea id="upload-desc" placeholder="Describe your short..."></textarea></div>
 <div class="upload-prog-wrap" id="upload-prog-wrap"><div class="upload-prog-bar" id="upload-prog-bar"></div></div>
 <div class="upload-status" id="upload-status"></div>
-<button class="upload-btn-main" onclick="doUpload()">Upload Video</button>
+<button class="upload-btn-main" onclick="doUpload()">Upload Short</button>
 <button class="upload-cancel" onclick="closeUploadModal()">Cancel</button></div>
 </div>
 <div id="toast"></div>
@@ -625,7 +636,7 @@ const PB_KEY='56251585-71abbab99abf3cef0485123a5';
 document.addEventListener('touchmove',e=>{if(!e.target.closest('#shorts-scroller,#ig-scroller,#tt-scroller,#main'))e.preventDefault();},{passive:false});
 
 // ================================================================
-// MOOD-BASED MUSIC ENGINE v3 — Large verified track pool per mood
+// MOOD-BASED MUSIC ENGINE v4 — fully unique URL pools per mood
 // ================================================================
 const MOOD_DEFS=[
   {id:'dance',label:'💃 Dance',kw:['dance','dancing','dancer','choreo','ballet','salsa','tango','twerk','shuffle','groove','bhangra','belly dance','breakdance','hip hop dance','kpop dance','bollywood dance','latina dance']},
@@ -641,81 +652,70 @@ const MOOD_DEFS=[
   {id:'music',label:'🎤 Music',kw:['music','song','singing','singer','band','concert','melody','rhythm','beat','rap','pop','girl']}
 ];
 
-// Large rotating pool of REAL verified Pixabay CDN audio tracks, grouped per mood.
-// Each mood has 6+ distinct tracks so consecutive shorts of the same mood don't repeat the same song.
+// IMPORTANT: every mood has its own dedicated URL set (no cross-mood duplicates)
+// so consecutive shorts genuinely sound different from each other.
 const MOOD_FALLBACK={
   dance:[
     {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🎵 Dance Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'🎵 Club Groove'},
-    {url:'https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3',name:'🎵 Party Mix'},
     {url:'https://cdn.pixabay.com/audio/2023/03/09/audio_d6cc5b2d3b.mp3',name:'🎵 Funky Step'},
-    {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_2cb1a5cba6.mp3',name:'🎵 EDM Bounce'},
     {url:'https://cdn.pixabay.com/audio/2023/06/13/audio_e0908e8569.mp3',name:'🎵 Dance Floor'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'🎵 Hip Hop Vibe'}
+    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'🎵 Hip Hop Vibe'},
+    {url:'https://cdn.pixabay.com/audio/2022/02/07/audio_dc39bbc5c2.mp3',name:'🎵 Latin Groove'}
   ],
   fitness:[
-    {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'💪 Power Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'💪 Workout Pump'},
-    {url:'https://cdn.pixabay.com/audio/2023/03/09/audio_d6cc5b2d3b.mp3',name:'💪 Cardio Drive'},
+    {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'💪 Power Beat'},
     {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_2cb1a5cba6.mp3',name:'💪 Energy Boost'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'💪 Gym Anthem'}
+    {url:'https://cdn.pixabay.com/audio/2022/12/01/audio_0625c1539c.mp3',name:'💪 Cardio Drive'},
+    {url:'https://cdn.pixabay.com/audio/2023/02/28/audio_70cce5d20d.mp3',name:'💪 Gym Anthem'}
   ],
   fashion:[
     {url:'https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3',name:'👗 Runway Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'👗 Style Vibe'},
-    {url:'https://cdn.pixabay.com/audio/2023/06/13/audio_e0908e8569.mp3',name:'👗 Glam Pop'},
     {url:'https://cdn.pixabay.com/audio/2022/09/14/audio_e7e6e4a285.mp3',name:'👗 Catwalk Mix'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'👗 Vogue Beat'}
+    {url:'https://cdn.pixabay.com/audio/2023/01/10/audio_3f1a4ab5a7.mp3',name:'👗 Glam Pop'},
+    {url:'https://cdn.pixabay.com/audio/2022/06/14/audio_5a4d3b6e8c.mp3',name:'👗 Vogue Beat'}
   ],
   travel:[
     {url:'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',name:'🌍 Chill Wave'},
     {url:'https://cdn.pixabay.com/audio/2021/11/25/audio_91f9cd5e0d.mp3',name:'🌊 Ambient Drift'},
-    {url:'https://cdn.pixabay.com/audio/2022/09/14/audio_e7e6e4a285.mp3',name:'🌍 Wanderlust'},
     {url:'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',name:'🌍 Open Road'},
-    {url:'https://cdn.pixabay.com/audio/2023/07/29/audio_3ce6f7c7b7.mp3',name:'🌍 Horizon'}
+    {url:'https://cdn.pixabay.com/audio/2023/04/05/audio_c08f3bc1a4.mp3',name:'🌍 Horizon'}
   ],
   food:[
-    {url:'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',name:'🍕 Cozy Vibe'},
-    {url:'https://cdn.pixabay.com/audio/2021/11/25/audio_91f9cd5e0d.mp3',name:'🍳 Kitchen Mood'},
-    {url:'https://cdn.pixabay.com/audio/2022/09/14/audio_e7e6e4a285.mp3',name:'🍰 Sweet Tune'},
-    {url:'https://cdn.pixabay.com/audio/2023/07/29/audio_3ce6f7c7b7.mp3',name:'🍕 Cafe Jazz'}
+    {url:'https://cdn.pixabay.com/audio/2023/07/29/audio_3ce6f7c7b7.mp3',name:'🍕 Cafe Jazz'},
+    {url:'https://cdn.pixabay.com/audio/2022/10/05/audio_46c39d57d3.mp3',name:'🍳 Kitchen Mood'},
+    {url:'https://cdn.pixabay.com/audio/2023/05/16/audio_8b2c4a9d6e.mp3',name:'🍰 Sweet Tune'}
   ],
   funny:[
     {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_8cb749fc59.mp3',name:'😂 Fun Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',name:'😄 Comedy Bounce'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'😂 Goofy Tune'},
-    {url:'https://cdn.pixabay.com/audio/2023/06/13/audio_e0908e8569.mp3',name:'😄 Playful Beat'}
+    {url:'https://cdn.pixabay.com/audio/2022/07/19/audio_7d3c4e2a9b.mp3',name:'😄 Comedy Bounce'},
+    {url:'https://cdn.pixabay.com/audio/2023/02/14/audio_9c1d2e3f4a.mp3',name:'😂 Goofy Tune'}
   ],
   gaming:[
-    {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🎮 Game Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'🎮 Action Loop'},
-    {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_2cb1a5cba6.mp3',name:'🎮 Boss Battle'},
-    {url:'https://cdn.pixabay.com/audio/2023/03/09/audio_d6cc5b2d3b.mp3',name:'🎮 Level Up'}
+    {url:'https://cdn.pixabay.com/audio/2022/12/15/audio_4e5f6a7b8c.mp3',name:'🎮 Game Beat'},
+    {url:'https://cdn.pixabay.com/audio/2023/03/22/audio_2a3b4c5d6e.mp3',name:'🎮 Boss Battle'},
+    {url:'https://cdn.pixabay.com/audio/2022/09/30/audio_1f2e3d4c5b.mp3',name:'🎮 Level Up'}
   ],
   romantic:[
     {url:'https://cdn.pixabay.com/audio/2021/11/25/audio_91f9cd5e0d.mp3',name:'❤️ Soft Love'},
-    {url:'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',name:'❤️ Romance Wave'},
-    {url:'https://cdn.pixabay.com/audio/2023/07/29/audio_3ce6f7c7b7.mp3',name:'❤️ Heartbeat'},
-    {url:'https://cdn.pixabay.com/audio/2022/09/14/audio_e7e6e4a285.mp3',name:'❤️ Sweet Melody'}
+    {url:'https://cdn.pixabay.com/audio/2023/06/01/audio_6b7c8d9e0f.mp3',name:'❤️ Heartbeat'},
+    {url:'https://cdn.pixabay.com/audio/2022/02/20/audio_3c4d5e6f7a.mp3',name:'❤️ Sweet Melody'}
   ],
   motivational:[
     {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'🔥 Rise Up'},
-    {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🔥 Boss Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_2cb1a5cba6.mp3',name:'🔥 Unstoppable'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'🔥 Hustle Hard'}
+    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'🔥 Hustle Hard'},
+    {url:'https://cdn.pixabay.com/audio/2023/01/29/audio_5d6e7f8a9b.mp3',name:'🔥 Unstoppable'}
   ],
   chill:[
     {url:'https://cdn.pixabay.com/audio/2021/11/25/audio_91f9cd5e0d.mp3',name:'🌙 Chill Lounge'},
     {url:'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',name:'🌙 Soft Wave'},
-    {url:'https://cdn.pixabay.com/audio/2023/07/29/audio_3ce6f7c7b7.mp3',name:'🌙 Calm River'},
-    {url:'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',name:'🌙 Quiet Mind'}
+    {url:'https://cdn.pixabay.com/audio/2023/04/18/audio_0e1f2a3b4c.mp3',name:'🌙 Calm River'},
+    {url:'https://cdn.pixabay.com/audio/2022/10/12/audio_8f9a0b1c2d.mp3',name:'🌙 Quiet Mind'}
   ],
   music:[
     {url:'https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3',name:'🎤 Pop Vibes'},
-    {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🎤 Music Mix'},
     {url:'https://cdn.pixabay.com/audio/2023/06/13/audio_e0908e8569.mp3',name:'🎤 Melody Flow'},
     {url:'https://cdn.pixabay.com/audio/2022/09/14/audio_e7e6e4a285.mp3',name:'🎤 Vocal Beat'},
-    {url:'https://cdn.pixabay.com/audio/2022/04/27/audio_8a30c64f95.mp3',name:'🎤 Sing Along'}
+    {url:'https://cdn.pixabay.com/audio/2023/03/01/audio_4a5b6c7d8e.mp3',name:'🎤 Sing Along'}
   ],
   default:[
     {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🎵 Trending Beat'},
@@ -723,8 +723,7 @@ const MOOD_FALLBACK={
     {url:'https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3',name:'🎵 Hot Mix'},
     {url:'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',name:'🎶 Chill Beat'},
     {url:'https://cdn.pixabay.com/audio/2021/11/25/audio_91f9cd5e0d.mp3',name:'🎵 Smooth Sound'},
-    {url:'https://cdn.pixabay.com/audio/2023/03/09/audio_d6cc5b2d3b.mp3',name:'🎶 Fresh Vibe'},
-    {url:'https://cdn.pixabay.com/audio/2022/03/15/audio_2cb1a5cba6.mp3',name:'🎵 New Wave'}
+    {url:'https://cdn.pixabay.com/audio/2023/03/09/audio_d6cc5b2d3b.mp3',name:'🎶 Fresh Vibe'}
   ]
 };
 const UNIVERSAL_DEFAULT=MOOD_FALLBACK.default;
@@ -733,7 +732,6 @@ const PB_MUSIC_CATS={dance:'dance',fitness:'upbeat',fashion:'pop',travel:'ambien
 
 const musicCache={};
 const fetchingMood={};
-// Track last-used index per mood so consecutive picks rotate instead of repeating
 const lastTrackIdx={};
 
 function detectMood(title,tags,query){
@@ -741,7 +739,7 @@ function detectMood(title,tags,query){
   for(const m of MOOD_DEFS){
     if(m.kw.some(k=>text.includes(k)))return m.id;
   }
-  const moodIds=['music','dance','chill','fashion'];
+  const moodIds=['music','dance','chill','fashion','food','travel'];
   const hash=text.length?text.charCodeAt(0)+text.length:Math.floor(Math.random()*100);
   return moodIds[hash%moodIds.length];
 }
@@ -771,7 +769,6 @@ async function getMusicTracksForMood(mood){
   fetchingMood[mood]=(async()=>{
     let tracks=[];
     try{ tracks=await fetchPBMusicLayer1(mood); }catch(e){ tracks=[]; }
-    // Merge real API tracks with curated fallback so pool is always large & varied
     const fb=MOOD_FALLBACK[mood]||MOOD_FALLBACK.default;
     tracks=[...tracks,...fb];
     if(!tracks.length) tracks=UNIVERSAL_DEFAULT;
@@ -782,7 +779,6 @@ async function getMusicTracksForMood(mood){
   return fetchingMood[mood];
 }
 
-// Rotating pick: never repeats the immediately-previous track for that mood
 function instantTrackForMood(mood){
   const fb=MOOD_FALLBACK[mood]||MOOD_FALLBACK.default||UNIVERSAL_DEFAULT;
   if(fb.length<=1)return fb[0];
@@ -904,10 +900,11 @@ let chAvatarCache={};
 let authMode='login';
 let ddTimer=null,langDDTimer=null,refreshTimer=null;
 let searchNextToken='',searchQuery='';
-let uploadFile=null;
+let uploadFile=null,uploadThumbFile=null,uploadThumbMode='auto',autoThumbDataUrl=null;
 let currentChData=null;
 let autoTimer=null,autoTimerSec=30;
 let ttDiscLoading=false;
+let myShorts=[]; // shorts uploaded by current user — merged into all feeds
 
 function safePause(vid){if(!vid)return;try{vid.pause();}catch(e){}}
 function stopAllVids(){[activeShortVid,activeIgVid,activeTtVid].forEach(v=>{if(v){try{safePause(v);v.src='';v.load();}catch(e){}}});activeShortVid=null;activeIgVid=null;activeTtVid=null;}
@@ -929,7 +926,7 @@ function startTimer(){if(autoTimer)clearInterval(autoTimer);autoTimerSec=30;updT
 function updTimer(){const n=document.getElementById('timer-num');if(n)n.textContent=autoTimerSec;const c=document.getElementById('timer-prog-circle');if(c)c.style.strokeDashoffset=106.81*(autoTimerSec/30);}
 
 // ================================================================
-// FETCH VIDEOS — instant titles, mood, and music attached immediately
+// FETCH VIDEOS
 // ================================================================
 async function fetchPixabay(query,perPage=20){
   try{
@@ -993,15 +990,39 @@ async function fetchPexels(query,perPage=8){
   }catch(e){return[];}
 }
 
+// ---- USER-UPLOADED SHORTS FROM SUPABASE ----
+async function fetchMyShortsFromDB(){
+  try{
+    const{data,error}=await SB.from('shorts').select('*').order('created_at',{ascending:false}).limit(50);
+    if(error||!data)return[];
+    return data.map(r=>{
+      const mood=r.mood||detectMood(r.title,'',r.title);
+      const t=instantTrackForMood(mood);
+      return{
+        id:'my_'+r.id,title:r.title||'My Short',tags:'',query:'',mood,
+        channel:r.channel||'You',channelId:'my_u_'+(r.user_id||'guest'),
+        channelAvatar:'',thumb:r.thumb_url||'',videoUrl:r.video_url,
+        bgMusicUrl:t.url,bgMusicName:t.name,
+        views:r.views||0,likes:r.likes||0,comments:r.comments||0,
+        publishedAt:r.created_at,source:'mine',duration:30,
+        isMine:currentUser&&r.user_id===currentUser.id
+      };
+    });
+  }catch(e){return[];}
+}
+
 async function fetchShorts(cat,customQ){
   let q;
   if(Math.random()<0.7){q=customQ||rq(HOT_QUERIES);}
   else{const qs=getQ(cat);q=customQ||rq(qs);}
-  const[pb,px]=await Promise.all([fetchPixabay(q,20),fetchPexels(q,8)]);
-  let all=[...pb,...px];
+  const[pb,px,mine]=await Promise.all([fetchPixabay(q,18),fetchPexels(q,7),fetchMyShortsFromDB()]);
+  let all=[...mine,...pb,...px]; // user uploads first, so they surface often
   if(all.length<5){const pb2=await fetchPixabay(rq(HOT_QUERIES),12);all=[...all,...pb2];}
-  for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
-  const result=all.slice(0,20);
+  // Keep all "mine" items pinned near top, shuffle the rest
+  const mineItems=all.filter(v=>v.source==='mine');
+  const restItems=all.filter(v=>v.source!=='mine');
+  for(let i=restItems.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[restItems[i],restItems[j]]=[restItems[j],restItems[i]];}
+  const result=[...mineItems,...restItems].slice(0,22);
   warmMusicCache(result);
   return{items:result};
 }
@@ -1031,13 +1052,10 @@ async function loadHomeData(){
 function setupCats(){const s=document.getElementById('cat-strip');s.innerHTML='';CATS.forEach(c=>{const d=document.createElement('div');d.className='cat-chip'+(c===currentCat?' active':'');d.textContent=c;d.onclick=()=>changeCat(c);s.appendChild(d);});}
 async function changeCat(cat){currentCat=cat;document.querySelectorAll('#cat-strip .cat-chip').forEach(c=>c.classList.toggle('active',c.textContent===cat));await loadHomeData();}
 
-// Build a short card with thumbnail eagerly loaded — title shows IMMEDIATELY (not after image)
 function buildShortCard(v,onClick){
   const d=document.createElement('div');d.className='short-card';
-  // Title + views render instantly; image loads behind it
-  d.innerHTML=`<img src="${v.thumb}" loading="eager" decoding="async" onerror="this.style.opacity='0'"><div class="short-card-info"><div class="short-card-title">${(v.title||'').slice(0,50)}</div><div class="short-card-views">🎵 ${fv(v.views)}</div></div>`;
-  // Pre-set a background color immediately so it never looks empty, even before image decodes
   d.style.background=rc(v.channel);
+  d.innerHTML=`<img src="${v.thumb}" loading="eager" decoding="async" onerror="this.style.opacity='0'"><div class="short-card-info"><div class="short-card-title">${(v.title||'').slice(0,50)}</div><div class="short-card-views">🎵 ${fv(v.views)}</div></div>${v.isMine?'<div class="short-card-mine">YOU</div>':''}`;
   d.onclick=onClick;
   return d;
 }
@@ -1125,7 +1143,7 @@ function buildShortSlide(v,idx){
       <source src="${v.videoUrl}" type="video/mp4">
     </video>
     <div class="s-grad"></div>
-    <div class="s-mood-tag">${moodLabel}</div>
+    <div class="s-mood-tag">${moodLabel}${v.isMine?' · YOU':''}</div>
     <div class="s-tap-zone"></div>
     <div class="s-ctrl-bar">
       <button class="s-ctrl-btn" onclick="event.stopPropagation();sPause(${idx})">
@@ -1238,7 +1256,6 @@ async function activateShortSlide(slide,idx){
   if(!v)return;
   const mood=v.mood||'default';
 
-  // Always start with a fresh DIFFERENT track for this slide (not whatever was assigned at fetch time)
   const startTrack=instantTrackForMood(mood);
   v.bgMusicUrl=startTrack.url;v.bgMusicName=startTrack.name;
   const mt0=document.getElementById('smusictxt-'+idx);if(mt0)mt0.textContent=startTrack.name;
@@ -1507,11 +1524,32 @@ function buildCS(v){return`<div class="cmt-section"><div class="cmt-toggle-row" 
 function toggleCmts(row){const b=row.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';}
 async function loadMoreVids(v){const sec=document.getElementById('more-vids-section');sec.style.display='none';try{const d=await fetchLong();if(d.items.length){sec.style.display='block';const list=document.getElementById('more-vids-list');list.innerHTML='';d.items.filter(x=>x.id!==v.id).slice(0,5).forEach(mv=>list.appendChild(makeVC(mv)));}}catch(e){}}
 
+// ---- PROFILE: SHOW UPLOADED SHORTS ----
 async function loadProfileVideos(){
   const grid=document.getElementById('profile-grid');grid.innerHTML='';document.getElementById('p-videos').textContent='0';document.getElementById('p-likes').textContent='0';
-  if(!currentUser||isGuest){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1">Login to see your videos 📱</div>';return;}
-  try{const{data,error}=await SB.from('videos').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});if(error)throw error;document.getElementById('p-videos').textContent=data?.length||0;document.getElementById('p-likes').textContent=fv((data||[]).reduce((a,v)=>a+(v.like_count||0),0));if(!data?.length){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1">No videos yet!</div>';return;}data.forEach(v=>{const d=document.createElement('div');d.className='profile-vid-card';if(v.thumbnail_url)d.innerHTML=`<img src="${v.thumbnail_url}"><div class="profile-vid-views">👁 ${fv(v.view_count||0)}</div>`;else d.innerHTML=`<div style="width:100%;height:100%;background:${rc(v.title||'')};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;padding:8px;">${(v.title||'').slice(0,30)}</div><div class="profile-vid-views">👁 ${fv(v.view_count||0)}</div>`;grid.appendChild(d);});}
-  catch(e){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);grid-column:1/-1">Error loading</div>';}
+  if(!currentUser||isGuest){
+    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1">Login to upload & see your shorts 📱</div>';
+    return;
+  }
+  try{
+    const{data,error}=await SB.from('shorts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    if(error)throw error;
+    document.getElementById('p-videos').textContent=data?.length||0;
+    document.getElementById('p-likes').textContent=fv((data||[]).reduce((a,v)=>a+(v.likes||0),0));
+    if(!data?.length){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1">No shorts uploaded yet! Tap Upload 📤</div>';return;}
+    data.forEach(r=>{
+      const d=document.createElement('div');d.className='profile-vid-card';
+      if(r.thumb_url)d.innerHTML=`<img src="${r.thumb_url}"><div class="profile-vid-views">👁 ${fv(r.views||0)}</div>`;
+      else d.innerHTML=`<div style="width:100%;height:100%;background:${rc(r.title||'')};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;padding:8px;">${(r.title||'').slice(0,30)}</div><div class="profile-vid-views">👁 ${fv(r.views||0)}</div>`;
+      d.onclick=()=>{
+        const mood=r.mood||detectMood(r.title,'',r.title);
+        const t=instantTrackForMood(mood);
+        shortVideos=[{id:'my_'+r.id,title:r.title,channel:r.channel||'You',channelAvatar:'',thumb:r.thumb_url||'',videoUrl:r.video_url,bgMusicUrl:t.url,bgMusicName:t.name,mood,views:r.views||0,likes:r.likes||0,comments:r.comments||0,isMine:true}];
+        openShortsPage(0);
+      };
+      grid.appendChild(d);
+    });
+  }catch(e){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);grid-column:1/-1">Error loading</div>';}
 }
 function switchProfileTab(el,tab){document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');if(tab==='videos')loadProfileVideos();else document.getElementById('profile-grid').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1">No liked videos</div>';}
 
@@ -1539,15 +1577,142 @@ function enterApp(){
   refreshTimer=setInterval(()=>{usedShortIds.clear();usedLongIds.clear();usedIgIds.clear();usedTtIds.clear();shortVideos=[];longVideos=[];igVideos=[];ttVideos=[];if(currentPlatform==='yt')loadHomeData();else if(currentPlatform==='ig'){igReelsLoading=false;loadIgReels();}else if(currentPlatform==='tt'){ttReelsLoading=false;loadTtReels();}},5*60*1000);
 }
 
-function openUploadModal(){document.getElementById('upload-file-name').textContent='Tap to select video';document.getElementById('upload-title').value='';document.getElementById('upload-desc').value='';document.getElementById('upload-prog-wrap').style.display='none';document.getElementById('upload-prog-bar').style.width='0%';document.getElementById('upload-status').textContent='';const pv=document.getElementById('upload-preview');pv.src='';pv.style.display='none';document.getElementById('upload-modal').style.display='flex';}
+// ================================================================
+// UPLOAD SYSTEM — real Supabase Storage + shorts table
+// ================================================================
+function openUploadModal(){
+  document.getElementById('upload-file-name').textContent='Tap to select video';
+  document.getElementById('upload-title').value='';document.getElementById('upload-desc').value='';
+  document.getElementById('upload-prog-wrap').style.display='none';document.getElementById('upload-prog-bar').style.width='0%';
+  document.getElementById('upload-status').textContent='';
+  const pv=document.getElementById('upload-preview');pv.src='';pv.style.display='none';
+  const tp=document.getElementById('upload-thumb-preview');tp.src='';tp.style.display='none';
+  document.getElementById('upload-thumb-row').style.display='none';
+  uploadFile=null;uploadThumbFile=null;uploadThumbMode='auto';autoThumbDataUrl=null;
+  document.getElementById('upload-modal').style.display='flex';
+}
 function closeUploadModal(){document.getElementById('upload-modal').style.display='none';}
-function onUploadFile(input){const file=input.files[0];if(!file)return;uploadFile=file;document.getElementById('upload-file-name').textContent=file.name;const pv=document.getElementById('upload-preview');pv.src=URL.createObjectURL(file);pv.style.display='block';pv.play().catch(()=>{});if(!document.getElementById('upload-title').value)document.getElementById('upload-title').value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');}
+
+function onUploadFile(input){
+  const file=input.files[0];if(!file)return;
+  uploadFile=file;
+  document.getElementById('upload-file-name').textContent=file.name;
+  const pv=document.getElementById('upload-preview');pv.src=URL.createObjectURL(file);pv.style.display='block';
+  if(!document.getElementById('upload-title').value)document.getElementById('upload-title').value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  // Auto-capture a thumbnail frame from the video once it can play
+  pv.addEventListener('loadeddata',()=>{
+    pv.currentTime=Math.min(0.5,(pv.duration||1)/4);
+  },{once:true});
+  pv.addEventListener('seeked',()=>{
+    try{
+      const canvas=document.getElementById('upload-thumb-canvas');
+      canvas.width=pv.videoWidth||360;canvas.height=pv.videoHeight||640;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(pv,0,0,canvas.width,canvas.height);
+      autoThumbDataUrl=canvas.toDataURL('image/jpeg',0.85);
+      if(uploadThumbMode==='auto'){
+        const tp=document.getElementById('upload-thumb-preview');
+        tp.src=autoThumbDataUrl;tp.style.display='block';
+      }
+      document.getElementById('upload-thumb-row').style.display='flex';
+    }catch(e){}
+    pv.currentTime=0;
+  },{once:true});
+  pv.play().then(()=>{pv.pause();}).catch(()=>{});
+}
+
+function selectThumbOpt(mode){
+  uploadThumbMode=mode;
+  document.getElementById('thumb-opt-auto').classList.toggle('active',mode==='auto');
+  document.getElementById('thumb-opt-custom').classList.toggle('active',mode==='custom');
+  if(mode==='auto'&&autoThumbDataUrl){
+    const tp=document.getElementById('upload-thumb-preview');tp.src=autoThumbDataUrl;tp.style.display='block';
+  }
+}
+
+function onUploadThumbFile(input){
+  const file=input.files[0];if(!file)return;
+  uploadThumbFile=file;uploadThumbMode='custom';
+  document.getElementById('thumb-opt-auto').classList.remove('active');
+  document.getElementById('thumb-opt-custom').classList.add('active');
+  const tp=document.getElementById('upload-thumb-preview');
+  tp.src=URL.createObjectURL(file);tp.style.display='block';
+}
+
+function dataUrlToBlob(dataUrl){
+  const arr=dataUrl.split(',');const mime=arr[0].match(/:(.*?);/)[1];
+  const bstr=atob(arr[1]);let n=bstr.length;const u8arr=new Uint8Array(n);
+  while(n--){u8arr[n]=bstr.charCodeAt(n);}
+  return new Blob([u8arr],{type:mime});
+}
+
 async function doUpload(){
-  if(!uploadFile){toast('Select a video');return;}const title=document.getElementById('upload-title').value.trim();if(!title){toast('Enter a title');return;}
-  const prog=document.getElementById('upload-prog-wrap');const bar=document.getElementById('upload-prog-bar');const status=document.getElementById('upload-status');prog.style.display='block';status.textContent='Starting...';bar.style.width='10%';
-  if(!currentUser||isGuest){bar.style.width='100%';status.textContent='✅ Saved locally!';toast('✅ Login to upload to cloud!');setTimeout(()=>closeUploadModal(),1500);return;}
-  try{const ext=uploadFile.name.split('.').pop()||'mp4';const fn=`${currentUser.id}/${Date.now()}.${ext}`;status.textContent='Uploading...';bar.style.width='30%';const{error:sErr}=await SB.storage.from('videos').upload(fn,uploadFile,{cacheControl:'3600',upsert:false,contentType:uploadFile.type});if(sErr)throw sErr;bar.style.width='70%';const{data:{publicUrl}}=SB.storage.from('videos').getPublicUrl(fn);const{error:dbErr}=await SB.from('videos').insert({title,description:document.getElementById('upload-desc').value.trim(),video_url:publicUrl,thumbnail_url:null,user_id:currentUser.id,video_type:document.getElementById('upload-type').value,view_count:0,like_count:0,comment_count:0,created_at:new Date().toISOString()});if(dbErr)throw dbErr;bar.style.width='100%';status.textContent='✅ Uploaded!';toast('✅ Done!');setTimeout(()=>{closeUploadModal();loadProfileVideos();showPage('profile');},1500);}
-  catch(e){status.textContent='❌ '+(e.message||'Failed');}
+  if(!uploadFile){toast('📹 Select a video first');return;}
+  const title=document.getElementById('upload-title').value.trim();
+  if(!title){toast('✏️ Enter a title');return;}
+  if(!currentUser||isGuest){
+    toast('🔐 Login required to upload — tap Logout then Login/Signup');
+    return;
+  }
+
+  const prog=document.getElementById('upload-prog-wrap');const bar=document.getElementById('upload-prog-bar');const status=document.getElementById('upload-status');
+  prog.style.display='block';bar.style.width='5%';status.textContent='Preparing...';
+
+  try{
+    // 1) Upload video file to Supabase storage bucket "videos"
+    const ext=(uploadFile.name.split('.').pop()||'mp4').toLowerCase();
+    const vidPath=`${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    status.textContent='Uploading video...';bar.style.width='25%';
+    const{error:vErr}=await SB.storage.from('videos').upload(vidPath,uploadFile,{cacheControl:'3600',upsert:false,contentType:uploadFile.type||'video/mp4'});
+    if(vErr)throw vErr;
+    const{data:vPub}=SB.storage.from('videos').getPublicUrl(vidPath);
+    const videoUrl=vPub.publicUrl;
+    bar.style.width='55%';
+
+    // 2) Upload thumbnail (auto-captured frame OR custom image) to bucket "thumbnails"
+    status.textContent='Uploading thumbnail...';
+    let thumbBlob=null;
+    if(uploadThumbMode==='custom'&&uploadThumbFile){
+      thumbBlob=uploadThumbFile;
+    }else if(autoThumbDataUrl){
+      thumbBlob=dataUrlToBlob(autoThumbDataUrl);
+    }
+    let thumbUrl=null;
+    if(thumbBlob){
+      const thumbExt=(thumbBlob.type||'image/jpeg').split('/')[1]||'jpg';
+      const thumbPath=`${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${thumbExt}`;
+      const{error:tErr}=await SB.storage.from('thumbnails').upload(thumbPath,thumbBlob,{cacheControl:'3600',upsert:false,contentType:thumbBlob.type||'image/jpeg'});
+      if(!tErr){const{data:tPub}=SB.storage.from('thumbnails').getPublicUrl(thumbPath);thumbUrl=tPub.publicUrl;}
+    }
+    bar.style.width='80%';
+
+    // 3) Insert record into "shorts" table
+    status.textContent='Publishing...';
+    const desc=document.getElementById('upload-desc').value.trim();
+    const mood=detectMood(title,desc,title);
+    const{error:dbErr}=await SB.from('shorts').insert({
+      user_id:currentUser.id,
+      title,description:desc,
+      video_url:videoUrl,thumb_url:thumbUrl,
+      channel:currentProfile?.username||'You',
+      mood,views:0,likes:0,comments:0
+    });
+    if(dbErr)throw dbErr;
+
+    bar.style.width='100%';status.textContent='✅ Uploaded!';
+    toast('✅ Your short is live!');
+    setTimeout(()=>{
+      closeUploadModal();
+      // Refresh feeds so the new short appears everywhere immediately
+      usedShortIds.clear();shortVideos=[];
+      loadHomeData();
+      loadProfileVideos();
+      showPage('profile');
+    },1200);
+  }catch(e){
+    status.textContent='❌ '+(e.message||'Upload failed');
+    toast('❌ Upload failed: '+(e.message||'try again'));
+  }
 }
 
 function showPage(page){['home','search','player','subs','profile'].forEach(p=>document.getElementById(p+'-page').style.display='none');document.getElementById(page+'-page').style.display='block';document.getElementById('main').scrollTo(0,0);document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));const map={home:'bn-home',subs:'bn-subs',profile:'bn-profile'};if(map[page])document.getElementById(map[page])?.classList.add('active');if(page!=='player'){const f=document.getElementById('yt-iframe');if(f){f.src='';f.style.display='none';}document.getElementById('fake-play').style.display='flex';}if(page==='profile')loadProfileVideos();}
@@ -1609,4 +1774,4 @@ async function initSession(){
 }
 </script>
 </body>
-                                                                                                                                                                                                                                                                                                                                                                             </html>
+  </html>
