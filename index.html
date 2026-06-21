@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Flixa</title>
-<link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -618,6 +617,7 @@ html,body{height:100%;}
 <input type="file" id="upload-thumb-file" accept="image/*" style="display:none" onchange="onUploadThumbFile(this)">
 <div class="upload-field"><label>Title *</label><input type="text" id="upload-title" placeholder="Short title..."></div>
 <div class="upload-field"><label>Description</label><textarea id="upload-desc" placeholder="Describe your short..."></textarea></div>
+<div class="upload-field"><label>Category</label><select id="upload-category"><option value="All">All</option><option value="Dance">Dance</option><option value="Music">Music</option><option value="Fitness">Fitness</option><option value="Fashion">Fashion</option><option value="Funny">Funny</option><option value="Travel">Travel</option><option value="Food">Food</option><option value="Gaming">Gaming</option></select></div>
 <div class="upload-prog-wrap" id="upload-prog-wrap"><div class="upload-prog-bar" id="upload-prog-bar"></div></div>
 <div class="upload-status" id="upload-status"></div>
 <button class="upload-btn-main" onclick="doUpload()">Upload Short</button>
@@ -652,8 +652,6 @@ const MOOD_DEFS=[
   {id:'music',label:'🎤 Music',kw:['music','song','singing','singer','band','concert','melody','rhythm','beat','rap','pop','girl']}
 ];
 
-// IMPORTANT: every mood has its own dedicated URL set (no cross-mood duplicates)
-// so consecutive shorts genuinely sound different from each other.
 const MOOD_FALLBACK={
   dance:[
     {url:'https://cdn.pixabay.com/audio/2022/10/25/audio_5b636e06c4.mp3',name:'🎵 Dance Beat'},
@@ -904,7 +902,7 @@ let uploadFile=null,uploadThumbFile=null,uploadThumbMode='auto',autoThumbDataUrl
 let currentChData=null;
 let autoTimer=null,autoTimerSec=30;
 let ttDiscLoading=false;
-let myShorts=[]; // shorts uploaded by current user — merged into all feeds
+let myShorts=[];
 
 function safePause(vid){if(!vid)return;try{vid.pause();}catch(e){}}
 function stopAllVids(){[activeShortVid,activeIgVid,activeTtVid].forEach(v=>{if(v){try{safePause(v);v.src='';v.load();}catch(e){}}});activeShortVid=null;activeIgVid=null;activeTtVid=null;}
@@ -926,7 +924,7 @@ function startTimer(){if(autoTimer)clearInterval(autoTimer);autoTimerSec=30;updT
 function updTimer(){const n=document.getElementById('timer-num');if(n)n.textContent=autoTimerSec;const c=document.getElementById('timer-prog-circle');if(c)c.style.strokeDashoffset=106.81*(autoTimerSec/30);}
 
 // ================================================================
-// FETCH VIDEOS
+// FETCH VIDEOS — includes uploaded shorts from Supabase
 // ================================================================
 async function fetchPixabay(query,perPage=20){
   try{
@@ -991,9 +989,11 @@ async function fetchPexels(query,perPage=8){
 }
 
 // ---- USER-UPLOADED SHORTS FROM SUPABASE ----
-async function fetchMyShortsFromDB(){
+async function fetchMyShortsFromDB(category){
   try{
-    const{data,error}=await SB.from('shorts').select('*').order('created_at',{ascending:false}).limit(50);
+    let query=SB.from('shorts').select('*').order('created_at',{ascending:false});
+    if(category&&category!=='All'){query=query.eq('category',category);}
+    const{data,error}=await query.limit(50);
     if(error||!data)return[];
     return data.map(r=>{
       const mood=r.mood||detectMood(r.title,'',r.title);
@@ -1005,7 +1005,8 @@ async function fetchMyShortsFromDB(){
         bgMusicUrl:t.url,bgMusicName:t.name,
         views:r.views||0,likes:r.likes||0,comments:r.comments||0,
         publishedAt:r.created_at,source:'mine',duration:30,
-        isMine:currentUser&&r.user_id===currentUser.id
+        isMine:currentUser&&r.user_id===currentUser.id,
+        category:r.category||'All'
       };
     });
   }catch(e){return[];}
@@ -1015,8 +1016,8 @@ async function fetchShorts(cat,customQ){
   let q;
   if(Math.random()<0.7){q=customQ||rq(HOT_QUERIES);}
   else{const qs=getQ(cat);q=customQ||rq(qs);}
-  const[pb,px,mine]=await Promise.all([fetchPixabay(q,18),fetchPexels(q,7),fetchMyShortsFromDB()]);
-  let all=[...mine,...pb,...px]; // user uploads first, so they surface often
+  const[pb,px,mine]=await Promise.all([fetchPixabay(q,18),fetchPexels(q,7),fetchMyShortsFromDB(cat)]);
+  let all=[...mine,...pb,...px];
   if(all.length<5){const pb2=await fetchPixabay(rq(HOT_QUERIES),12);all=[...all,...pb2];}
   // Keep all "mine" items pinned near top, shuffle the rest
   const mineItems=all.filter(v=>v.source==='mine');
@@ -1689,13 +1690,15 @@ async function doUpload(){
     // 3) Insert record into "shorts" table
     status.textContent='Publishing...';
     const desc=document.getElementById('upload-desc').value.trim();
+    const category=document.getElementById('upload-category').value||'All';
     const mood=detectMood(title,desc,title);
+    const channel=currentProfile?.username||'You';
     const{error:dbErr}=await SB.from('shorts').insert({
       user_id:currentUser.id,
       title,description:desc,
       video_url:videoUrl,thumb_url:thumbUrl,
-      channel:currentProfile?.username||'You',
-      mood,views:0,likes:0,comments:0
+      channel, mood, category,
+      views:0,likes:0,comments:0
     });
     if(dbErr)throw dbErr;
 
@@ -1774,4 +1777,4 @@ async function initSession(){
 }
 </script>
 </body>
-</html>
+  </html>
