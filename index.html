@@ -1715,6 +1715,18 @@ function uploadFileXHR(bucket,path,file,onProgress){
     xhr.send(file);
   });
 }
+// ===CONNECTIVITY PRE-CHECK — tells you WHICH kind of network failure this is
+// before wasting time baking/uploading a video.===
+async function checkNetworkBeforeUpload(){
+  if(!navigator.onLine){
+    throw new Error('Your device reports no internet connection right now. Check WiFi / mobile data and try again.');
+  }
+  try{
+    await fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',mode:'cors',cache:'no-store'});
+  }catch(probeErr){
+    throw new Error('Cannot reach Supabase servers from inside this app. If this page is running inside a wrapped WebView/APK, make sure the app declares the INTERNET permission in AndroidManifest.xml and that the WebView has JavaScript + network access enabled. If you are testing in a normal browser, check for a firewall/VPN blocking *.supabase.co.');
+  }
+}
 async function dbInsertREST(table,row){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
     method:'POST',
@@ -1747,6 +1759,7 @@ async function doUpload(){
   document.getElementById('up-draft-btn').disabled=true;
 
   try{
+    await checkNetworkBeforeUpload();
     setProgress(2,'Rendering trim, filters & overlays...','🎬 Processing Video');
     let processed=null;
     try{processed=await bakeVideo(pct=>setProgress(2+pct*0.28,'Rendering... '+Math.round(pct)+'%'));}
@@ -1898,4 +1911,4 @@ async function initSession(){
 }
 </script>
 </body>
-  </html>
+</html>
