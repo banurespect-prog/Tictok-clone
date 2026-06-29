@@ -89,7 +89,7 @@ body{color:#f1f1f1;max-width:430px;margin:0 auto;position:relative;}
 #search-bar input::placeholder{color:var(--text3);}
 #search-bar button{padding:9px 12px;background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:14px;}
 .lang-btn{display:flex;align-items:center;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;}
-#timer-badge{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1.5px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+#timer-badge,.timer-svg,.timer-track,.timer-prog,.timer-num{display:none;}
 .timer-svg{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);transform:rotate(-90deg);}
 .timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:2;}
 .timer-prog{fill:none;stroke:var(--red);stroke-width:2;stroke-linecap:round;}
@@ -522,6 +522,19 @@ body{color:#f1f1f1;max-width:430px;margin:0 auto;position:relative;}
 .up-skip-link{text-align:center;font-size:12px;color:#666;text-decoration:underline;cursor:pointer;margin-top:6px;}
 
 .up-bake-note{background:rgba(62,166,255,.08);border:1px solid rgba(62,166,255,.25);border-radius:12px;padding:10px 12px;font-size:11px;color:#9cc8ff;line-height:1.4;margin-top:10px;}
+
+/* ===STICKY PLAYER + MINI PLAYER=== */
+#player-sticky-top{position:sticky;top:0;z-index:50;background:var(--bg);}
+.pip-mini-btn{background:var(--bg2);border:1px solid var(--border);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);flex-shrink:0;}
+.pip-mini-btn svg{width:18px;height:18px;}
+#mini-player{display:none;position:fixed;left:14px;bottom:72px;width:200px;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 8px 30px rgba(0,0,0,.6);z-index:580;border:1px solid #222;touch-action:none;}
+#mini-player-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;}
+#mini-player-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.mp-info{padding:6px 8px 2px;}
+.mp-title{font-size:11px;color:#ddd;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-ctrls{display:flex;justify-content:space-around;padding:4px 6px 8px;}
+.mp-btn{background:rgba(255,255,255,.08);border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.mp-btn svg{width:15px;height:15px;fill:white;}
 </style>
 </head>
 <body>
@@ -568,7 +581,6 @@ body{color:#f1f1f1;max-width:430px;margin:0 auto;position:relative;}
 <div class="dd-arrow" onclick="toggleDD()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></div>
 <div id="search-bar"><input type="text" id="search-input" placeholder="Search..." autocomplete="off" onfocus="showSearchPage()" onkeydown="if(event.key==='Enter')doSearch()"><button onclick="doSearch()">🔍</button></div>
 <button class="lang-btn" onclick="toggleLangDD()"><span id="lang-flag-display">🇮🇳</span><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></button>
-<div id="timer-badge" onclick="showPage('profile')"><svg class="timer-svg" viewBox="0 0 40 40"><circle class="timer-track" cx="20" cy="20" r="17"/><circle class="timer-prog" id="timer-prog-circle" cx="20" cy="20" r="17" stroke-dasharray="106.81" stroke-dashoffset="0"/></svg><span class="timer-num" id="timer-num">30</span></div>
 </nav>
 
 <div id="main" style="display:none;">
@@ -589,9 +601,11 @@ body{color:#f1f1f1;max-width:430px;margin:0 auto;position:relative;}
 <div id="search-results-wrap" style="display:none;"><div id="search-shorts-wrap" style="display:none;"><div class="section-hdr"><span class="red-pill">SHORTS</span></div><div class="shorts-grid-2" id="search-shorts-grid"></div></div><div class="section-hdr" id="search-vids-hdr" style="display:none;"><span>📺</span><span>Videos</span></div><div id="search-long-feed"></div></div>
 </div>
 <div id="player-page">
-<div class="player-topbar"><div class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke-linecap="round"/></svg></div><div class="player-title-txt" id="player-title">Video</div></div>
+<div id="player-sticky-top">
+<div class="player-topbar"><div class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke-linecap="round"/></svg></div><div class="player-title-txt" id="player-title">Video</div><button class="pip-mini-btn" onclick="minimizeToMiniPlayer()" title="Mini player"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="12" width="8" height="6" rx="1" fill="currentColor"/></svg></button></div>
 <div class="player-wrap"><div class="fake-play" id="fake-play" onclick="playVideo()"><img id="player-thumb" src="" alt=""><div class="fake-overlay"></div><div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><iframe id="yt-iframe" style="display:none;" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe></div>
 <div class="ctrl-bar"><button class="ctrl-btn" id="loop-btn" onclick="toggleLoop()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Loop</button></div>
+</div>
 <div id="vid-details"></div><div id="cmt-section"></div>
 <div class="more-vids" id="more-vids-section" style="display:none;"><div class="more-vids-title">📺 More Videos</div><div id="more-vids-list"></div></div>
 </div>
@@ -783,6 +797,15 @@ body{color:#f1f1f1;max-width:430px;margin:0 auto;position:relative;}
 </div>
 
 <div id="toast"></div>
+<div id="mini-player">
+  <div id="mini-player-frame-wrap"><iframe id="mini-yt-iframe" frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope"></iframe></div>
+  <div class="mp-info"><div class="mp-title" id="mp-title">Video</div></div>
+  <div class="mp-ctrls">
+    <button class="mp-btn" onclick="miniPlayerToggle()"><svg id="mp-play-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+    <button class="mp-btn" onclick="expandMiniPlayer()"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+    <button class="mp-btn" onclick="closeMiniPlayer()"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+</div>
 
 <script>
 const{createClient}=supabase;
@@ -886,7 +909,7 @@ let shortsObs=null,igObs=null,ttObs=null;
 let igRL=false,ttRL=false,igQL=false,ttSL=false,longLM=false,searchLM=false,ttDL=false;
 let chAvatarCache={};
 let authMode='login';
-let ddTimer=null,refreshTimer=null,autoTimer=null,autoTimerSec=30;
+let ddTimer=null,refreshTimer=null;
 let searchNextToken='',searchQuery='';
 let upFile=null,upFileURL=null,upThumbFile=null,upThumbMode='auto',autoThumbUrl=null,upStep=1;
 let upDuration=0,upTrimStart=0,upTrimEnd=0;
@@ -938,29 +961,28 @@ function setLang(code,flag,name){
 function toggleLangDD(){const dd=document.getElementById('lang-dropdown');document.getElementById('platform-dropdown').classList.remove('open');if(dd.classList.contains('open'))dd.classList.remove('open');else{dd.classList.add('open');setTimeout(()=>dd.classList.remove('open'),6000);}}
 
 // Timer
-function startTimer(){if(autoTimer)clearInterval(autoTimer);autoTimerSec=30;updTimer();autoTimer=setInterval(()=>{autoTimerSec--;updTimer();if(autoTimerSec<=0){autoTimerSec=30;fetchShorts(currentCat).then(r=>{if(r.items.length){const ni=r.items.filter(v=>!usedShortIds.has(v.id));if(ni.length){shortVideos=[...ni,...shortVideos].slice(0,30);ni.forEach(v=>usedShortIds.add(v.id));renderHomeShorts();}}});}},1000);}
-function updTimer(){const n=document.getElementById('timer-num');if(n)n.textContent=autoTimerSec;const c=document.getElementById('timer-prog-circle');if(c)c.style.strokeDashoffset=106.81*(autoTimerSec/30);}
+// (30s auto-refresh timer removed per request)
 
 // ===FAST IMAGE LOADER===
+// Shows color instantly, loads images directly (no artificial scheduling delay)
 function loadImgFast(imgEl,src){
   if(!src){return;}
-  const tryLoad=()=>{
-    imgEl.src=src;
-    imgEl.onload=()=>{imgEl.classList.add('shown');};
-    imgEl.onerror=()=>{imgEl.style.display='none';};
-  };
-  if('requestIdleCallback' in window){requestIdleCallback(tryLoad,{timeout:500});}
-  else{setTimeout(tryLoad,10);}
+  imgEl.src=src;
+  imgEl.onload=()=>{imgEl.classList.add('shown');};
+  imgEl.onerror=()=>{imgEl.style.display='none';};
 }
 
-// ===CARD BUILDER===
+// ===CARD BUILDER — instant color + fast image===
 function buildShortCard(v,onClick){
   const wrap=document.createElement('div');
   wrap.className='short-card';
   const color=rc(v.channel||'A');
+  // Instant color bg
   const bg=document.createElement('div');bg.className='sc-color';bg.style.background=color;wrap.appendChild(bg);
+  // Image
   if(v.thumb){
     const img=document.createElement('img');img.className='sc-img';
+    // Use smaller Pexels image for speed
     let src=v.thumb;
     if(src.includes('pexels.com')&&!src.includes('?')){src=src+'?auto=compress&cs=tinysrgb&w=200&h=350&fit=crop';}
     else if(src.includes('vimeocdn')&&!src.includes('_320')){src=src.replace(/_\d+x\d+/,'_320x180');}
@@ -976,7 +998,7 @@ function buildShortCard(v,onClick){
   return wrap;
 }
 
-// ===FETCH===
+// ===FETCH — category-specific===
 async function fetchPixabay(query,perPage=16){
   try{
     const url=`https://pixabay.com/api/videos/?key=${PB_KEY}&q=${encodeURIComponent(query)}&per_page=${perPage}&orientation=vertical&safesearch=true&order=popular`;
@@ -1010,6 +1032,7 @@ async function fetchPexels(query,perPage=6){
       if(!file?.link)continue;
       const title=query.replace(/\b\w/g,c=>c.toUpperCase())+' ✨';
       const mood=detectMood(title,'',query);const t=pickTrack(mood);
+      // Pexels compressed thumbnail
       const thumb=v.image?v.image+'?auto=compress&cs=tinysrgb&w=200&h=350&fit=crop':'' ;
       items.push({id:'px_'+v.id,title,tags:query,query,mood,channel:v.user?.name||'Creator',channelId:'px_u_'+(v.user?.id||v.id),channelAvatar:av(v.id%5),thumb,videoUrl:file.link,bgMusicUrl:t.url,bgMusicName:t.name,views:Math.floor(Math.random()*600000)+5000,likes:Math.floor(Math.random()*60000)+200,comments:Math.floor(Math.random()*6000)+50,publishedAt:new Date(Date.now()-Math.random()*7*86400000).toISOString(),source:'pexels',duration:v.duration||30});
     }
@@ -1017,7 +1040,7 @@ async function fetchPexels(query,perPage=6){
   }catch(e){return[];}
 }
 
-// ===SUPABASE fetch===
+// ===SUPABASE fetch — category filter + real views===
 async function fetchUploaded(category){
   try{
     let q=SB.from('videos').select('*').eq('video_type','short').order('created_at',{ascending:false});
@@ -1033,6 +1056,7 @@ async function fetchUploaded(category){
 }
 
 async function fetchShorts(cat,customQ){
+  // Use category-specific query
   const q=customQ||getCatQuery(cat);
   const[pb,px,uploaded]=await Promise.all([fetchPixabay(q,16),fetchPexels(q,6),fetchUploaded(cat)]);
   let all=[...uploaded,...pb,...px];
@@ -1191,6 +1215,7 @@ async function activateSlide(slide,idx){
   playBG(t.url,()=>{const fb=pickTrack(mood);playBG(fb.url,null,mood);},mood);
   const sc=document.getElementById('shorts-scroller');
   [1,2].forEach(off=>{const ni=idx+off;if(ni<sc.children.length){const nv=sc.children[ni].querySelector('.s-video');if(nv&&nv.preload==='none'){nv.preload='metadata';nv.load();}}});
+  // Update real view count in Supabase
   if(v.dbId){
     try{await SB.from('videos').update({view_count:(v.views||0)+1}).eq('id',v.dbId);}catch(e){}
   }
@@ -1240,7 +1265,7 @@ function genCmts(){const ns=['Ahmad','Sara','Priya','Fatima','Ji-ho','Sofia','BT
 
 function loadSubsPage(){const chs=['Hot Dance Girls','Bollywood Queens','Fitness Models','Fashion Girls','Latin Dance','Kpop Stars'];const list=document.getElementById('subs-list');list.innerHTML='';chs.forEach(ch=>{const d=document.createElement('div');d.className='sub-ch-item';d.innerHTML=`<div class="sub-ch-av" style="background:${rc(ch)}">${ch[0]}</div><div class="sub-ch-info"><div class="sub-ch-name">${ch}</div><div class="sub-ch-count">${rSubs()} subscribers</div></div><button class="unsub-btn" onclick="toast('Done!')">Subscribed</button>`;list.appendChild(d);});}
 
-function openPlayer(v){currentVideoId=v.id;loopActive=false;document.getElementById('loop-btn').classList.remove('on');showPage('player');document.getElementById('player-title').textContent=v.title;document.getElementById('player-thumb').src=v.thumb;document.getElementById('fake-play').style.display='flex';document.getElementById('yt-iframe').style.display='none';document.getElementById('yt-iframe').src='';document.getElementById('vid-details').innerHTML=buildVD(v);document.getElementById('cmt-section').innerHTML=buildCS(v);loadMoreVids(v);}
+function openPlayer(v){if(miniPlayerOn)closeMiniPlayer();currentVideoId=v.id;loopActive=false;document.getElementById('loop-btn').classList.remove('on');showPage('player');document.getElementById('player-title').textContent=v.title;document.getElementById('player-thumb').src=v.thumb;document.getElementById('fake-play').style.display='flex';document.getElementById('yt-iframe').style.display='none';document.getElementById('yt-iframe').src='';document.getElementById('vid-details').innerHTML=buildVD(v);document.getElementById('cmt-section').innerHTML=buildCS(v);loadMoreVids(v);}
 function playVideo(){const f=document.getElementById('yt-iframe');f.src=`https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1${loopActive?'&loop=1&playlist='+currentVideoId:''}`;document.getElementById('fake-play').style.display='none';f.style.display='block';}
 function toggleLoop(){loopActive=!loopActive;document.getElementById('loop-btn').classList.toggle('on',loopActive);toast(loopActive?'🔁 Loop ON':'🔁 OFF');if(document.getElementById('yt-iframe').style.display!=='none')playVideo();}
 function buildVD(v){const ac=rc(v.channel);const avH=v.channelAvatar?`<img src="${v.channelAvatar}" onerror="this.parentElement.textContent='${(v.channel||'C')[0]}'">`:`${(v.channel||'?')[0]}`;return`<div class="vid-details"><div class="vd-title">${v.title}</div><div class="vd-ch-row"><div class="vd-ch-left"><div class="vd-av" style="background:${ac}">${avH}</div><div><div class="vd-ch-name">${v.channel}</div><div class="vd-subs">${v.subs||rSubs()} subscribers</div></div></div><button class="sub-btn" onclick="this.classList.toggle('subscribed');this.textContent=this.classList.contains('subscribed')?'Subscribed':'Subscribe';toast('✅!')">Subscribe</button></div><div class="vd-stats"><div class="stat-chip">👁 ${fv(v.views)}</div><div class="stat-chip">❤️ ${fv(v.likes)}</div><div class="stat-chip">📅 ${ago(v.publishedAt)}</div></div><div class="vd-acts"><button class="vd-act like-act" onclick="this.classList.toggle('liked');toast('❤️!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${fv(v.likes)}</button><button class="vd-act save-act" onclick="toast('🔖!')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save</button><button class="vd-act share-act" onclick="doShare()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Share</button></div></div>`;}
@@ -1248,14 +1273,15 @@ function buildCS(v){return`<div class="cmt-section"><div class="cmt-toggle-row" 
 function toggleCmts(row){const b=row.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';}
 async function loadMoreVids(v){const sec=document.getElementById('more-vids-section');sec.style.display='none';try{const d=await fetchLong();if(d.items.length){sec.style.display='block';const list=document.getElementById('more-vids-list');list.innerHTML='';d.items.filter(x=>x.id!==v.id).slice(0,5).forEach(mv=>list.appendChild(makeVC(mv)));}}catch(e){}}
 
-// ===PROFILE===
+// ===PROFILE — shows real uploaded shorts===
 async function loadProfileVideos(){
   const grid=document.getElementById('profile-grid');grid.innerHTML='';
   document.getElementById('p-videos').textContent='0';document.getElementById('p-likes').textContent='0';
   try{
+    // Always show all uploaded shorts (public)
     let q=SB.from('videos').select('*').eq('video_type','short').order('created_at',{ascending:false});
     if(currentUser&&!isGuest)q=q.eq('user_id',currentUser.id);
-    else q=q.limit(9);
+    else q=q.limit(9); // show recent 9 for guests
     const{data,error}=await q.limit(30);
     if(error)throw error;
     if(!data?.length){grid.innerHTML='<div style="padding:44px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1;">No shorts yet! Tap Upload 📤</div>';
@@ -1274,6 +1300,7 @@ async function loadProfileVideos(){
       grid.appendChild(d);
     });
   }catch(e){
+    // Show guest message
     grid.innerHTML='<div style="padding:44px;text-align:center;color:var(--text2);font-size:14px;grid-column:1/-1;">Upload your first short! 📤</div>';
   }
 }
@@ -1293,7 +1320,7 @@ async function submitAuth(){
   btn.textContent=authMode==='login'?'Login':'Create Account';btn.disabled=false;
 }
 function guestMode(){isGuest=true;currentUser=null;currentProfile={username:'Guest'};enterApp();}
-async function doLogout(){await SB.auth.signOut().catch(()=>{});stopAllVids();stopBG();currentUser=null;currentProfile=null;isGuest=false;['topnav','botnav','main','ig-page','tt-page'].forEach(id=>document.getElementById(id).style.display='none');if(autoTimer)clearInterval(autoTimer);if(refreshTimer)clearInterval(refreshTimer);document.getElementById('auth-screen').style.display='flex';toast('👋 Logged out');}
+async function doLogout(){await SB.auth.signOut().catch(()=>{});stopAllVids();stopBG();currentUser=null;currentProfile=null;isGuest=false;['topnav','botnav','main','ig-page','tt-page'].forEach(id=>document.getElementById(id).style.display='none');if(refreshTimer)clearInterval(refreshTimer);document.getElementById('auth-screen').style.display='flex';toast('👋 Logged out');}
 async function loadProfile(){if(!currentUser)return;try{const{data}=await SB.from('profiles').select('*').eq('id',currentUser.id).single();currentProfile=data||{username:currentUser.email?.split('@')[0]||'User'};}catch(e){currentProfile={username:currentUser.email?.split('@')[0]||'User'};}}
 function updateProfileUI(){const name=currentProfile?.username||'Guest';document.getElementById('ig-profile-av').textContent=name[0].toUpperCase();document.getElementById('profile-av-el').textContent=name[0].toUpperCase();document.getElementById('profile-username-el').textContent=name;document.getElementById('profile-handle-el').textContent='@'+name.toLowerCase().replace(/\s+/g,'_');}
 
@@ -1301,12 +1328,12 @@ function enterApp(){
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('topnav').style.display='flex';document.getElementById('botnav').style.display='flex';document.getElementById('main').style.display='block';
   document.getElementById('lang-flag-display').textContent=currentLangFlag;
-  updateProfileUI();setupCats();loadSubsPage();loadHomeData();setupInfScroll();setupSearchScroll();loadProfileVideos();startTimer();
+  updateProfileUI();setupCats();loadSubsPage();loadHomeData();setupInfScroll();setupSearchScroll();loadProfileVideos();
   if(refreshTimer)clearInterval(refreshTimer);
   refreshTimer=setInterval(()=>{usedShortIds.clear();usedLongIds.clear();usedIgIds.clear();usedTtIds.clear();shortVideos=[];longVideos=[];igVideos=[];ttVideos=[];if(currentPlatform==='yt')loadHomeData();else if(currentPlatform==='ig'){igRL=false;loadIgReels();}else if(currentPlatform==='tt'){ttRL=false;loadTtReels();}},5*60*1000);
 }
 
-// ===UPLOAD — 7-STEP FLOW===
+// ===UPLOAD — 7-STEP FLOW (camera, trim, music, filters, text/stickers, captions, details)===
 function openUploadModal(){
   upFile=null;if(upFileURL){URL.revokeObjectURL(upFileURL);}upFileURL=null;
   upThumbFile=null;upThumbMode='auto';autoThumbUrl=null;upStep=1;
@@ -1847,6 +1874,19 @@ function afterSuccess(){closeUploadModal();showPage('profile');}
 
 // Nav
 function showPage(page){
+  const playerWasOpen=document.getElementById('player-page').style.display==='block';
+  const ytIframe=document.getElementById('yt-iframe');
+  const wasPlaying=playerWasOpen&&ytIframe&&ytIframe.style.display!=='none'&&ytIframe.src;
+  if(wasPlaying&&page!=='player'&&!miniPlayerOn&&currentVideoId){
+    miniPlayerVideoId=currentVideoId;
+    miniPlayerTitle=document.getElementById('player-title').textContent||'Video';
+    document.getElementById('mp-title').textContent=miniPlayerTitle;
+    const mf=document.getElementById('mini-yt-iframe');
+    mf.src=`https://www.youtube-nocookie.com/embed/${miniPlayerVideoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+    document.getElementById('mini-player').style.display='block';
+    miniPlayerOn=true;miniPlayerPlaying=true;
+    setMiniPlayIcon(true);
+  }
   ['home','search','player','subs','profile'].forEach(p=>document.getElementById(p+'-page').style.display='none');
   document.getElementById(page+'-page').style.display='block';
   document.getElementById('main').scrollTo(0,0);
@@ -1858,6 +1898,62 @@ function showPage(page){
   if(page==='search')setupTrending();
 }
 function goBack(){showPage('home');}
+
+// ===MINI PLAYER (in-app floating, persists while browsing other tabs)===
+// Note: real OS-level Picture-in-Picture that survives leaving the app entirely
+// needs native Android code in the wrapper app -- this is the in-app equivalent.
+let miniPlayerOn=false,miniPlayerVideoId=null,miniPlayerTitle='',miniPlayerPlaying=true;
+function minimizeToMiniPlayer(){goBack();}
+function setMiniPlayIcon(playing){
+  const ic=document.getElementById('mp-play-icon');
+  if(ic)ic.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>';
+}
+function miniPostCmd(func){
+  const mf=document.getElementById('mini-yt-iframe');
+  if(mf&&mf.contentWindow)try{mf.contentWindow.postMessage(JSON.stringify({event:'command',func,args:''}),'*');}catch(e){}
+}
+function miniPlayerToggle(){
+  miniPlayerPlaying=!miniPlayerPlaying;
+  miniPostCmd(miniPlayerPlaying?'playVideo':'pauseVideo');
+  setMiniPlayIcon(miniPlayerPlaying);
+}
+function expandMiniPlayer(){
+  if(!miniPlayerVideoId)return;
+  const vid=miniPlayerVideoId,title=miniPlayerTitle;
+  closeMiniPlayer();
+  currentVideoId=vid;
+  showPage('player');
+  document.getElementById('player-title').textContent=title;
+  document.getElementById('fake-play').style.display='none';
+  const f=document.getElementById('yt-iframe');
+  f.src=`https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1`;
+  f.style.display='block';
+}
+function closeMiniPlayer(){
+  document.getElementById('mini-player').style.display='none';
+  document.getElementById('mini-yt-iframe').src='';
+  miniPlayerOn=false;miniPlayerVideoId=null;
+}
+(function setupMiniDrag(){
+  const mp=document.getElementById('mini-player');
+  if(!mp)return;
+  let dragging=false,sx=0,sy=0,ox=0,oy=0;
+  mp.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.mp-btn'))return;
+    dragging=true;sx=e.clientX;sy=e.clientY;
+    const r=mp.getBoundingClientRect();ox=r.left;oy=r.top;
+    try{mp.setPointerCapture(e.pointerId);}catch(pe){}
+  });
+  mp.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const dx=e.clientX-sx,dy=e.clientY-sy;
+    mp.style.left=Math.max(4,Math.min(window.innerWidth-mp.offsetWidth-4,ox+dx))+'px';
+    mp.style.top=Math.max(4,Math.min(window.innerHeight-mp.offsetHeight-4,oy+dy))+'px';
+    mp.style.bottom='auto';
+  });
+  mp.addEventListener('pointerup',()=>{dragging=false;});
+  mp.addEventListener('pointercancel',()=>{dragging=false;});
+})();
 function toggleDD(){const dd=document.getElementById('platform-dropdown');document.getElementById('lang-dropdown').classList.remove('open');if(dd.classList.contains('open')){dd.classList.remove('open');clearTimeout(ddTimer);}else{dd.classList.add('open');clearTimeout(ddTimer);ddTimer=setTimeout(()=>dd.classList.remove('open'),5000);}}
 document.addEventListener('click',e=>{
   const dd=document.getElementById('platform-dropdown');const ld=document.getElementById('lang-dropdown');
@@ -1891,10 +1987,12 @@ async function selectPlatform(p){
   else if(p==='tt'){document.getElementById('tt-page').style.display='flex';usedTtIds.clear();ttVideos=[];ttRL=false;loadTtReels();}
 }
 
-// ===INIT===
+// ===INIT — No language splash screen, go straight to app===
 window.addEventListener('load',()=>{
+  // Load saved lang silently
   const saved=localStorage.getItem('anskinge_lang');
   if(saved){try{const l=JSON.parse(saved);currentLang=l.code;currentLangFlag=l.flag;currentLangName=l.name;}catch(e){}}
+  // Show splash then go directly to app/auth
   requestAnimationFrame(()=>requestAnimationFrame(()=>{document.getElementById('sp-bar').style.width='100%';}));
   setTimeout(()=>{
     const sp=document.getElementById('splash');sp.style.transition='opacity .4s';sp.style.opacity='0';
@@ -1911,4 +2009,4 @@ async function initSession(){
 }
 </script>
 </body>
-</html>
+                                                                                                                                                                                                                                                                               </html>
