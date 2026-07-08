@@ -753,26 +753,17 @@ const YT_API='https://www.googleapis.com/youtube/v3';
 const PX_KEY='rVYJFrOlf2ietM2vzzy92WCbVQYQ31hqzYhZYtUGypWk21uJM1uutJoZ';
 const PB_KEY='56251585-71abbab99abf3cef0485123a5';
 
-// ===REAL SOCIAL DATA — Supabase Edge Function (Apify tokens hidden server-side)===
-// FIX: previously this was a mistyped project ref ("wgcivzdeiwmjgebyqewr") that pointed
-// to a project that doesn't exist, so IG/TikTok real scraper data never loaded and it
-// silently fell back to Pixabay/Pexels stock videos. Now it always matches SUPABASE_URL.
-const SOCIAL_FEED_URL=SUPABASE_URL+'/functions/v1/social-feed';
+// ===REAL SOCIAL DATA — Supabase Edge Function on a SEPARATE Supabase project
+// (this project only hosts the scraper function; it is NOT the same project as
+// SUPABASE_URL above, which hosts auth/storage/videos table). Do not merge these.
+const SOCIAL_FEED_URL='https://wgcivzdeiwmjgebyqewr.supabase.co/functions/v1/social-feed';
 
 async function fetchSocialFeed(platform,type,query,limit){
   limit=limit||20;
   try{
-    // FIX: Supabase Edge Functions require apikey/Authorization headers by default
-    // (unless "Verify JWT" is disabled on the function). Without these, Supabase
-    // rejects the request with 401 before your function code even runs, so this
-    // always silently fell back to Pixabay/Pexels. Now it sends the anon key.
     const r=await fetch(SOCIAL_FEED_URL,{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SUPABASE_KEY,
-        'Authorization':'Bearer '+SUPABASE_KEY
-      },
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({platform,type:type||'feed',query:query||'',limit})
     });
     if(!r.ok){console.warn('social-feed HTTP',r.status,await r.text().catch(()=>''));return[];}
@@ -1143,17 +1134,17 @@ async function doSearch(){
 }
 function setupSearchScroll(){const ss=document.createElement('div');ss.style.height='20px';document.getElementById('search-long-feed').appendChild(ss);new IntersectionObserver(async(e)=>{if(!e[0].isIntersecting||!searchQuery||searchLM)return;searchLM=true;const m=await fetchLong(searchQuery,searchNextToken);searchNextToken=m.next;const lf=document.getElementById('search-long-feed');m.items.filter(v=>!usedLongIds.has(v.id)).forEach(v=>{usedLongIds.add(v.id);lf.insertBefore(makeVC(v),ss);});searchLM=false;},{threshold:0.1}).observe(ss);}
 
-// loadIgQGrid uses real Instagram data via Supabase Edge Function first, falls back to Pixabay/Pexels
+// loadIgQGrid — ONLY real Instagram data from the social-feed edge function. No fallback.
 function openIgQPage(){document.getElementById('ig-q-page').style.display='flex';if(!igQVideos.length)loadIgQGrid();}
 function closeIgQPage(){document.getElementById('ig-q-page').style.display='none';}
 function doIgSearch(){const q=document.getElementById('ig-q-input').value.trim();if(!q)return;usedIgQIds.clear();igQVideos=[];loadIgQGrid(q);}
 async function loadIgQGrid(query){
   if(igQL)return;igQL=true;const grid=document.getElementById('ig-q-grid');
-  if(!igQVideos.length)grid.innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
-  let items=await fetchSocialFeed('ig','search',query||getCatQuery('All'),20);
-  if(!items.length){const data=await fetchShorts('All',query||getCatQuery('All'));items=data.items;}
+  grid.innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';
+  let items=await fetchSocialFeed('ig','search',query||'',20);
   items.filter(v=>!usedIgQIds.has(v.id)).forEach(v=>{usedIgQIds.add(v.id);igQVideos.push(v);});
   grid.innerHTML='';
+  if(!igQVideos.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No Instagram results found</div>';igQL=false;return;}
   igQVideos.forEach((v,i)=>{const d=document.createElement('div');d.className='short-card-3';d.style.background=rc(v.channel);const img=document.createElement('img');img.src=v.thumb;img.loading='eager';img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';img.onerror=()=>{img.style.opacity='0';};const info=document.createElement('div');info.className='short-card-3-info';info.innerHTML=`<div class="short-card-3-views">👁 ${fv(v.views)}</div>`;d.appendChild(img);d.appendChild(info);d.addEventListener('touchend',e=>{e.preventDefault();shortVideos=[...igQVideos];openShortsPage(i);},{passive:false});d.addEventListener('click',()=>{shortVideos=[...igQVideos];openShortsPage(i);});grid.appendChild(d);});
   igQL=false;
 }
@@ -1161,12 +1152,16 @@ async function loadIgQGrid(query){
 async function openTtDiscover(){document.getElementById('tt-discover-page').style.display='flex';if(!ttDL)loadTtDiscover();}
 async function loadTtDiscover(){
   ttDL=true;const body=document.getElementById('tt-disc-body');body.innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
-  const data=await fetchShorts('Dance',getCatQuery('Dance'));
+  const items=await fetchSocialFeed('tt','feed','',20);
   body.innerHTML='';
-  const ts=document.createElement('div');ts.style.padding='14px 0';ts.innerHTML='<div style="font-size:16px;font-weight:900;color:#fff;padding:0 14px 10px;">🔥 Hot Trending</div>';
-  const tsc=document.createElement('div');tsc.style.cssText='display:flex;gap:10px;padding:0 14px;overflow-x:auto;';
-  data.items.slice(0,8).forEach(v=>{const t=document.createElement('div');t.style.cssText='width:90px;flex-shrink:0;cursor:pointer;';t.innerHTML=`<img src="${v.thumb}" style="width:90px;height:120px;object-fit:cover;border-radius:10px;display:block;" loading="eager" onerror="this.style.opacity='0'"><div style="font-size:11px;color:#999;margin-top:5px;line-height:1.3;">${(v.title||'').slice(0,28)}</div>`;t.onclick=()=>{shortVideos=[v,...data.items];openShortsPage(0);};tsc.appendChild(t);});
-  ts.appendChild(tsc);body.appendChild(ts);
+  if(items.length){
+    const ts=document.createElement('div');ts.style.padding='14px 0';ts.innerHTML='<div style="font-size:16px;font-weight:900;color:#fff;padding:0 14px 10px;">🔥 Hot Trending</div>';
+    const tsc=document.createElement('div');tsc.style.cssText='display:flex;gap:10px;padding:0 14px;overflow-x:auto;';
+    items.slice(0,8).forEach(v=>{const t=document.createElement('div');t.style.cssText='width:90px;flex-shrink:0;cursor:pointer;';t.innerHTML=`<img src="${v.thumb}" style="width:90px;height:120px;object-fit:cover;border-radius:10px;display:block;" loading="eager" onerror="this.style.opacity='0'"><div style="font-size:11px;color:#999;margin-top:5px;line-height:1.3;">${(v.title||'').slice(0,28)}</div>`;t.onclick=()=>{shortVideos=[v,...items];openShortsPage(0);};tsc.appendChild(t);});
+    ts.appendChild(tsc);body.appendChild(ts);
+  }else{
+    body.innerHTML='<div class="empty-msg">No TikTok trending data available right now</div>';
+  }
   const hashtags=[{name:'#HotDanceGirl',count:'50M'},{name:'#DanceChallenge',count:'120M'},{name:'#FitnessGirl',count:'40M'},{name:'#BollywoodDance',count:'30M'},{name:'#KpopGirl',count:'60M'}];
   hashtags.forEach(ht=>{const sec=document.createElement('div');sec.style.borderBottom='1px solid #1a1a1a';sec.innerHTML=`<div style="display:flex;align-items:center;padding:13px 14px;cursor:pointer;"><div style="width:42px;height:42px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#fff;margin-right:12px;">#</div><div><div style="font-size:14px;font-weight:800;color:#fff;">${ht.name}</div><div style="font-size:12px;color:#888;margin-top:2px;">${ht.count} videos</div></div><span style="color:#888;font-size:18px;margin-left:auto;">›</span></div>`;body.appendChild(sec);});
   ttDL=false;
@@ -1176,13 +1171,13 @@ async function doTtDiscSearch(){const q=document.getElementById('tt-disc-inp').v
 function openTtSearch(){document.getElementById('tt-search-page').style.display='flex';usedTtSpIds.clear();ttSpVideos=[];document.getElementById('tt-sp-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';loadTtSpGrid();}
 function closeTtSearch(){document.getElementById('tt-search-page').style.display='none';}
 async function doTtSearch(){const q=document.getElementById('tt-sp-inp').value.trim();if(!q)return;usedTtSpIds.clear();ttSpVideos=[];document.getElementById('tt-sp-grid').innerHTML='<div class="loading-dots" style="grid-column:1/-1"><span></span><span></span><span></span></div>';await loadTtSpGrid(q);}
-// loadTtSpGrid uses real TikTok data via Supabase Edge Function first, falls back to Pixabay/Pexels
+// loadTtSpGrid — ONLY real TikTok data from the social-feed edge function. No fallback.
 async function loadTtSpGrid(query){
   if(ttSL)return;ttSL=true;
-  let items=await fetchSocialFeed('tt','search',query||getCatQuery('All'),20);
-  if(!items.length){const data=await fetchShorts('All',query||getCatQuery('All'));items=data.items;}
+  let items=await fetchSocialFeed('tt','search',query||'',20);
   items.filter(v=>!usedTtSpIds.has(v.id)).forEach(v=>{usedTtSpIds.add(v.id);ttSpVideos.push(v);});
   const grid=document.getElementById('tt-sp-grid');grid.innerHTML='';
+  if(!ttSpVideos.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1">No TikTok results found</div>';ttSL=false;return;}
   ttSpVideos.forEach((v,i)=>grid.appendChild(buildShortCard(v,()=>{shortVideos=[...ttSpVideos];openShortsPage(i);})));
   ttSL=false;
 }
@@ -1259,13 +1254,12 @@ function openSPanel(c){document.getElementById('s-panel-count').textContent=`${f
 function closeSPanel(){document.getElementById('s-panel').style.display='none';document.getElementById('s-overlay').style.display='none';}
 function leaveShorts(page){if(shortsObs){try{shortsObs.disconnect();}catch(e){}}shortsObs=null;document.querySelectorAll('.s-video').forEach(v=>{try{v.pause();v.src='';v.load();}catch(e){}});activeShortVid=null;stopBG();document.getElementById('shorts-page').style.display='none';document.getElementById('shorts-botnav').style.display='none';document.getElementById('botnav').style.display='flex';document.getElementById('topnav').style.display='flex';document.getElementById('main').style.display='block';showPage(page);}
 
-// IG Reels — fetches real Instagram data via Supabase Edge Function first, falls back to Pixabay/Pexels
+// IG Reels — ONLY real Instagram data from the social-feed edge function. No Pixabay/Pexels fallback.
 async function loadIgReels(query){
   if(igRL)return;igRL=true;stopAllVids();
   const sc=document.getElementById('ig-scroller');
   sc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:60vh;"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
   let items=await fetchSocialFeed('ig',query?'search':'feed',query,20);
-  if(!items.length){const data=await fetchShorts('All',query||getCatQuery('All'));items=data.items;}
   igVideos=items.filter(v=>!usedIgIds.has(v.id));
   igVideos.forEach(v=>usedIgIds.add(v.id));
   igRL=false;renderIgReels();
@@ -1273,7 +1267,6 @@ async function loadIgReels(query){
     if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!igRL){
       igRL=true;
       let more=await fetchSocialFeed('ig','feed','',10);
-      if(!more.length){const m=await fetchShorts('All',getCatQuery('All'));more=m.items;}
       more.filter(v=>!usedIgIds.has(v.id)).forEach(v=>{usedIgIds.add(v.id);igVideos.push(v);const sl=buildIgSlide(v,igVideos.length-1);sc.appendChild(sl);try{igObs&&igObs.observe(sl);}catch(e){}});
       igRL=false;
     }
@@ -1285,18 +1278,17 @@ const tz=slide.querySelector('.ig-tap-zone');let lt=0;const onTap=e=>{if(e.targe
 function igDP(idx,p){const d1=document.getElementById('igd-'+idx),d2=document.getElementById('igds-'+idx);if(d1)d1.classList.toggle('paused',p);if(d2)d2.classList.toggle('paused',p);}
 async function activateIgSlide(slide,idx){const vid=slide.querySelector('.ig-video');if(!vid)return;activeIgVid=vid;if(vid.preload==='none'){vid.preload='auto';vid.load();}vid.muted=true;vid.play().catch(()=>{});const b=document.getElementById('igpb-'+idx);if(b)b.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';igDP(idx,false);const v=igVideos[idx];if(!v)return;const mood=v.mood||'default';const t=pickTrack(mood);const mt=document.getElementById('igmt-'+idx);if(mt)mt.textContent=t.name;playBG(t.url,()=>{const fb=pickTrack(mood);playBG(fb.url,null,mood);},mood);}
 function igPause(idx){const sc=document.getElementById('ig-scroller');const sl=sc.querySelector('[data-idx="'+idx+'"]');if(!sl)return;const vid=sl.querySelector('.ig-video');const b=document.getElementById('igpb-'+idx);if(vid&&vid.paused){vid.play().catch(()=>{});if(bgAudio&&bgAudio.paused)bgAudio.play().catch(()=>{});if(b)b.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';igDP(idx,false);}else{if(vid)vid.pause();if(bgAudio)bgAudio.pause();if(b)b.innerHTML='<path d="M8 5v14l11-7z"/>';igDP(idx,true);}}
-function renderIgReels(){const sc=document.getElementById('ig-scroller');sc.innerHTML='';if(igObs){try{igObs.disconnect();}catch(e){}}igObs=null;activeIgVid=null;if(!igVideos.length){sc.innerHTML='<div style="color:#fff;text-align:center;padding:40px;margin-top:40vh;">No reels</div>';return;}igVideos.forEach((v,i)=>sc.appendChild(buildIgSlide(v,i)));igObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting||e.intersectionRatio<0.65)return;const slide=e.target;const idx=parseInt(slide.dataset.idx||0);Array.from(sc.querySelectorAll('.ig-slide')).forEach(s=>{if(s!==slide){const ov=s.querySelector('.ig-video');if(ov&&!ov.paused)ov.pause();}});stopBG();activateIgSlide(slide,idx);});},{threshold:0.65});sc.querySelectorAll('.ig-slide').forEach(s=>igObs.observe(s));setTimeout(()=>{const f=sc.querySelector('.ig-slide');if(f)activateIgSlide(f,0);},100);}
+function renderIgReels(){const sc=document.getElementById('ig-scroller');sc.innerHTML='';if(igObs){try{igObs.disconnect();}catch(e){}}igObs=null;activeIgVid=null;if(!igVideos.length){sc.innerHTML='<div style="color:#fff;text-align:center;padding:40px;margin-top:40vh;">No Instagram data available right now<br><span style="font-size:12px;color:#888;">(social-feed function returned nothing)</span></div>';return;}igVideos.forEach((v,i)=>sc.appendChild(buildIgSlide(v,i)));igObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting||e.intersectionRatio<0.65)return;const slide=e.target;const idx=parseInt(slide.dataset.idx||0);Array.from(sc.querySelectorAll('.ig-slide')).forEach(s=>{if(s!==slide){const ov=s.querySelector('.ig-video');if(ov&&!ov.paused)ov.pause();}});stopBG();activateIgSlide(slide,idx);});},{threshold:0.65});sc.querySelectorAll('.ig-slide').forEach(s=>igObs.observe(s));setTimeout(()=>{const f=sc.querySelector('.ig-slide');if(f)activateIgSlide(f,0);},100);}
 function igLike(act,orig){const svg=act?.querySelector('svg');const cnt=act?.querySelector('.ig-act-count');const liked=svg?.getAttribute('fill')==='#ff4444';if(svg){svg.setAttribute('fill',liked?'none':'#ff4444');svg.setAttribute('stroke',liked?'white':'#ff4444');}if(cnt)cnt.textContent=fv(liked?Math.max(0,orig-1):orig+1);toast(liked?'Like removed':'❤️!');}
 function openIgPanel(c){document.getElementById('ig-panel-count').textContent=`${fv(c)} Comments`;document.getElementById('ig-cmt-list').innerHTML=genCmts();document.getElementById('ig-panel').style.display='block';document.getElementById('ig-overlay').style.display='block';}
 function closeIgPanel(){document.getElementById('ig-panel').style.display='none';document.getElementById('ig-overlay').style.display='none';}
 
-// TT Reels — fetches real TikTok data via Supabase Edge Function first, falls back to Pixabay/Pexels
+// TT Reels — ONLY real TikTok data from the social-feed edge function. No Pixabay/Pexels fallback.
 async function loadTtReels(query){
   if(ttRL)return;ttRL=true;stopAllVids();
   const sc=document.getElementById('tt-scroller');
   sc.innerHTML='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
   let items=await fetchSocialFeed('tt',query?'search':'feed',query,20);
-  if(!items.length){const data=await fetchShorts('All',query||getCatQuery('All'));items=data.items;}
   ttVideos=items.filter(v=>!usedTtIds.has(v.id));
   ttVideos.forEach(v=>usedTtIds.add(v.id));
   ttRL=false;renderTtReels();
@@ -1304,7 +1296,6 @@ async function loadTtReels(query){
     if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<600&&!ttRL){
       ttRL=true;
       let more=await fetchSocialFeed('tt','feed','',10);
-      if(!more.length){const m=await fetchShorts('All',getCatQuery('All'));more=m.items;}
       more.filter(v=>!usedTtIds.has(v.id)).forEach(v=>{usedTtIds.add(v.id);ttVideos.push(v);const sl=buildTtSlide(v,ttVideos.length-1);sc.appendChild(sl);try{ttObs&&ttObs.observe(sl);}catch(e){}});
       ttRL=false;
     }
@@ -1316,7 +1307,7 @@ const tz=slide.querySelector('.tt-tap-zone');let lt=0;const onTap=e=>{if(e.targe
 function ttDP(idx,p){const d1=document.getElementById('ttd-'+idx),d2=document.getElementById('ttds-'+idx);if(d1)d1.classList.toggle('paused',p);if(d2)d2.classList.toggle('paused',p);}
 async function activateTtSlide(slide,idx){const vid=slide.querySelector('.tt-video');if(!vid)return;activeTtVid=vid;if(vid.preload==='none'){vid.preload='auto';vid.load();}vid.muted=true;vid.play().catch(()=>{});const b=document.getElementById('ttpb-'+idx);if(b)b.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';ttDP(idx,false);const v=ttVideos[idx];if(!v)return;const mood=v.mood||'default';const t=pickTrack(mood);const mt=document.getElementById('ttmt-'+idx);if(mt)mt.textContent=t.name;playBG(t.url,()=>{const fb=pickTrack(mood);playBG(fb.url,null,mood);},mood);}
 function ttPause(idx){const sc=document.getElementById('tt-scroller');const sl=sc.querySelector('[data-idx="'+idx+'"]');if(!sl)return;const vid=sl.querySelector('.tt-video');const b=document.getElementById('ttpb-'+idx);if(vid&&vid.paused){vid.play().catch(()=>{});if(bgAudio&&bgAudio.paused)bgAudio.play().catch(()=>{});if(b)b.innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';ttDP(idx,false);}else{if(vid)vid.pause();if(bgAudio)bgAudio.pause();if(b)b.innerHTML='<path d="M8 5v14l11-7z"/>';ttDP(idx,true);}}
-function renderTtReels(){const sc=document.getElementById('tt-scroller');sc.innerHTML='';if(ttObs){try{ttObs.disconnect();}catch(e){}}ttObs=null;activeTtVid=null;if(!ttVideos.length){sc.innerHTML='<div style="color:#fff;text-align:center;padding:40px;margin-top:40vh;">No videos</div>';return;}ttVideos.forEach((v,i)=>sc.appendChild(buildTtSlide(v,i)));ttObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting||e.intersectionRatio<0.65)return;const slide=e.target;const idx=parseInt(slide.dataset.idx||0);Array.from(sc.querySelectorAll('.tt-slide')).forEach(s=>{if(s!==slide){const ov=s.querySelector('.tt-video');if(ov&&!ov.paused)ov.pause();}});stopBG();activateTtSlide(slide,idx);});},{threshold:0.65});sc.querySelectorAll('.tt-slide').forEach(s=>ttObs.observe(s));setTimeout(()=>{const f=sc.querySelector('.tt-slide');if(f)activateTtSlide(f,0);},100);}
+function renderTtReels(){const sc=document.getElementById('tt-scroller');sc.innerHTML='';if(ttObs){try{ttObs.disconnect();}catch(e){}}ttObs=null;activeTtVid=null;if(!ttVideos.length){sc.innerHTML='<div style="color:#fff;text-align:center;padding:40px;margin-top:40vh;">No TikTok data available right now<br><span style="font-size:12px;color:#888;">(social-feed function returned nothing)</span></div>';return;}ttVideos.forEach((v,i)=>sc.appendChild(buildTtSlide(v,i)));ttObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(!e.isIntersecting||e.intersectionRatio<0.65)return;const slide=e.target;const idx=parseInt(slide.dataset.idx||0);Array.from(sc.querySelectorAll('.tt-slide')).forEach(s=>{if(s!==slide){const ov=s.querySelector('.tt-video');if(ov&&!ov.paused)ov.pause();}});stopBG();activateTtSlide(slide,idx);});},{threshold:0.65});sc.querySelectorAll('.tt-slide').forEach(s=>ttObs.observe(s));setTimeout(()=>{const f=sc.querySelector('.tt-slide');if(f)activateTtSlide(f,0);},100);}
 function ttLike(act,orig){const svg=act?.querySelector('svg');const cnt=act?.querySelector('.tt-act-count');const liked=svg?.getAttribute('fill')==='#fe2c55';if(svg){svg.setAttribute('fill',liked?'none':'#fe2c55');svg.setAttribute('stroke',liked?'white':'#fe2c55');}if(cnt)cnt.textContent=fv(liked?Math.max(0,orig-1):orig+1);toast(liked?'Like removed':'❤️!');}
 function openTtPanel(c){document.getElementById('tt-panel-count').textContent=`${fv(c)} Comments`;document.getElementById('tt-cmt-list').innerHTML=genCmts();document.getElementById('tt-panel').style.display='block';document.getElementById('tt-overlay').style.display='block';}
 function closeTtPanel(){document.getElementById('tt-panel').style.display='none';document.getElementById('tt-overlay').style.display='none';}
